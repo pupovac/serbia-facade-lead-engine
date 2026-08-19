@@ -1,8 +1,11 @@
 name: CI
 
 on:
+  # Only `main` needs a push trigger. Feature branches are covered by the
+  # pull_request trigger; keeping `branches: ['**']` here made every PR run
+  # the whole matrix twice — once for the push, once for the PR.
   push:
-    branches: ['**']
+    branches: [main]
   pull_request:
 
 concurrency:
