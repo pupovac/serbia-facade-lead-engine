@@ -131,6 +131,10 @@
       },
       "overpass_query": "[out:json][timeout:180];area[\"ISO3166-1\"=\"RS\"][admin_level=2]->.rs;(nwr[\"shop\"=\"doityourself\"](area.rs);nwr[\"shop\"=\"hardware\"](area.rs);nwr[\"shop\"=\"trade\"](area.rs);nwr[\"shop\"=\"paint\"](area.rs);nwr[\"shop\"=\"building_materials\"](area.rs);nwr[\"shop\"=\"building_material\"](area.rs);nwr[\"trade\"=\"building_supplies\"](area.rs););out tags center;",
       "overpass_endpoint": "POST https://overpass-api.de/api/interpreter, body form-field 'data'",
+      "sample_urls": [
+        "https://overpass-api.de/api/interpreter",
+        "https://overpass-turbo.eu/"
+      ],
       "notes": "Honest assessment of Serbian OSM coverage: usable but not good. Only 39% of the 608 elements carry any phone tag, and 81 have no name at all. 'trade=building_supplies' returned zero elements in Serbia, and 'shop=building_material' (singular) is a 3-element typo variant of the 23-element 'shop=building_materials' — neither is the mapping convention here. The bulk sits under shop=hardware (297 elements, 149 with phone), which mixes real gvožđare with locksmiths and tool shops, so classification noise is high. Its real value is not volume: it is the only source giving lat/lon, which makes it the best cross-check for deduping the directory sources geographically, and the shop=hardware slice is where multi-branch chains surface — every chain in the chains section below was discovered from repeated name/brand/operator tags in this dump."
     },
     {
