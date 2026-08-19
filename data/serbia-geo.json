@@ -1,0 +1,5102 @@
+{
+  "_meta": {
+    "description": "Canonical geographic coverage dataset for Serbia (excluding Kosovo and Metohija). Every geographic crawl in this project iterates over this file.",
+    "unit_count": 145,
+    "city_municipality_count": 17,
+    "generated_by": "scripts/build-serbia-geo.py",
+    "sources": [
+      {
+        "name": "Statistical Office of the Republic of Serbia — 2022 Census of Population, Households and Dwellings, data by municipalities and cities (G20234001)",
+        "url": "https://publikacije.stat.gov.rs/G2023/Pdf/G20234001.pdf",
+        "used_for": "population (2022 census), area, settlement count, administrative district"
+      },
+      {
+        "name": "Wikipedia (sr) — Градови и општине Србије",
+        "url": "https://sr.wikipedia.org/wiki/Градови_и_општине_Србије",
+        "used_for": "machine-readable transcription of the RZS 2022 census table"
+      },
+      {
+        "name": "Wikipedia (en) — Municipalities and cities of Serbia",
+        "url": "https://en.wikipedia.org/wiki/Municipalities_and_cities_of_Serbia",
+        "used_for": "independent cross-check of the unit list against the Law on Territorial Organisation of the Republic of Serbia (Sl. glasnik RS 129/2007, 18/2016, 47/2018): 117 municipalities + 28 cities de facto"
+      },
+      {
+        "name": "RATEL numbering plan, via Wikipedia (en) — Telephone numbers in Serbia",
+        "url": "https://en.wikipedia.org/wiki/Telephone_numbers_in_Serbia",
+        "used_for": "landline_prefix and landline_group_center"
+      },
+      {
+        "name": "Pošta Srbije postal code list, via Wikipedia (sr) — Списак поштанских бројева у Србији",
+        "url": "https://sr.wikipedia.org/wiki/Списак_поштанских_бројева_у_Србији",
+        "used_for": "postal_codes of the municipal seat"
+      }
+    ],
+    "authority_note": "The unit list is cross-checked name by name at build time against the English Wikipedia list of municipalities and cities of Serbia, which is sourced from the Law on Territorial Organisation of the Republic of Serbia. The build fails if the two disagree. Both lists agree on all 145 local self-government units.",
+    "kosovo_note": "The 28 municipalities of Kosovo and Metohija are deliberately excluded: they are not administered by Serbian institutions and are out of scope for this project.",
+    "priority_tier_rule": "Computed over the 145 local self-government units by 2022 census population: tier 1 = the 20 most populous, tier 2 = population >= 20,000, tier 3 = the rest. Belgrade city municipalities are tiered separately — the 10 urban-core ones are tier 1, the 7 suburban ones are tier 2.",
+    "population_note": "population is the 2022 census figure for the whole local self-government unit, not just its seat settlement. The Belgrade city municipalities marked population_census_year 2011 had no 2022 figure in the sources above.",
+    "postal_codes_note": "postal_codes lists the code(s) of the municipal seat post office, not every code inside the unit.",
+    "landline_prefix_note": "Serbian landline area codes are shared across a whole RATEL network group, so one prefix maps to many municipalities. landline_group_center marks the municipality a code is named after — use it when a landline number is the only location signal.",
+    "search_variants_note": "Nominative, locative and genitive of the place name, each in both the diacritic and the ASCII-folded spelling. Serbian is inflected — listings say \"fasader u Novom Sadu\", not \"fasader Novi Sad\" — so a geographic query must be built from these variants, not from name_sr alone."
+  },
+  "municipalities": [
+    {
+      "id": "ada",
+      "name_sr": "Ada",
+      "name_ascii": "Ada",
+      "name_cyrillic": "Ада",
+      "search_variants": [
+        "Ada",
+        "Adi",
+        "Ade"
+      ],
+      "search_variants_cyrillic": [
+        "Ада",
+        "Ади",
+        "Аде"
+      ],
+      "type": "municipality",
+      "district": "Severnobanatski okrug",
+      "region": "Vojvodina",
+      "population": 13293,
+      "population_census_year": 2022,
+      "area_km2": 227,
+      "settlement_count": 5,
+      "postal_codes": [
+        "24430"
+      ],
+      "landline_prefix": "024",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "aleksandrovac",
+      "name_sr": "Aleksandrovac",
+      "name_ascii": "Aleksandrovac",
+      "name_cyrillic": "Александровац",
+      "search_variants": [
+        "Aleksandrovac",
+        "Aleksandrovcu",
+        "Aleksandrovca"
+      ],
+      "search_variants_cyrillic": [
+        "Александровац",
+        "Александровцу",
+        "Александровца"
+      ],
+      "type": "municipality",
+      "district": "Rasinski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 22069,
+      "population_census_year": 2022,
+      "area_km2": 387,
+      "settlement_count": 55,
+      "postal_codes": [
+        "37230"
+      ],
+      "landline_prefix": "037",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "aleksinac",
+      "name_sr": "Aleksinac",
+      "name_ascii": "Aleksinac",
+      "name_cyrillic": "Алексинац",
+      "search_variants": [
+        "Aleksinac",
+        "Aleksincu",
+        "Aleksinca"
+      ],
+      "search_variants_cyrillic": [
+        "Алексинац",
+        "Алексинцу",
+        "Алексинца"
+      ],
+      "type": "municipality",
+      "district": "Nišavski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 43098,
+      "population_census_year": 2022,
+      "area_km2": 707,
+      "settlement_count": 72,
+      "postal_codes": [
+        "18220"
+      ],
+      "landline_prefix": "018",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "alibunar",
+      "name_sr": "Alibunar",
+      "name_ascii": "Alibunar",
+      "name_cyrillic": "Алибунар",
+      "search_variants": [
+        "Alibunar",
+        "Alibunaru",
+        "Alibunara"
+      ],
+      "search_variants_cyrillic": [
+        "Алибунар",
+        "Алибунару",
+        "Алибунара"
+      ],
+      "type": "municipality",
+      "district": "Južnobanatski okrug",
+      "region": "Vojvodina",
+      "population": 17139,
+      "population_census_year": 2022,
+      "area_km2": 602,
+      "settlement_count": 10,
+      "postal_codes": [
+        "26310"
+      ],
+      "landline_prefix": "013",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "apatin",
+      "name_sr": "Apatin",
+      "name_ascii": "Apatin",
+      "name_cyrillic": "Апатин",
+      "search_variants": [
+        "Apatin",
+        "Apatinu",
+        "Apatina"
+      ],
+      "search_variants_cyrillic": [
+        "Апатин",
+        "Апатину",
+        "Апатина"
+      ],
+      "type": "municipality",
+      "district": "Zapadnobački okrug",
+      "region": "Vojvodina",
+      "population": 23155,
+      "population_census_year": 2022,
+      "area_km2": 380,
+      "settlement_count": 5,
+      "postal_codes": [
+        "25260"
+      ],
+      "landline_prefix": "025",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "arandjelovac",
+      "name_sr": "Aranđelovac",
+      "name_ascii": "Arandjelovac",
+      "name_cyrillic": "Аранђеловац",
+      "search_variants": [
+        "Aranđelovac",
+        "Arandjelovac",
+        "Aranđelovcu",
+        "Arandjelovcu",
+        "Aranđelovca",
+        "Arandjelovca"
+      ],
+      "search_variants_cyrillic": [
+        "Аранђеловац",
+        "Аранђеловцу",
+        "Аранђеловца"
+      ],
+      "type": "municipality",
+      "district": "Šumadijski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 41297,
+      "population_census_year": 2022,
+      "area_km2": 376,
+      "settlement_count": 19,
+      "postal_codes": [
+        "34300"
+      ],
+      "landline_prefix": "034",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "arilje",
+      "name_sr": "Arilje",
+      "name_ascii": "Arilje",
+      "name_cyrillic": "Ариље",
+      "search_variants": [
+        "Arilje",
+        "Arilju",
+        "Arilja"
+      ],
+      "search_variants_cyrillic": [
+        "Ариље",
+        "Ариљу",
+        "Ариља"
+      ],
+      "type": "municipality",
+      "district": "Zlatiborski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 17063,
+      "population_census_year": 2022,
+      "area_km2": 349,
+      "settlement_count": 22,
+      "postal_codes": [
+        "31230"
+      ],
+      "landline_prefix": "031",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "babusnica",
+      "name_sr": "Babušnica",
+      "name_ascii": "Babusnica",
+      "name_cyrillic": "Бабушница",
+      "search_variants": [
+        "Babušnica",
+        "Babusnica",
+        "Babušnici",
+        "Babusnici",
+        "Babušnice",
+        "Babusnice"
+      ],
+      "search_variants_cyrillic": [
+        "Бабушница",
+        "Бабушници",
+        "Бабушнице"
+      ],
+      "type": "municipality",
+      "district": "Pirotski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 9109,
+      "population_census_year": 2022,
+      "area_km2": 529,
+      "settlement_count": 53,
+      "postal_codes": [
+        "18330"
+      ],
+      "landline_prefix": "010",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "bac",
+      "name_sr": "Bač",
+      "name_ascii": "Bac",
+      "name_cyrillic": "Бач",
+      "search_variants": [
+        "Bač",
+        "Bac",
+        "Baču",
+        "Bacu",
+        "Bača",
+        "Baca"
+      ],
+      "search_variants_cyrillic": [
+        "Бач",
+        "Бачу",
+        "Бача"
+      ],
+      "type": "municipality",
+      "district": "Južnobački okrug",
+      "region": "Vojvodina",
+      "population": 11431,
+      "population_census_year": 2022,
+      "area_km2": 367,
+      "settlement_count": 6,
+      "postal_codes": [
+        "21420"
+      ],
+      "landline_prefix": "021",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "backa-palanka",
+      "name_sr": "Bačka Palanka",
+      "name_ascii": "Backa Palanka",
+      "name_cyrillic": "Бачка Паланка",
+      "search_variants": [
+        "Bačka Palanka",
+        "Backa Palanka",
+        "Bačkoj Palanci",
+        "Backoj Palanci",
+        "Bačke Palanke",
+        "Backe Palanke"
+      ],
+      "search_variants_cyrillic": [
+        "Бачка Паланка",
+        "Бачкој Паланци",
+        "Бачке Паланке"
+      ],
+      "type": "municipality",
+      "district": "Južnobački okrug",
+      "region": "Vojvodina",
+      "population": 48265,
+      "population_census_year": 2022,
+      "area_km2": 590,
+      "settlement_count": 14,
+      "postal_codes": [
+        "21400"
+      ],
+      "landline_prefix": "021",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "backa-topola",
+      "name_sr": "Bačka Topola",
+      "name_ascii": "Backa Topola",
+      "name_cyrillic": "Бачка Топола",
+      "search_variants": [
+        "Bačka Topola",
+        "Backa Topola",
+        "Bačkoj Topoli",
+        "Backoj Topoli",
+        "Bačke Topole",
+        "Backe Topole"
+      ],
+      "search_variants_cyrillic": [
+        "Бачка Топола",
+        "Бачкој Тополи",
+        "Бачке Тополе"
+      ],
+      "type": "municipality",
+      "district": "Severnobački okrug",
+      "region": "Vojvodina",
+      "population": 26228,
+      "population_census_year": 2022,
+      "area_km2": 596,
+      "settlement_count": 23,
+      "postal_codes": [
+        "24300"
+      ],
+      "landline_prefix": "024",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "backi-petrovac",
+      "name_sr": "Bački Petrovac",
+      "name_ascii": "Backi Petrovac",
+      "name_cyrillic": "Бачки Петровац",
+      "search_variants": [
+        "Bački Petrovac",
+        "Backi Petrovac",
+        "Bačkom Petrovcu",
+        "Backom Petrovcu",
+        "Bačkog Petrovca",
+        "Backog Petrovca"
+      ],
+      "search_variants_cyrillic": [
+        "Бачки Петровац",
+        "Бачком Петровцу",
+        "Бачког Петровца"
+      ],
+      "type": "municipality",
+      "district": "Južnobački okrug",
+      "region": "Vojvodina",
+      "population": 11512,
+      "population_census_year": 2022,
+      "area_km2": 158,
+      "settlement_count": 4,
+      "postal_codes": [
+        "21470"
+      ],
+      "landline_prefix": "021",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "bajina-basta",
+      "name_sr": "Bajina Bašta",
+      "name_ascii": "Bajina Basta",
+      "name_cyrillic": "Бајина Башта",
+      "search_variants": [
+        "Bajina Bašta",
+        "Bajina Basta",
+        "Bajinoj Bašti",
+        "Bajinoj Basti",
+        "Bajine Bašte",
+        "Bajine Baste"
+      ],
+      "search_variants_cyrillic": [
+        "Бајина Башта",
+        "Бајиној Башти",
+        "Бајине Баште"
+      ],
+      "type": "municipality",
+      "district": "Zlatiborski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 23533,
+      "population_census_year": 2022,
+      "area_km2": 673,
+      "settlement_count": 36,
+      "postal_codes": [
+        "31250"
+      ],
+      "landline_prefix": "031",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "batocina",
+      "name_sr": "Batočina",
+      "name_ascii": "Batocina",
+      "name_cyrillic": "Баточина",
+      "search_variants": [
+        "Batočina",
+        "Batocina",
+        "Batočini",
+        "Batocini",
+        "Batočine",
+        "Batocine"
+      ],
+      "search_variants_cyrillic": [
+        "Баточина",
+        "Баточини",
+        "Баточине"
+      ],
+      "type": "municipality",
+      "district": "Šumadijski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 10162,
+      "population_census_year": 2022,
+      "area_km2": 136,
+      "settlement_count": 11,
+      "postal_codes": [
+        "34227"
+      ],
+      "landline_prefix": "034",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "becej",
+      "name_sr": "Bečej",
+      "name_ascii": "Becej",
+      "name_cyrillic": "Бечеј",
+      "search_variants": [
+        "Bečej",
+        "Becej",
+        "Bečeju",
+        "Beceju",
+        "Bečeja",
+        "Beceja"
+      ],
+      "search_variants_cyrillic": [
+        "Бечеј",
+        "Бечеју",
+        "Бечеја"
+      ],
+      "type": "municipality",
+      "district": "Južnobački okrug",
+      "region": "Vojvodina",
+      "population": 30681,
+      "population_census_year": 2022,
+      "area_km2": 486,
+      "settlement_count": 5,
+      "postal_codes": [
+        "21220"
+      ],
+      "landline_prefix": "021",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "bela-crkva",
+      "name_sr": "Bela Crkva",
+      "name_ascii": "Bela Crkva",
+      "name_cyrillic": "Бела Црква",
+      "search_variants": [
+        "Bela Crkva",
+        "Beloj Crkvi",
+        "Bele Crkve"
+      ],
+      "search_variants_cyrillic": [
+        "Бела Црква",
+        "Белој Цркви",
+        "Беле Цркве"
+      ],
+      "type": "municipality",
+      "district": "Južnobanatski okrug",
+      "region": "Vojvodina",
+      "population": 14451,
+      "population_census_year": 2022,
+      "area_km2": 353,
+      "settlement_count": 14,
+      "postal_codes": [
+        "26340"
+      ],
+      "landline_prefix": "013",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "bela-palanka",
+      "name_sr": "Bela Palanka",
+      "name_ascii": "Bela Palanka",
+      "name_cyrillic": "Бела Паланка",
+      "search_variants": [
+        "Bela Palanka",
+        "Beloj Palanci",
+        "Bele Palanke"
+      ],
+      "search_variants_cyrillic": [
+        "Бела Паланка",
+        "Белој Паланци",
+        "Беле Паланке"
+      ],
+      "type": "municipality",
+      "district": "Pirotski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 9947,
+      "population_census_year": 2022,
+      "area_km2": 517,
+      "settlement_count": 49,
+      "postal_codes": [
+        "18310"
+      ],
+      "landline_prefix": "018",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "beocin",
+      "name_sr": "Beočin",
+      "name_ascii": "Beocin",
+      "name_cyrillic": "Беочин",
+      "search_variants": [
+        "Beočin",
+        "Beocin",
+        "Beočinu",
+        "Beocinu",
+        "Beočina",
+        "Beocina"
+      ],
+      "search_variants_cyrillic": [
+        "Беочин",
+        "Беочину",
+        "Беочина"
+      ],
+      "type": "municipality",
+      "district": "Južnobački okrug",
+      "region": "Vojvodina",
+      "population": 13875,
+      "population_census_year": 2022,
+      "area_km2": 184,
+      "settlement_count": 8,
+      "postal_codes": [
+        "21300"
+      ],
+      "landline_prefix": "021",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "beograd",
+      "name_sr": "Beograd",
+      "name_ascii": "Beograd",
+      "name_cyrillic": "Београд",
+      "search_variants": [
+        "Beograd",
+        "Beogradu",
+        "Beograda"
+      ],
+      "search_variants_cyrillic": [
+        "Београд",
+        "Београду",
+        "Београда"
+      ],
+      "type": "city",
+      "district": "Grad Beograd",
+      "region": "Beogradski region",
+      "population": 1681405,
+      "population_census_year": 2022,
+      "area_km2": 3235,
+      "settlement_count": null,
+      "postal_codes": [
+        "11000"
+      ],
+      "landline_prefix": "011",
+      "landline_group_center": true,
+      "priority_tier": 1,
+      "parent_id": null
+    },
+    {
+      "id": "blace",
+      "name_sr": "Blace",
+      "name_ascii": "Blace",
+      "name_cyrillic": "Блаце",
+      "search_variants": [
+        "Blace",
+        "Blacu",
+        "Blaca"
+      ],
+      "search_variants_cyrillic": [
+        "Блаце",
+        "Блацу",
+        "Блаца"
+      ],
+      "type": "municipality",
+      "district": "Toplički okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 9682,
+      "population_census_year": 2022,
+      "area_km2": 306,
+      "settlement_count": 40,
+      "postal_codes": [
+        "18420"
+      ],
+      "landline_prefix": "027",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "bogatic",
+      "name_sr": "Bogatić",
+      "name_ascii": "Bogatic",
+      "name_cyrillic": "Богатић",
+      "search_variants": [
+        "Bogatić",
+        "Bogatic",
+        "Bogatiću",
+        "Bogaticu",
+        "Bogatića",
+        "Bogatica"
+      ],
+      "search_variants_cyrillic": [
+        "Богатић",
+        "Богатићу",
+        "Богатића"
+      ],
+      "type": "municipality",
+      "district": "Mačvanski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 24522,
+      "population_census_year": 2022,
+      "area_km2": 384,
+      "settlement_count": 14,
+      "postal_codes": [
+        "15350"
+      ],
+      "landline_prefix": "015",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "bojnik",
+      "name_sr": "Bojnik",
+      "name_ascii": "Bojnik",
+      "name_cyrillic": "Бојник",
+      "search_variants": [
+        "Bojnik",
+        "Bojniku",
+        "Bojnika"
+      ],
+      "search_variants_cyrillic": [
+        "Бојник",
+        "Бојнику",
+        "Бојника"
+      ],
+      "type": "municipality",
+      "district": "Jablanički okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 9315,
+      "population_census_year": 2022,
+      "area_km2": 264,
+      "settlement_count": 36,
+      "postal_codes": [
+        "16205"
+      ],
+      "landline_prefix": "016",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "boljevac",
+      "name_sr": "Boljevac",
+      "name_ascii": "Boljevac",
+      "name_cyrillic": "Бољевац",
+      "search_variants": [
+        "Boljevac",
+        "Boljevcu",
+        "Boljevca"
+      ],
+      "search_variants_cyrillic": [
+        "Бољевац",
+        "Бољевцу",
+        "Бољевца"
+      ],
+      "type": "municipality",
+      "district": "Zaječarski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 10184,
+      "population_census_year": 2022,
+      "area_km2": 828,
+      "settlement_count": 20,
+      "postal_codes": [
+        "19370"
+      ],
+      "landline_prefix": "030",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "bor",
+      "name_sr": "Bor",
+      "name_ascii": "Bor",
+      "name_cyrillic": "Бор",
+      "search_variants": [
+        "Bor",
+        "Boru",
+        "Bora"
+      ],
+      "search_variants_cyrillic": [
+        "Бор",
+        "Бору",
+        "Бора"
+      ],
+      "type": "city",
+      "district": "Borski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 40845,
+      "population_census_year": 2022,
+      "area_km2": 856,
+      "settlement_count": 14,
+      "postal_codes": [
+        "19210"
+      ],
+      "landline_prefix": "030",
+      "landline_group_center": true,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "bosilegrad",
+      "name_sr": "Bosilegrad",
+      "name_ascii": "Bosilegrad",
+      "name_cyrillic": "Босилеград",
+      "search_variants": [
+        "Bosilegrad",
+        "Bosilegradu",
+        "Bosilegrada"
+      ],
+      "search_variants_cyrillic": [
+        "Босилеград",
+        "Босилеграду",
+        "Босилеграда"
+      ],
+      "type": "municipality",
+      "district": "Pčinjski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 6065,
+      "population_census_year": 2022,
+      "area_km2": 571,
+      "settlement_count": 37,
+      "postal_codes": [
+        "17540"
+      ],
+      "landline_prefix": "017",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "brus",
+      "name_sr": "Brus",
+      "name_ascii": "Brus",
+      "name_cyrillic": "Брус",
+      "search_variants": [
+        "Brus",
+        "Brusu",
+        "Brusa"
+      ],
+      "search_variants_cyrillic": [
+        "Брус",
+        "Брусу",
+        "Бруса"
+      ],
+      "type": "municipality",
+      "district": "Rasinski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 13594,
+      "population_census_year": 2022,
+      "area_km2": 606,
+      "settlement_count": 58,
+      "postal_codes": [
+        "37220"
+      ],
+      "landline_prefix": "037",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "bujanovac",
+      "name_sr": "Bujanovac",
+      "name_ascii": "Bujanovac",
+      "name_cyrillic": "Бујановац",
+      "search_variants": [
+        "Bujanovac",
+        "Bujanovcu",
+        "Bujanovca"
+      ],
+      "search_variants_cyrillic": [
+        "Бујановац",
+        "Бујановцу",
+        "Бујановца"
+      ],
+      "type": "municipality",
+      "district": "Pčinjski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 41068,
+      "population_census_year": 2022,
+      "area_km2": 461,
+      "settlement_count": 59,
+      "postal_codes": [
+        "17520"
+      ],
+      "landline_prefix": "017",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "cacak",
+      "name_sr": "Čačak",
+      "name_ascii": "Cacak",
+      "name_cyrillic": "Чачак",
+      "search_variants": [
+        "Čačak",
+        "Cacak",
+        "Čačku",
+        "Cacku",
+        "Čačka",
+        "Cacka"
+      ],
+      "search_variants_cyrillic": [
+        "Чачак",
+        "Чачку",
+        "Чачка"
+      ],
+      "type": "city",
+      "district": "Moravički okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 105612,
+      "population_census_year": 2022,
+      "area_km2": 636,
+      "settlement_count": 58,
+      "postal_codes": [
+        "32000"
+      ],
+      "landline_prefix": "032",
+      "landline_group_center": true,
+      "priority_tier": 1,
+      "parent_id": null
+    },
+    {
+      "id": "cajetina",
+      "name_sr": "Čajetina",
+      "name_ascii": "Cajetina",
+      "name_cyrillic": "Чајетина",
+      "search_variants": [
+        "Čajetina",
+        "Cajetina",
+        "Čajetini",
+        "Cajetini",
+        "Čajetine",
+        "Cajetine"
+      ],
+      "search_variants_cyrillic": [
+        "Чајетина",
+        "Чајетини",
+        "Чајетине"
+      ],
+      "type": "municipality",
+      "district": "Zlatiborski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 14585,
+      "population_census_year": 2022,
+      "area_km2": 647,
+      "settlement_count": 24,
+      "postal_codes": [
+        "31310"
+      ],
+      "landline_prefix": "031",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "cicevac",
+      "name_sr": "Ćićevac",
+      "name_ascii": "Cicevac",
+      "name_cyrillic": "Ћићевац",
+      "search_variants": [
+        "Ćićevac",
+        "Cicevac",
+        "Ćićevcu",
+        "Cicevcu",
+        "Ćićevca",
+        "Cicevca"
+      ],
+      "search_variants_cyrillic": [
+        "Ћићевац",
+        "Ћићевцу",
+        "Ћићевца"
+      ],
+      "type": "municipality",
+      "district": "Rasinski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 7860,
+      "population_census_year": 2022,
+      "area_km2": 124,
+      "settlement_count": 10,
+      "postal_codes": [
+        "37210"
+      ],
+      "landline_prefix": "037",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "coka",
+      "name_sr": "Čoka",
+      "name_ascii": "Coka",
+      "name_cyrillic": "Чока",
+      "search_variants": [
+        "Čoka",
+        "Coka",
+        "Čoki",
+        "Coki",
+        "Čoke",
+        "Coke"
+      ],
+      "search_variants_cyrillic": [
+        "Чока",
+        "Чоки",
+        "Чоке"
+      ],
+      "type": "municipality",
+      "district": "Severnobanatski okrug",
+      "region": "Vojvodina",
+      "population": 8556,
+      "population_census_year": 2022,
+      "area_km2": 321,
+      "settlement_count": 8,
+      "postal_codes": [
+        "23320"
+      ],
+      "landline_prefix": "0230",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "crna-trava",
+      "name_sr": "Crna Trava",
+      "name_ascii": "Crna Trava",
+      "name_cyrillic": "Црна Трава",
+      "search_variants": [
+        "Crna Trava",
+        "Crnoj Travi",
+        "Crne Trave"
+      ],
+      "search_variants_cyrillic": [
+        "Црна Трава",
+        "Црној Трави",
+        "Црне Траве"
+      ],
+      "type": "municipality",
+      "district": "Jablanički okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 1063,
+      "population_census_year": 2022,
+      "area_km2": 312,
+      "settlement_count": 25,
+      "postal_codes": [
+        "16215"
+      ],
+      "landline_prefix": "016",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "cuprija",
+      "name_sr": "Ćuprija",
+      "name_ascii": "Cuprija",
+      "name_cyrillic": "Ћуприја",
+      "search_variants": [
+        "Ćuprija",
+        "Cuprija",
+        "Ćupriji",
+        "Cupriji",
+        "Ćuprije",
+        "Cuprije"
+      ],
+      "search_variants_cyrillic": [
+        "Ћуприја",
+        "Ћуприји",
+        "Ћуприје"
+      ],
+      "type": "municipality",
+      "district": "Pomoravski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 25325,
+      "population_census_year": 2022,
+      "area_km2": 287,
+      "settlement_count": 16,
+      "postal_codes": [
+        "35230"
+      ],
+      "landline_prefix": "035",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "despotovac",
+      "name_sr": "Despotovac",
+      "name_ascii": "Despotovac",
+      "name_cyrillic": "Деспотовац",
+      "search_variants": [
+        "Despotovac",
+        "Despotovcu",
+        "Despotovca"
+      ],
+      "search_variants_cyrillic": [
+        "Деспотовац",
+        "Деспотовцу",
+        "Деспотовца"
+      ],
+      "type": "municipality",
+      "district": "Pomoravski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 18278,
+      "population_census_year": 2022,
+      "area_km2": 623,
+      "settlement_count": 33,
+      "postal_codes": [
+        "35213"
+      ],
+      "landline_prefix": "035",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "dimitrovgrad",
+      "name_sr": "Dimitrovgrad",
+      "name_ascii": "Dimitrovgrad",
+      "name_cyrillic": "Димитровград",
+      "search_variants": [
+        "Dimitrovgrad",
+        "Dimitrovgradu",
+        "Dimitrovgrada"
+      ],
+      "search_variants_cyrillic": [
+        "Димитровград",
+        "Димитровграду",
+        "Димитровграда"
+      ],
+      "type": "municipality",
+      "district": "Pirotski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 8043,
+      "population_census_year": 2022,
+      "area_km2": 483,
+      "settlement_count": 43,
+      "postal_codes": [
+        "18320"
+      ],
+      "landline_prefix": "010",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "doljevac",
+      "name_sr": "Doljevac",
+      "name_ascii": "Doljevac",
+      "name_cyrillic": "Дољевац",
+      "search_variants": [
+        "Doljevac",
+        "Doljevcu",
+        "Doljevca"
+      ],
+      "search_variants_cyrillic": [
+        "Дољевац",
+        "Дољевцу",
+        "Дољевца"
+      ],
+      "type": "municipality",
+      "district": "Nišavski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 15837,
+      "population_census_year": 2022,
+      "area_km2": 121,
+      "settlement_count": 16,
+      "postal_codes": [
+        "18410"
+      ],
+      "landline_prefix": "018",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "gadzin-han",
+      "name_sr": "Gadžin Han",
+      "name_ascii": "Gadzin Han",
+      "name_cyrillic": "Гаџин Хан",
+      "search_variants": [
+        "Gadžin Han",
+        "Gadzin Han",
+        "Gadžinom Hanu",
+        "Gadzinom Hanu",
+        "Gadžinog Hana",
+        "Gadzinog Hana"
+      ],
+      "search_variants_cyrillic": [
+        "Гаџин Хан",
+        "Гаџином Хану",
+        "Гаџиног Хана"
+      ],
+      "type": "municipality",
+      "district": "Nišavski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 5850,
+      "population_census_year": 2022,
+      "area_km2": 325,
+      "settlement_count": 34,
+      "postal_codes": [
+        "18240"
+      ],
+      "landline_prefix": "018",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "golubac",
+      "name_sr": "Golubac",
+      "name_ascii": "Golubac",
+      "name_cyrillic": "Голубац",
+      "search_variants": [
+        "Golubac",
+        "Golupcu",
+        "Golupca"
+      ],
+      "search_variants_cyrillic": [
+        "Голубац",
+        "Голупцу",
+        "Голупца"
+      ],
+      "type": "municipality",
+      "district": "Braničevski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 6599,
+      "population_census_year": 2022,
+      "area_km2": 367,
+      "settlement_count": 24,
+      "postal_codes": [
+        "12223"
+      ],
+      "landline_prefix": "012",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "gornji-milanovac",
+      "name_sr": "Gornji Milanovac",
+      "name_ascii": "Gornji Milanovac",
+      "name_cyrillic": "Горњи Милановац",
+      "search_variants": [
+        "Gornji Milanovac",
+        "Gornjem Milanovcu",
+        "Gornjeg Milanovca"
+      ],
+      "search_variants_cyrillic": [
+        "Горњи Милановац",
+        "Горњем Милановцу",
+        "Горњег Милановца"
+      ],
+      "type": "municipality",
+      "district": "Moravički okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 38985,
+      "population_census_year": 2022,
+      "area_km2": 836,
+      "settlement_count": 63,
+      "postal_codes": [
+        "32300"
+      ],
+      "landline_prefix": "032",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "indjija",
+      "name_sr": "Inđija",
+      "name_ascii": "Indjija",
+      "name_cyrillic": "Инђија",
+      "search_variants": [
+        "Inđija",
+        "Indjija",
+        "Inđiji",
+        "Indjiji",
+        "Inđije",
+        "Indjije"
+      ],
+      "search_variants_cyrillic": [
+        "Инђија",
+        "Инђији",
+        "Инђије"
+      ],
+      "type": "municipality",
+      "district": "Sremski okrug",
+      "region": "Vojvodina",
+      "population": 43443,
+      "population_census_year": 2022,
+      "area_km2": 385,
+      "settlement_count": 11,
+      "postal_codes": [
+        "22320"
+      ],
+      "landline_prefix": "022",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "irig",
+      "name_sr": "Irig",
+      "name_ascii": "Irig",
+      "name_cyrillic": "Ириг",
+      "search_variants": [
+        "Irig",
+        "Irigu",
+        "Iriga"
+      ],
+      "search_variants_cyrillic": [
+        "Ириг",
+        "Иригу",
+        "Ирига"
+      ],
+      "type": "municipality",
+      "district": "Sremski okrug",
+      "region": "Vojvodina",
+      "population": 9290,
+      "population_census_year": 2022,
+      "area_km2": 230,
+      "settlement_count": 12,
+      "postal_codes": [
+        "22406"
+      ],
+      "landline_prefix": "022",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "ivanjica",
+      "name_sr": "Ivanjica",
+      "name_ascii": "Ivanjica",
+      "name_cyrillic": "Ивањица",
+      "search_variants": [
+        "Ivanjica",
+        "Ivanjici",
+        "Ivanjice"
+      ],
+      "search_variants_cyrillic": [
+        "Ивањица",
+        "Ивањици",
+        "Ивањице"
+      ],
+      "type": "municipality",
+      "district": "Moravički okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 27751,
+      "population_census_year": 2022,
+      "area_km2": 1090,
+      "settlement_count": 49,
+      "postal_codes": [
+        "32250"
+      ],
+      "landline_prefix": "032",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "jagodina",
+      "name_sr": "Jagodina",
+      "name_ascii": "Jagodina",
+      "name_cyrillic": "Јагодина",
+      "search_variants": [
+        "Jagodina",
+        "Jagodini",
+        "Jagodine"
+      ],
+      "search_variants_cyrillic": [
+        "Јагодина",
+        "Јагодини",
+        "Јагодине"
+      ],
+      "type": "city",
+      "district": "Pomoravski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 64644,
+      "population_census_year": 2022,
+      "area_km2": 470,
+      "settlement_count": 53,
+      "postal_codes": [
+        "35000"
+      ],
+      "landline_prefix": "035",
+      "landline_group_center": true,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "kanjiza",
+      "name_sr": "Kanjiža",
+      "name_ascii": "Kanjiza",
+      "name_cyrillic": "Кањижа",
+      "search_variants": [
+        "Kanjiža",
+        "Kanjiza",
+        "Kanjiži",
+        "Kanjizi",
+        "Kanjiže",
+        "Kanjize"
+      ],
+      "search_variants_cyrillic": [
+        "Кањижа",
+        "Кањижи",
+        "Кањиже"
+      ],
+      "type": "municipality",
+      "district": "Severnobanatski okrug",
+      "region": "Vojvodina",
+      "population": 20141,
+      "population_census_year": 2022,
+      "area_km2": 399,
+      "settlement_count": 13,
+      "postal_codes": [
+        "24420"
+      ],
+      "landline_prefix": "024",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "kikinda",
+      "name_sr": "Kikinda",
+      "name_ascii": "Kikinda",
+      "name_cyrillic": "Кикинда",
+      "search_variants": [
+        "Kikinda",
+        "Kikindi",
+        "Kikinde"
+      ],
+      "search_variants_cyrillic": [
+        "Кикинда",
+        "Кикинди",
+        "Кикинде"
+      ],
+      "type": "city",
+      "district": "Severnobanatski okrug",
+      "region": "Vojvodina",
+      "population": 49326,
+      "population_census_year": 2022,
+      "area_km2": 782,
+      "settlement_count": 10,
+      "postal_codes": [
+        "23300"
+      ],
+      "landline_prefix": "0230",
+      "landline_group_center": true,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "kladovo",
+      "name_sr": "Kladovo",
+      "name_ascii": "Kladovo",
+      "name_cyrillic": "Кладово",
+      "search_variants": [
+        "Kladovo",
+        "Kladovu",
+        "Kladova"
+      ],
+      "search_variants_cyrillic": [
+        "Кладово",
+        "Кладову",
+        "Кладова"
+      ],
+      "type": "municipality",
+      "district": "Borski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 17435,
+      "population_census_year": 2022,
+      "area_km2": 629,
+      "settlement_count": 23,
+      "postal_codes": [
+        "19320"
+      ],
+      "landline_prefix": "019",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "knic",
+      "name_sr": "Knić",
+      "name_ascii": "Knic",
+      "name_cyrillic": "Кнић",
+      "search_variants": [
+        "Knić",
+        "Knic",
+        "Kniću",
+        "Knicu",
+        "Knića",
+        "Knica"
+      ],
+      "search_variants_cyrillic": [
+        "Кнић",
+        "Книћу",
+        "Кнића"
+      ],
+      "type": "municipality",
+      "district": "Šumadijski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 11729,
+      "population_census_year": 2022,
+      "area_km2": 413,
+      "settlement_count": 36,
+      "postal_codes": [
+        "34240"
+      ],
+      "landline_prefix": "034",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "knjazevac",
+      "name_sr": "Knjaževac",
+      "name_ascii": "Knjazevac",
+      "name_cyrillic": "Књажевац",
+      "search_variants": [
+        "Knjaževac",
+        "Knjazevac",
+        "Knjaževcu",
+        "Knjazevcu",
+        "Knjaževca",
+        "Knjazevca"
+      ],
+      "search_variants_cyrillic": [
+        "Књажевац",
+        "Књажевцу",
+        "Књажевца"
+      ],
+      "type": "municipality",
+      "district": "Zaječarski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 25341,
+      "population_census_year": 2022,
+      "area_km2": 1202,
+      "settlement_count": 86,
+      "postal_codes": [
+        "19350"
+      ],
+      "landline_prefix": "019",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "koceljeva",
+      "name_sr": "Koceljeva",
+      "name_ascii": "Koceljeva",
+      "name_cyrillic": "Коцељева",
+      "search_variants": [
+        "Koceljeva",
+        "Koceljevi",
+        "Koceljeve"
+      ],
+      "search_variants_cyrillic": [
+        "Коцељева",
+        "Коцељеви",
+        "Коцељеве"
+      ],
+      "type": "municipality",
+      "district": "Mačvanski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 11148,
+      "population_census_year": 2022,
+      "area_km2": 257,
+      "settlement_count": 17,
+      "postal_codes": [
+        "15220"
+      ],
+      "landline_prefix": "015",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "kosjeric",
+      "name_sr": "Kosjerić",
+      "name_ascii": "Kosjeric",
+      "name_cyrillic": "Косјерић",
+      "search_variants": [
+        "Kosjerić",
+        "Kosjeric",
+        "Kosjeriću",
+        "Kosjericu",
+        "Kosjerića",
+        "Kosjerica"
+      ],
+      "search_variants_cyrillic": [
+        "Косјерић",
+        "Косјерићу",
+        "Косјерића"
+      ],
+      "type": "municipality",
+      "district": "Zlatiborski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 10175,
+      "population_census_year": 2022,
+      "area_km2": 358,
+      "settlement_count": 27,
+      "postal_codes": [
+        "31260"
+      ],
+      "landline_prefix": "031",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "kovacica",
+      "name_sr": "Kovačica",
+      "name_ascii": "Kovacica",
+      "name_cyrillic": "Ковачица",
+      "search_variants": [
+        "Kovačica",
+        "Kovacica",
+        "Kovačici",
+        "Kovacici",
+        "Kovačice",
+        "Kovacice"
+      ],
+      "search_variants_cyrillic": [
+        "Ковачица",
+        "Ковачици",
+        "Ковачице"
+      ],
+      "type": "municipality",
+      "district": "Južnobanatski okrug",
+      "region": "Vojvodina",
+      "population": 21178,
+      "population_census_year": 2022,
+      "area_km2": 419,
+      "settlement_count": 8,
+      "postal_codes": [
+        "26210"
+      ],
+      "landline_prefix": "013",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "kovin",
+      "name_sr": "Kovin",
+      "name_ascii": "Kovin",
+      "name_cyrillic": "Ковин",
+      "search_variants": [
+        "Kovin",
+        "Kovinu",
+        "Kovina"
+      ],
+      "search_variants_cyrillic": [
+        "Ковин",
+        "Ковину",
+        "Ковина"
+      ],
+      "type": "municipality",
+      "district": "Južnobanatski okrug",
+      "region": "Vojvodina",
+      "population": 28141,
+      "population_census_year": 2022,
+      "area_km2": 730,
+      "settlement_count": 10,
+      "postal_codes": [
+        "26220"
+      ],
+      "landline_prefix": "013",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "kragujevac",
+      "name_sr": "Kragujevac",
+      "name_ascii": "Kragujevac",
+      "name_cyrillic": "Крагујевац",
+      "search_variants": [
+        "Kragujevac",
+        "Kragujevcu",
+        "Kragujevca"
+      ],
+      "search_variants_cyrillic": [
+        "Крагујевац",
+        "Крагујевцу",
+        "Крагујевца"
+      ],
+      "type": "city",
+      "district": "Šumadijski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 171186,
+      "population_census_year": 2022,
+      "area_km2": 835,
+      "settlement_count": 57,
+      "postal_codes": [
+        "34000"
+      ],
+      "landline_prefix": "034",
+      "landline_group_center": true,
+      "priority_tier": 1,
+      "parent_id": null
+    },
+    {
+      "id": "kraljevo",
+      "name_sr": "Kraljevo",
+      "name_ascii": "Kraljevo",
+      "name_cyrillic": "Краљево",
+      "search_variants": [
+        "Kraljevo",
+        "Kraljevu",
+        "Kraljeva"
+      ],
+      "search_variants_cyrillic": [
+        "Краљево",
+        "Краљеву",
+        "Краљева"
+      ],
+      "type": "city",
+      "district": "Raški okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 110196,
+      "population_census_year": 2022,
+      "area_km2": 1530,
+      "settlement_count": 92,
+      "postal_codes": [
+        "36000"
+      ],
+      "landline_prefix": "036",
+      "landline_group_center": true,
+      "priority_tier": 1,
+      "parent_id": null
+    },
+    {
+      "id": "krupanj",
+      "name_sr": "Krupanj",
+      "name_ascii": "Krupanj",
+      "name_cyrillic": "Крупањ",
+      "search_variants": [
+        "Krupanj",
+        "Krupnju",
+        "Krupnja"
+      ],
+      "search_variants_cyrillic": [
+        "Крупањ",
+        "Крупњу",
+        "Крупња"
+      ],
+      "type": "municipality",
+      "district": "Mačvanski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 14399,
+      "population_census_year": 2022,
+      "area_km2": 342,
+      "settlement_count": 23,
+      "postal_codes": [
+        "15314"
+      ],
+      "landline_prefix": "015",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "krusevac",
+      "name_sr": "Kruševac",
+      "name_ascii": "Krusevac",
+      "name_cyrillic": "Крушевац",
+      "search_variants": [
+        "Kruševac",
+        "Krusevac",
+        "Kruševcu",
+        "Krusevcu",
+        "Kruševca",
+        "Krusevca"
+      ],
+      "search_variants_cyrillic": [
+        "Крушевац",
+        "Крушевцу",
+        "Крушевца"
+      ],
+      "type": "city",
+      "district": "Rasinski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 113582,
+      "population_census_year": 2022,
+      "area_km2": 854,
+      "settlement_count": 101,
+      "postal_codes": [
+        "37000"
+      ],
+      "landline_prefix": "037",
+      "landline_group_center": true,
+      "priority_tier": 1,
+      "parent_id": null
+    },
+    {
+      "id": "kucevo",
+      "name_sr": "Kučevo",
+      "name_ascii": "Kucevo",
+      "name_cyrillic": "Кучево",
+      "search_variants": [
+        "Kučevo",
+        "Kucevo",
+        "Kučevu",
+        "Kucevu",
+        "Kučeva",
+        "Kuceva"
+      ],
+      "search_variants_cyrillic": [
+        "Кучево",
+        "Кучеву",
+        "Кучева"
+      ],
+      "type": "municipality",
+      "district": "Braničevski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 11806,
+      "population_census_year": 2022,
+      "area_km2": 721,
+      "settlement_count": 26,
+      "postal_codes": [
+        "12240"
+      ],
+      "landline_prefix": "012",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "kula",
+      "name_sr": "Kula",
+      "name_ascii": "Kula",
+      "name_cyrillic": "Кула",
+      "search_variants": [
+        "Kula",
+        "Kuli",
+        "Kule"
+      ],
+      "search_variants_cyrillic": [
+        "Кула",
+        "Кули",
+        "Куле"
+      ],
+      "type": "municipality",
+      "district": "Zapadnobački okrug",
+      "region": "Vojvodina",
+      "population": 35592,
+      "population_census_year": 2022,
+      "area_km2": 481,
+      "settlement_count": 7,
+      "postal_codes": [
+        "25230"
+      ],
+      "landline_prefix": "025",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "kursumlija",
+      "name_sr": "Kuršumlija",
+      "name_ascii": "Kursumlija",
+      "name_cyrillic": "Куршумлија",
+      "search_variants": [
+        "Kuršumlija",
+        "Kursumlija",
+        "Kuršumliji",
+        "Kursumliji",
+        "Kuršumlije",
+        "Kursumlije"
+      ],
+      "search_variants_cyrillic": [
+        "Куршумлија",
+        "Куршумлији",
+        "Куршумлије"
+      ],
+      "type": "municipality",
+      "district": "Toplički okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 15823,
+      "population_census_year": 2022,
+      "area_km2": 952,
+      "settlement_count": 90,
+      "postal_codes": [
+        "18430"
+      ],
+      "landline_prefix": "027",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "lajkovac",
+      "name_sr": "Lajkovac",
+      "name_ascii": "Lajkovac",
+      "name_cyrillic": "Лајковац",
+      "search_variants": [
+        "Lajkovac",
+        "Lajkovcu",
+        "Lajkovca"
+      ],
+      "search_variants_cyrillic": [
+        "Лајковац",
+        "Лајковцу",
+        "Лајковца"
+      ],
+      "type": "municipality",
+      "district": "Kolubarski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 13825,
+      "population_census_year": 2022,
+      "area_km2": 186,
+      "settlement_count": 19,
+      "postal_codes": [
+        "14224"
+      ],
+      "landline_prefix": "014",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "lapovo",
+      "name_sr": "Lapovo",
+      "name_ascii": "Lapovo",
+      "name_cyrillic": "Лапово",
+      "search_variants": [
+        "Lapovo",
+        "Lapovu",
+        "Lapova"
+      ],
+      "search_variants_cyrillic": [
+        "Лапово",
+        "Лапову",
+        "Лапова"
+      ],
+      "type": "municipality",
+      "district": "Šumadijski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 6582,
+      "population_census_year": 2022,
+      "area_km2": 55,
+      "settlement_count": 2,
+      "postal_codes": [
+        "34221"
+      ],
+      "landline_prefix": "034",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "lebane",
+      "name_sr": "Lebane",
+      "name_ascii": "Lebane",
+      "name_cyrillic": "Лебане",
+      "search_variants": [
+        "Lebane",
+        "Lebanu",
+        "Lebana"
+      ],
+      "search_variants_cyrillic": [
+        "Лебане",
+        "Лебану",
+        "Лебана"
+      ],
+      "type": "municipality",
+      "district": "Jablanički okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 18119,
+      "population_census_year": 2022,
+      "area_km2": 337,
+      "settlement_count": 39,
+      "postal_codes": [
+        "16230"
+      ],
+      "landline_prefix": "016",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "leskovac",
+      "name_sr": "Leskovac",
+      "name_ascii": "Leskovac",
+      "name_cyrillic": "Лесковац",
+      "search_variants": [
+        "Leskovac",
+        "Leskovcu",
+        "Leskovca"
+      ],
+      "search_variants_cyrillic": [
+        "Лесковац",
+        "Лесковцу",
+        "Лесковца"
+      ],
+      "type": "city",
+      "district": "Jablanički okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 123950,
+      "population_census_year": 2022,
+      "area_km2": 1025,
+      "settlement_count": 144,
+      "postal_codes": [
+        "16000"
+      ],
+      "landline_prefix": "016",
+      "landline_group_center": true,
+      "priority_tier": 1,
+      "parent_id": null
+    },
+    {
+      "id": "ljig",
+      "name_sr": "Ljig",
+      "name_ascii": "Ljig",
+      "name_cyrillic": "Љиг",
+      "search_variants": [
+        "Ljig",
+        "Ljigu",
+        "Ljiga"
+      ],
+      "search_variants_cyrillic": [
+        "Љиг",
+        "Љигу",
+        "Љига"
+      ],
+      "type": "municipality",
+      "district": "Kolubarski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 10711,
+      "population_census_year": 2022,
+      "area_km2": 279,
+      "settlement_count": 27,
+      "postal_codes": [
+        "14240"
+      ],
+      "landline_prefix": "014",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "ljubovija",
+      "name_sr": "Ljubovija",
+      "name_ascii": "Ljubovija",
+      "name_cyrillic": "Љубовија",
+      "search_variants": [
+        "Ljubovija",
+        "Ljuboviji",
+        "Ljubovije"
+      ],
+      "search_variants_cyrillic": [
+        "Љубовија",
+        "Љубовији",
+        "Љубовије"
+      ],
+      "type": "municipality",
+      "district": "Mačvanski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 12168,
+      "population_census_year": 2022,
+      "area_km2": 356,
+      "settlement_count": 27,
+      "postal_codes": [
+        "15320"
+      ],
+      "landline_prefix": "015",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "loznica",
+      "name_sr": "Loznica",
+      "name_ascii": "Loznica",
+      "name_cyrillic": "Лозница",
+      "search_variants": [
+        "Loznica",
+        "Loznici",
+        "Loznice"
+      ],
+      "search_variants_cyrillic": [
+        "Лозница",
+        "Лозници",
+        "Лознице"
+      ],
+      "type": "city",
+      "district": "Mačvanski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 72062,
+      "population_census_year": 2022,
+      "area_km2": 612,
+      "settlement_count": 54,
+      "postal_codes": [
+        "15300"
+      ],
+      "landline_prefix": "015",
+      "landline_group_center": false,
+      "priority_tier": 1,
+      "parent_id": null
+    },
+    {
+      "id": "lucani",
+      "name_sr": "Lučani",
+      "name_ascii": "Lucani",
+      "name_cyrillic": "Лучани",
+      "search_variants": [
+        "Lučani",
+        "Lucani",
+        "Lučanima",
+        "Lucanima",
+        "Lučana",
+        "Lucana"
+      ],
+      "search_variants_cyrillic": [
+        "Лучани",
+        "Лучанима",
+        "Лучана"
+      ],
+      "type": "municipality",
+      "district": "Moravički okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 16933,
+      "population_census_year": 2022,
+      "area_km2": 454,
+      "settlement_count": 36,
+      "postal_codes": [
+        "32240"
+      ],
+      "landline_prefix": "032",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "majdanpek",
+      "name_sr": "Majdanpek",
+      "name_ascii": "Majdanpek",
+      "name_cyrillic": "Мајданпек",
+      "search_variants": [
+        "Majdanpek",
+        "Majdanpeku",
+        "Majdanpeka"
+      ],
+      "search_variants_cyrillic": [
+        "Мајданпек",
+        "Мајданпеку",
+        "Мајданпека"
+      ],
+      "type": "municipality",
+      "district": "Borski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 14559,
+      "population_census_year": 2022,
+      "area_km2": 932,
+      "settlement_count": 14,
+      "postal_codes": [
+        "19250"
+      ],
+      "landline_prefix": "030",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "mali-idjos",
+      "name_sr": "Mali Iđoš",
+      "name_ascii": "Mali Idjos",
+      "name_cyrillic": "Мали Иђош",
+      "search_variants": [
+        "Mali Iđoš",
+        "Mali Idjos",
+        "Malom Iđošu",
+        "Malom Idjosu",
+        "Malog Iđoša",
+        "Malog Idjosa"
+      ],
+      "search_variants_cyrillic": [
+        "Мали Иђош",
+        "Малом Иђошу",
+        "Малог Иђоша"
+      ],
+      "type": "municipality",
+      "district": "Severnobački okrug",
+      "region": "Vojvodina",
+      "population": 9983,
+      "population_census_year": 2022,
+      "area_km2": 181,
+      "settlement_count": 3,
+      "postal_codes": [
+        "24321"
+      ],
+      "landline_prefix": "024",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "mali-zvornik",
+      "name_sr": "Mali Zvornik",
+      "name_ascii": "Mali Zvornik",
+      "name_cyrillic": "Мали Зворник",
+      "search_variants": [
+        "Mali Zvornik",
+        "Malom Zvorniku",
+        "Malog Zvornika"
+      ],
+      "search_variants_cyrillic": [
+        "Мали Зворник",
+        "Малом Зворнику",
+        "Малог Зворника"
+      ],
+      "type": "municipality",
+      "district": "Mačvanski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 11219,
+      "population_census_year": 2022,
+      "area_km2": 184,
+      "settlement_count": 12,
+      "postal_codes": [
+        "15318"
+      ],
+      "landline_prefix": "015",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "malo-crnice",
+      "name_sr": "Malo Crniće",
+      "name_ascii": "Malo Crnice",
+      "name_cyrillic": "Мало Црниће",
+      "search_variants": [
+        "Malo Crniće",
+        "Malo Crnice",
+        "Malom Crniću",
+        "Malom Crnicu",
+        "Malog Crnića",
+        "Malog Crnica"
+      ],
+      "search_variants_cyrillic": [
+        "Мало Црниће",
+        "Малом Црнићу",
+        "Малог Црнића"
+      ],
+      "type": "municipality",
+      "district": "Braničevski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 8986,
+      "population_census_year": 2022,
+      "area_km2": 269,
+      "settlement_count": 19,
+      "postal_codes": [
+        "12311"
+      ],
+      "landline_prefix": "012",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "medvedja",
+      "name_sr": "Medveđa",
+      "name_ascii": "Medvedja",
+      "name_cyrillic": "Медвеђа",
+      "search_variants": [
+        "Medveđa",
+        "Medvedja",
+        "Medveđi",
+        "Medvedji",
+        "Medveđe",
+        "Medvedje"
+      ],
+      "search_variants_cyrillic": [
+        "Медвеђа",
+        "Медвеђи",
+        "Медвеђе"
+      ],
+      "type": "municipality",
+      "district": "Jablanički okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 6360,
+      "population_census_year": 2022,
+      "area_km2": 524,
+      "settlement_count": 44,
+      "postal_codes": [
+        "16240"
+      ],
+      "landline_prefix": "016",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "merosina",
+      "name_sr": "Merošina",
+      "name_ascii": "Merosina",
+      "name_cyrillic": "Мерошина",
+      "search_variants": [
+        "Merošina",
+        "Merosina",
+        "Merošini",
+        "Merosini",
+        "Merošine",
+        "Merosine"
+      ],
+      "search_variants_cyrillic": [
+        "Мерошина",
+        "Мерошини",
+        "Мерошине"
+      ],
+      "type": "municipality",
+      "district": "Nišavski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 11873,
+      "population_census_year": 2022,
+      "area_km2": 193,
+      "settlement_count": 27,
+      "postal_codes": [
+        "18252"
+      ],
+      "landline_prefix": "018",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "mionica",
+      "name_sr": "Mionica",
+      "name_ascii": "Mionica",
+      "name_cyrillic": "Мионица",
+      "search_variants": [
+        "Mionica",
+        "Mionici",
+        "Mionice"
+      ],
+      "search_variants_cyrillic": [
+        "Мионица",
+        "Мионици",
+        "Мионице"
+      ],
+      "type": "municipality",
+      "district": "Kolubarski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 12061,
+      "population_census_year": 2022,
+      "area_km2": 329,
+      "settlement_count": 36,
+      "postal_codes": [
+        "14242"
+      ],
+      "landline_prefix": "014",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "negotin",
+      "name_sr": "Negotin",
+      "name_ascii": "Negotin",
+      "name_cyrillic": "Неготин",
+      "search_variants": [
+        "Negotin",
+        "Negotinu",
+        "Negotina"
+      ],
+      "search_variants_cyrillic": [
+        "Неготин",
+        "Неготину",
+        "Неготина"
+      ],
+      "type": "municipality",
+      "district": "Borski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 28261,
+      "population_census_year": 2022,
+      "area_km2": 1090,
+      "settlement_count": 39,
+      "postal_codes": [
+        "19300"
+      ],
+      "landline_prefix": "019",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "nis",
+      "name_sr": "Niš",
+      "name_ascii": "Nis",
+      "name_cyrillic": "Ниш",
+      "search_variants": [
+        "Niš",
+        "Nis",
+        "Nišu",
+        "Nisu",
+        "Niša",
+        "Nisa"
+      ],
+      "search_variants_cyrillic": [
+        "Ниш",
+        "Нишу",
+        "Ниша"
+      ],
+      "type": "city",
+      "district": "Nišavski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 249501,
+      "population_census_year": 2022,
+      "area_km2": 596,
+      "settlement_count": 71,
+      "postal_codes": [
+        "18000"
+      ],
+      "landline_prefix": "018",
+      "landline_group_center": true,
+      "priority_tier": 1,
+      "parent_id": null
+    },
+    {
+      "id": "nova-crnja",
+      "name_sr": "Nova Crnja",
+      "name_ascii": "Nova Crnja",
+      "name_cyrillic": "Нова Црња",
+      "search_variants": [
+        "Nova Crnja",
+        "Novoj Crnji",
+        "Nove Crnje"
+      ],
+      "search_variants_cyrillic": [
+        "Нова Црња",
+        "Новој Црњи",
+        "Нове Црње"
+      ],
+      "type": "municipality",
+      "district": "Srednjobanatski okrug",
+      "region": "Vojvodina",
+      "population": 8147,
+      "population_census_year": 2022,
+      "area_km2": 273,
+      "settlement_count": 6,
+      "postal_codes": [
+        "23218"
+      ],
+      "landline_prefix": "023",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "nova-varos",
+      "name_sr": "Nova Varoš",
+      "name_ascii": "Nova Varos",
+      "name_cyrillic": "Нова Варош",
+      "search_variants": [
+        "Nova Varoš",
+        "Nova Varos",
+        "Novoj Varoši",
+        "Novoj Varosi",
+        "Nove Varoši",
+        "Nove Varosi"
+      ],
+      "search_variants_cyrillic": [
+        "Нова Варош",
+        "Новој Вароши",
+        "Нове Вароши"
+      ],
+      "type": "municipality",
+      "district": "Zlatiborski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 13507,
+      "population_census_year": 2022,
+      "area_km2": 581,
+      "settlement_count": 33,
+      "postal_codes": [
+        "31320"
+      ],
+      "landline_prefix": "033",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "novi-becej",
+      "name_sr": "Novi Bečej",
+      "name_ascii": "Novi Becej",
+      "name_cyrillic": "Нови Бечеј",
+      "search_variants": [
+        "Novi Bečej",
+        "Novi Becej",
+        "Novom Bečeju",
+        "Novom Beceju",
+        "Novog Bečeja",
+        "Novog Beceja"
+      ],
+      "search_variants_cyrillic": [
+        "Нови Бечеј",
+        "Новом Бечеју",
+        "Новог Бечеја"
+      ],
+      "type": "municipality",
+      "district": "Srednjobanatski okrug",
+      "region": "Vojvodina",
+      "population": 19886,
+      "population_census_year": 2022,
+      "area_km2": 609,
+      "settlement_count": 4,
+      "postal_codes": [
+        "23272"
+      ],
+      "landline_prefix": "023",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "novi-knezevac",
+      "name_sr": "Novi Kneževac",
+      "name_ascii": "Novi Knezevac",
+      "name_cyrillic": "Нови Кнежевац",
+      "search_variants": [
+        "Novi Kneževac",
+        "Novi Knezevac",
+        "Novom Kneževcu",
+        "Novom Knezevcu",
+        "Novog Kneževca",
+        "Novog Knezevca"
+      ],
+      "search_variants_cyrillic": [
+        "Нови Кнежевац",
+        "Новом Кнежевцу",
+        "Новог Кнежевца"
+      ],
+      "type": "municipality",
+      "district": "Severnobanatski okrug",
+      "region": "Vojvodina",
+      "population": 8627,
+      "population_census_year": 2022,
+      "area_km2": 305,
+      "settlement_count": 9,
+      "postal_codes": [
+        "23330"
+      ],
+      "landline_prefix": "0230",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "novi-pazar",
+      "name_sr": "Novi Pazar",
+      "name_ascii": "Novi Pazar",
+      "name_cyrillic": "Нови Пазар",
+      "search_variants": [
+        "Novi Pazar",
+        "Novom Pazaru",
+        "Novog Pazara"
+      ],
+      "search_variants_cyrillic": [
+        "Нови Пазар",
+        "Новом Пазару",
+        "Новог Пазара"
+      ],
+      "type": "city",
+      "district": "Raški okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 106720,
+      "population_census_year": 2022,
+      "area_km2": 742,
+      "settlement_count": 99,
+      "postal_codes": [
+        "36300"
+      ],
+      "landline_prefix": "020",
+      "landline_group_center": true,
+      "priority_tier": 1,
+      "parent_id": null
+    },
+    {
+      "id": "novi-sad",
+      "name_sr": "Novi Sad",
+      "name_ascii": "Novi Sad",
+      "name_cyrillic": "Нови Сад",
+      "search_variants": [
+        "Novi Sad",
+        "Novom Sadu",
+        "Novog Sada"
+      ],
+      "search_variants_cyrillic": [
+        "Нови Сад",
+        "Новом Саду",
+        "Новог Сада"
+      ],
+      "type": "city",
+      "district": "Južnobački okrug",
+      "region": "Vojvodina",
+      "population": 368967,
+      "population_census_year": 2022,
+      "area_km2": 699,
+      "settlement_count": 16,
+      "postal_codes": [
+        "21000"
+      ],
+      "landline_prefix": "021",
+      "landline_group_center": true,
+      "priority_tier": 1,
+      "parent_id": null
+    },
+    {
+      "id": "odzaci",
+      "name_sr": "Odžaci",
+      "name_ascii": "Odzaci",
+      "name_cyrillic": "Оџаци",
+      "search_variants": [
+        "Odžaci",
+        "Odzaci",
+        "Odžacima",
+        "Odzacima",
+        "Odžaka",
+        "Odzaka"
+      ],
+      "search_variants_cyrillic": [
+        "Оџаци",
+        "Оџацима",
+        "Оџака"
+      ],
+      "type": "municipality",
+      "district": "Zapadnobački okrug",
+      "region": "Vojvodina",
+      "population": 24926,
+      "population_census_year": 2022,
+      "area_km2": 411,
+      "settlement_count": 9,
+      "postal_codes": [
+        "25250"
+      ],
+      "landline_prefix": "025",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "opovo",
+      "name_sr": "Opovo",
+      "name_ascii": "Opovo",
+      "name_cyrillic": "Опово",
+      "search_variants": [
+        "Opovo",
+        "Opovu",
+        "Opova"
+      ],
+      "search_variants_cyrillic": [
+        "Опово",
+        "Опову",
+        "Опова"
+      ],
+      "type": "municipality",
+      "district": "Južnobanatski okrug",
+      "region": "Vojvodina",
+      "population": 9462,
+      "population_census_year": 2022,
+      "area_km2": 203,
+      "settlement_count": 4,
+      "postal_codes": [
+        "26204"
+      ],
+      "landline_prefix": "013",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "osecina",
+      "name_sr": "Osečina",
+      "name_ascii": "Osecina",
+      "name_cyrillic": "Осечина",
+      "search_variants": [
+        "Osečina",
+        "Osecina",
+        "Osečini",
+        "Osecini",
+        "Osečine",
+        "Osecine"
+      ],
+      "search_variants_cyrillic": [
+        "Осечина",
+        "Осечини",
+        "Осечине"
+      ],
+      "type": "municipality",
+      "district": "Kolubarski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 9951,
+      "population_census_year": 2022,
+      "area_km2": 319,
+      "settlement_count": 20,
+      "postal_codes": [
+        "14253"
+      ],
+      "landline_prefix": "014",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "pancevo",
+      "name_sr": "Pančevo",
+      "name_ascii": "Pancevo",
+      "name_cyrillic": "Панчево",
+      "search_variants": [
+        "Pančevo",
+        "Pancevo",
+        "Pančevu",
+        "Pancevu",
+        "Pančeva",
+        "Panceva"
+      ],
+      "search_variants_cyrillic": [
+        "Панчево",
+        "Панчеву",
+        "Панчева"
+      ],
+      "type": "city",
+      "district": "Južnobanatski okrug",
+      "region": "Vojvodina",
+      "population": 115454,
+      "population_census_year": 2022,
+      "area_km2": 756,
+      "settlement_count": 10,
+      "postal_codes": [
+        "26000"
+      ],
+      "landline_prefix": "013",
+      "landline_group_center": true,
+      "priority_tier": 1,
+      "parent_id": null
+    },
+    {
+      "id": "paracin",
+      "name_sr": "Paraćin",
+      "name_ascii": "Paracin",
+      "name_cyrillic": "Параћин",
+      "search_variants": [
+        "Paraćin",
+        "Paracin",
+        "Paraćinu",
+        "Paracinu",
+        "Paraćina",
+        "Paracina"
+      ],
+      "search_variants_cyrillic": [
+        "Параћин",
+        "Параћину",
+        "Параћина"
+      ],
+      "type": "municipality",
+      "district": "Pomoravski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 45543,
+      "population_census_year": 2022,
+      "area_km2": 542,
+      "settlement_count": 35,
+      "postal_codes": [
+        "35250"
+      ],
+      "landline_prefix": "035",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "pecinci",
+      "name_sr": "Pećinci",
+      "name_ascii": "Pecinci",
+      "name_cyrillic": "Пећинци",
+      "search_variants": [
+        "Pećinci",
+        "Pecinci",
+        "Pećincima",
+        "Pecincima",
+        "Pećinaca",
+        "Pecinaca"
+      ],
+      "search_variants_cyrillic": [
+        "Пећинци",
+        "Пећинцима",
+        "Пећинаца"
+      ],
+      "type": "municipality",
+      "district": "Sremski okrug",
+      "region": "Vojvodina",
+      "population": 18401,
+      "population_census_year": 2022,
+      "area_km2": 489,
+      "settlement_count": 15,
+      "postal_codes": [
+        "22410"
+      ],
+      "landline_prefix": "022",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "petrovac-na-mlavi",
+      "name_sr": "Petrovac na Mlavi",
+      "name_ascii": "Petrovac na Mlavi",
+      "name_cyrillic": "Петровац на Млави",
+      "search_variants": [
+        "Petrovac na Mlavi",
+        "Petrovcu na Mlavi",
+        "Petrovca na Mlavi"
+      ],
+      "search_variants_cyrillic": [
+        "Петровац на Млави",
+        "Петровцу на Млави",
+        "Петровца на Млави"
+      ],
+      "type": "municipality",
+      "district": "Braničevski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 25900,
+      "population_census_year": 2022,
+      "area_km2": 655,
+      "settlement_count": 34,
+      "postal_codes": [
+        "12300"
+      ],
+      "landline_prefix": "012",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "pirot",
+      "name_sr": "Pirot",
+      "name_ascii": "Pirot",
+      "name_cyrillic": "Пирот",
+      "search_variants": [
+        "Pirot",
+        "Pirotu",
+        "Pirota"
+      ],
+      "search_variants_cyrillic": [
+        "Пирот",
+        "Пироту",
+        "Пирота"
+      ],
+      "type": "city",
+      "district": "Pirotski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 49601,
+      "population_census_year": 2022,
+      "area_km2": 1232,
+      "settlement_count": 72,
+      "postal_codes": [
+        "18300"
+      ],
+      "landline_prefix": "010",
+      "landline_group_center": true,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "plandiste",
+      "name_sr": "Plandište",
+      "name_ascii": "Plandiste",
+      "name_cyrillic": "Пландиште",
+      "search_variants": [
+        "Plandište",
+        "Plandiste",
+        "Plandištu",
+        "Plandistu",
+        "Plandišta",
+        "Plandista"
+      ],
+      "search_variants_cyrillic": [
+        "Пландиште",
+        "Пландишту",
+        "Пландишта"
+      ],
+      "type": "municipality",
+      "district": "Južnobanatski okrug",
+      "region": "Vojvodina",
+      "population": 8957,
+      "population_census_year": 2022,
+      "area_km2": 383,
+      "settlement_count": 14,
+      "postal_codes": [
+        "26360"
+      ],
+      "landline_prefix": "013",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "pozarevac",
+      "name_sr": "Požarevac",
+      "name_ascii": "Pozarevac",
+      "name_cyrillic": "Пожаревац",
+      "search_variants": [
+        "Požarevac",
+        "Pozarevac",
+        "Požarevcu",
+        "Pozarevcu",
+        "Požarevca",
+        "Pozarevca"
+      ],
+      "search_variants_cyrillic": [
+        "Пожаревац",
+        "Пожаревцу",
+        "Пожаревца"
+      ],
+      "type": "city",
+      "district": "Braničevski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 68648,
+      "population_census_year": 2022,
+      "area_km2": 477,
+      "settlement_count": 27,
+      "postal_codes": [
+        "12000"
+      ],
+      "landline_prefix": "012",
+      "landline_group_center": true,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "pozega",
+      "name_sr": "Požega",
+      "name_ascii": "Pozega",
+      "name_cyrillic": "Пожега",
+      "search_variants": [
+        "Požega",
+        "Pozega",
+        "Požegi",
+        "Pozegi",
+        "Požege",
+        "Pozege"
+      ],
+      "search_variants_cyrillic": [
+        "Пожега",
+        "Пожеги",
+        "Пожеге"
+      ],
+      "type": "municipality",
+      "district": "Zlatiborski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 25988,
+      "population_census_year": 2022,
+      "area_km2": 426,
+      "settlement_count": 42,
+      "postal_codes": [
+        "31210"
+      ],
+      "landline_prefix": "031",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "presevo",
+      "name_sr": "Preševo",
+      "name_ascii": "Presevo",
+      "name_cyrillic": "Прешево",
+      "search_variants": [
+        "Preševo",
+        "Presevo",
+        "Preševu",
+        "Presevu",
+        "Preševa",
+        "Preseva"
+      ],
+      "search_variants_cyrillic": [
+        "Прешево",
+        "Прешеву",
+        "Прешева"
+      ],
+      "type": "municipality",
+      "district": "Pčinjski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 33449,
+      "population_census_year": 2022,
+      "area_km2": 264,
+      "settlement_count": 35,
+      "postal_codes": [
+        "17523"
+      ],
+      "landline_prefix": "017",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "priboj",
+      "name_sr": "Priboj",
+      "name_ascii": "Priboj",
+      "name_cyrillic": "Прибој",
+      "search_variants": [
+        "Priboj",
+        "Priboju",
+        "Priboja"
+      ],
+      "search_variants_cyrillic": [
+        "Прибој",
+        "Прибоју",
+        "Прибоја"
+      ],
+      "type": "municipality",
+      "district": "Zlatiborski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 23514,
+      "population_census_year": 2022,
+      "area_km2": 553,
+      "settlement_count": 33,
+      "postal_codes": [
+        "31330"
+      ],
+      "landline_prefix": "033",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "prijepolje",
+      "name_sr": "Prijepolje",
+      "name_ascii": "Prijepolje",
+      "name_cyrillic": "Пријепоље",
+      "search_variants": [
+        "Prijepolje",
+        "Prijepolju",
+        "Prijepolja"
+      ],
+      "search_variants_cyrillic": [
+        "Пријепоље",
+        "Пријепољу",
+        "Пријепоља"
+      ],
+      "type": "municipality",
+      "district": "Zlatiborski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 32214,
+      "population_census_year": 2022,
+      "area_km2": 827,
+      "settlement_count": 80,
+      "postal_codes": [
+        "31300"
+      ],
+      "landline_prefix": "033",
+      "landline_group_center": true,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "prokuplje",
+      "name_sr": "Prokuplje",
+      "name_ascii": "Prokuplje",
+      "name_cyrillic": "Прокупље",
+      "search_variants": [
+        "Prokuplje",
+        "Prokuplju",
+        "Prokuplja"
+      ],
+      "search_variants_cyrillic": [
+        "Прокупље",
+        "Прокупљу",
+        "Прокупља"
+      ],
+      "type": "city",
+      "district": "Toplički okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 38054,
+      "population_census_year": 2022,
+      "area_km2": 759,
+      "settlement_count": 107,
+      "postal_codes": [
+        "18400"
+      ],
+      "landline_prefix": "027",
+      "landline_group_center": true,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "raca",
+      "name_sr": "Rača",
+      "name_ascii": "Raca",
+      "name_cyrillic": "Рача",
+      "search_variants": [
+        "Rača",
+        "Raca",
+        "Rači",
+        "Raci",
+        "Rače",
+        "Race"
+      ],
+      "search_variants_cyrillic": [
+        "Рача",
+        "Рачи",
+        "Раче"
+      ],
+      "type": "municipality",
+      "district": "Šumadijski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 9638,
+      "population_census_year": 2022,
+      "area_km2": 216,
+      "settlement_count": 19,
+      "postal_codes": [
+        "34210"
+      ],
+      "landline_prefix": "034",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "raska",
+      "name_sr": "Raška",
+      "name_ascii": "Raska",
+      "name_cyrillic": "Рашка",
+      "search_variants": [
+        "Raška",
+        "Raska",
+        "Raški",
+        "Raski",
+        "Raške",
+        "Raske"
+      ],
+      "search_variants_cyrillic": [
+        "Рашка",
+        "Рашки",
+        "Рашке"
+      ],
+      "type": "municipality",
+      "district": "Raški okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 21498,
+      "population_census_year": 2022,
+      "area_km2": 670,
+      "settlement_count": 61,
+      "postal_codes": [
+        "36350"
+      ],
+      "landline_prefix": "036",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "razanj",
+      "name_sr": "Ražanj",
+      "name_ascii": "Razanj",
+      "name_cyrillic": "Ражањ",
+      "search_variants": [
+        "Ražanj",
+        "Razanj",
+        "Ražnju",
+        "Raznju",
+        "Ražnja",
+        "Raznja"
+      ],
+      "search_variants_cyrillic": [
+        "Ражањ",
+        "Ражњу",
+        "Ражња"
+      ],
+      "type": "municipality",
+      "district": "Nišavski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 7010,
+      "population_census_year": 2022,
+      "area_km2": 289,
+      "settlement_count": 23,
+      "postal_codes": [
+        "37215"
+      ],
+      "landline_prefix": "037",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "rekovac",
+      "name_sr": "Rekovac",
+      "name_ascii": "Rekovac",
+      "name_cyrillic": "Рековац",
+      "search_variants": [
+        "Rekovac",
+        "Rekovcu",
+        "Rekovca"
+      ],
+      "search_variants_cyrillic": [
+        "Рековац",
+        "Рековцу",
+        "Рековца"
+      ],
+      "type": "municipality",
+      "district": "Pomoravski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 8116,
+      "population_census_year": 2022,
+      "area_km2": 366,
+      "settlement_count": 32,
+      "postal_codes": [
+        "35260"
+      ],
+      "landline_prefix": "035",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "ruma",
+      "name_sr": "Ruma",
+      "name_ascii": "Ruma",
+      "name_cyrillic": "Рума",
+      "search_variants": [
+        "Ruma",
+        "Rumi",
+        "Rume"
+      ],
+      "search_variants_cyrillic": [
+        "Рума",
+        "Руми",
+        "Руме"
+      ],
+      "type": "municipality",
+      "district": "Sremski okrug",
+      "region": "Vojvodina",
+      "population": 48621,
+      "population_census_year": 2022,
+      "area_km2": 582,
+      "settlement_count": 17,
+      "postal_codes": [
+        "22400"
+      ],
+      "landline_prefix": "022",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "sabac",
+      "name_sr": "Šabac",
+      "name_ascii": "Sabac",
+      "name_cyrillic": "Шабац",
+      "search_variants": [
+        "Šabac",
+        "Sabac",
+        "Šapcu",
+        "Sapcu",
+        "Šapca",
+        "Sapca"
+      ],
+      "search_variants_cyrillic": [
+        "Шабац",
+        "Шапцу",
+        "Шапца"
+      ],
+      "type": "city",
+      "district": "Mačvanski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 105432,
+      "population_census_year": 2022,
+      "area_km2": 797,
+      "settlement_count": 52,
+      "postal_codes": [
+        "15000"
+      ],
+      "landline_prefix": "015",
+      "landline_group_center": true,
+      "priority_tier": 1,
+      "parent_id": null
+    },
+    {
+      "id": "secanj",
+      "name_sr": "Sečanj",
+      "name_ascii": "Secanj",
+      "name_cyrillic": "Сечањ",
+      "search_variants": [
+        "Sečanj",
+        "Secanj",
+        "Sečnju",
+        "Secnju",
+        "Sečnja",
+        "Secnja"
+      ],
+      "search_variants_cyrillic": [
+        "Сечањ",
+        "Сечњу",
+        "Сечња"
+      ],
+      "type": "municipality",
+      "district": "Srednjobanatski okrug",
+      "region": "Vojvodina",
+      "population": 10544,
+      "population_census_year": 2022,
+      "area_km2": 523,
+      "settlement_count": 11,
+      "postal_codes": [
+        "23240"
+      ],
+      "landline_prefix": "023",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "senta",
+      "name_sr": "Senta",
+      "name_ascii": "Senta",
+      "name_cyrillic": "Сента",
+      "search_variants": [
+        "Senta",
+        "Senti",
+        "Sente"
+      ],
+      "search_variants_cyrillic": [
+        "Сента",
+        "Сенти",
+        "Сенте"
+      ],
+      "type": "municipality",
+      "district": "Severnobanatski okrug",
+      "region": "Vojvodina",
+      "population": 17953,
+      "population_census_year": 2022,
+      "area_km2": 294,
+      "settlement_count": 5,
+      "postal_codes": [
+        "24400"
+      ],
+      "landline_prefix": "024",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "sid",
+      "name_sr": "Šid",
+      "name_ascii": "Sid",
+      "name_cyrillic": "Шид",
+      "search_variants": [
+        "Šid",
+        "Sid",
+        "Šidu",
+        "Sidu",
+        "Šida",
+        "Sida"
+      ],
+      "search_variants_cyrillic": [
+        "Шид",
+        "Шиду",
+        "Шида"
+      ],
+      "type": "municipality",
+      "district": "Sremski okrug",
+      "region": "Vojvodina",
+      "population": 27894,
+      "population_census_year": 2022,
+      "area_km2": 687,
+      "settlement_count": 19,
+      "postal_codes": [
+        "22239"
+      ],
+      "landline_prefix": "022",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "sjenica",
+      "name_sr": "Sjenica",
+      "name_ascii": "Sjenica",
+      "name_cyrillic": "Сјеница",
+      "search_variants": [
+        "Sjenica",
+        "Sjenici",
+        "Sjenice"
+      ],
+      "search_variants_cyrillic": [
+        "Сјеница",
+        "Сјеници",
+        "Сјенице"
+      ],
+      "type": "municipality",
+      "district": "Zlatiborski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 24083,
+      "population_census_year": 2022,
+      "area_km2": 1059,
+      "settlement_count": 101,
+      "postal_codes": [
+        "36310"
+      ],
+      "landline_prefix": "020",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "smederevo",
+      "name_sr": "Smederevo",
+      "name_ascii": "Smederevo",
+      "name_cyrillic": "Смедерево",
+      "search_variants": [
+        "Smederevo",
+        "Smederevu",
+        "Smedereva"
+      ],
+      "search_variants_cyrillic": [
+        "Смедерево",
+        "Смедереву",
+        "Смедерева"
+      ],
+      "type": "city",
+      "district": "Podunavski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 97930,
+      "population_census_year": 2022,
+      "area_km2": 484,
+      "settlement_count": 28,
+      "postal_codes": [
+        "11300"
+      ],
+      "landline_prefix": "026",
+      "landline_group_center": true,
+      "priority_tier": 1,
+      "parent_id": null
+    },
+    {
+      "id": "smederevska-palanka",
+      "name_sr": "Smederevska Palanka",
+      "name_ascii": "Smederevska Palanka",
+      "name_cyrillic": "Смедеревска Паланка",
+      "search_variants": [
+        "Smederevska Palanka",
+        "Smederevskoj Palanci",
+        "Smederevske Palanke"
+      ],
+      "search_variants_cyrillic": [
+        "Смедеревска Паланка",
+        "Смедеревској Паланци",
+        "Смедеревске Паланке"
+      ],
+      "type": "municipality",
+      "district": "Podunavski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 42192,
+      "population_census_year": 2022,
+      "area_km2": 421,
+      "settlement_count": 18,
+      "postal_codes": [
+        "11420"
+      ],
+      "landline_prefix": "026",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "sokobanja",
+      "name_sr": "Sokobanja",
+      "name_ascii": "Sokobanja",
+      "name_cyrillic": "Сокобања",
+      "search_variants": [
+        "Sokobanja",
+        "Sokobanji",
+        "Sokobanje"
+      ],
+      "search_variants_cyrillic": [
+        "Сокобања",
+        "Сокобањи",
+        "Сокобање"
+      ],
+      "type": "municipality",
+      "district": "Zaječarski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 13199,
+      "population_census_year": 2022,
+      "area_km2": 525,
+      "settlement_count": 25,
+      "postal_codes": [
+        "18230"
+      ],
+      "landline_prefix": "018",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "sombor",
+      "name_sr": "Sombor",
+      "name_ascii": "Sombor",
+      "name_cyrillic": "Сомбор",
+      "search_variants": [
+        "Sombor",
+        "Somboru",
+        "Sombora"
+      ],
+      "search_variants_cyrillic": [
+        "Сомбор",
+        "Сомбору",
+        "Сомбора"
+      ],
+      "type": "city",
+      "district": "Zapadnobački okrug",
+      "region": "Vojvodina",
+      "population": 70818,
+      "population_census_year": 2022,
+      "area_km2": 1216,
+      "settlement_count": 16,
+      "postal_codes": [
+        "25000"
+      ],
+      "landline_prefix": "025",
+      "landline_group_center": true,
+      "priority_tier": 1,
+      "parent_id": null
+    },
+    {
+      "id": "srbobran",
+      "name_sr": "Srbobran",
+      "name_ascii": "Srbobran",
+      "name_cyrillic": "Србобран",
+      "search_variants": [
+        "Srbobran",
+        "Srbobranu",
+        "Srbobrana"
+      ],
+      "search_variants_cyrillic": [
+        "Србобран",
+        "Србобрану",
+        "Србобрана"
+      ],
+      "type": "municipality",
+      "district": "Južnobački okrug",
+      "region": "Vojvodina",
+      "population": 14357,
+      "population_census_year": 2022,
+      "area_km2": 284,
+      "settlement_count": 3,
+      "postal_codes": [
+        "21480"
+      ],
+      "landline_prefix": "021",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "sremska-mitrovica",
+      "name_sr": "Sremska Mitrovica",
+      "name_ascii": "Sremska Mitrovica",
+      "name_cyrillic": "Сремска Митровица",
+      "search_variants": [
+        "Sremska Mitrovica",
+        "Sremskoj Mitrovici",
+        "Sremske Mitrovice"
+      ],
+      "search_variants_cyrillic": [
+        "Сремска Митровица",
+        "Сремској Митровици",
+        "Сремске Митровице"
+      ],
+      "type": "city",
+      "district": "Sremski okrug",
+      "region": "Vojvodina",
+      "population": 72580,
+      "population_census_year": 2022,
+      "area_km2": 762,
+      "settlement_count": 26,
+      "postal_codes": [
+        "22000"
+      ],
+      "landline_prefix": "022",
+      "landline_group_center": true,
+      "priority_tier": 1,
+      "parent_id": null
+    },
+    {
+      "id": "sremski-karlovci",
+      "name_sr": "Sremski Karlovci",
+      "name_ascii": "Sremski Karlovci",
+      "name_cyrillic": "Сремски Карловци",
+      "search_variants": [
+        "Sremski Karlovci",
+        "Sremskim Karlovcima",
+        "Sremskih Karlovaca"
+      ],
+      "search_variants_cyrillic": [
+        "Сремски Карловци",
+        "Сремским Карловцима",
+        "Сремских Карловаца"
+      ],
+      "type": "municipality",
+      "district": "Južnobački okrug",
+      "region": "Vojvodina",
+      "population": 7872,
+      "population_census_year": 2022,
+      "area_km2": 51,
+      "settlement_count": 1,
+      "postal_codes": [
+        "21205"
+      ],
+      "landline_prefix": "021",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "stara-pazova",
+      "name_sr": "Stara Pazova",
+      "name_ascii": "Stara Pazova",
+      "name_cyrillic": "Стара Пазова",
+      "search_variants": [
+        "Stara Pazova",
+        "Staroj Pazovi",
+        "Stare Pazove"
+      ],
+      "search_variants_cyrillic": [
+        "Стара Пазова",
+        "Старој Пазови",
+        "Старе Пазове"
+      ],
+      "type": "municipality",
+      "district": "Sremski okrug",
+      "region": "Vojvodina",
+      "population": 62318,
+      "population_census_year": 2022,
+      "area_km2": 350,
+      "settlement_count": 9,
+      "postal_codes": [
+        "22300"
+      ],
+      "landline_prefix": "022",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "subotica",
+      "name_sr": "Subotica",
+      "name_ascii": "Subotica",
+      "name_cyrillic": "Суботица",
+      "search_variants": [
+        "Subotica",
+        "Subotici",
+        "Subotice"
+      ],
+      "search_variants_cyrillic": [
+        "Суботица",
+        "Суботици",
+        "Суботице"
+      ],
+      "type": "city",
+      "district": "Severnobački okrug",
+      "region": "Vojvodina",
+      "population": 123952,
+      "population_census_year": 2022,
+      "area_km2": 1007,
+      "settlement_count": 19,
+      "postal_codes": [
+        "24000"
+      ],
+      "landline_prefix": "024",
+      "landline_group_center": true,
+      "priority_tier": 1,
+      "parent_id": null
+    },
+    {
+      "id": "surdulica",
+      "name_sr": "Surdulica",
+      "name_ascii": "Surdulica",
+      "name_cyrillic": "Сурдулица",
+      "search_variants": [
+        "Surdulica",
+        "Surdulici",
+        "Surdulice"
+      ],
+      "search_variants_cyrillic": [
+        "Сурдулица",
+        "Сурдулици",
+        "Сурдулице"
+      ],
+      "type": "municipality",
+      "district": "Pčinjski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 16991,
+      "population_census_year": 2022,
+      "area_km2": 628,
+      "settlement_count": 41,
+      "postal_codes": [
+        "17530"
+      ],
+      "landline_prefix": "017",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "svilajnac",
+      "name_sr": "Svilajnac",
+      "name_ascii": "Svilajnac",
+      "name_cyrillic": "Свилајнац",
+      "search_variants": [
+        "Svilajnac",
+        "Svilajncu",
+        "Svilajnca"
+      ],
+      "search_variants_cyrillic": [
+        "Свилајнац",
+        "Свилајнцу",
+        "Свилајнца"
+      ],
+      "type": "municipality",
+      "district": "Pomoravski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 20141,
+      "population_census_year": 2022,
+      "area_km2": 326,
+      "settlement_count": 22,
+      "postal_codes": [
+        "35210"
+      ],
+      "landline_prefix": "035",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "svrljig",
+      "name_sr": "Svrljig",
+      "name_ascii": "Svrljig",
+      "name_cyrillic": "Сврљиг",
+      "search_variants": [
+        "Svrljig",
+        "Svrljigu",
+        "Svrljiga"
+      ],
+      "search_variants_cyrillic": [
+        "Сврљиг",
+        "Сврљигу",
+        "Сврљига"
+      ],
+      "type": "municipality",
+      "district": "Nišavski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 10781,
+      "population_census_year": 2022,
+      "area_km2": 497,
+      "settlement_count": 39,
+      "postal_codes": [
+        "18360"
+      ],
+      "landline_prefix": "018",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "temerin",
+      "name_sr": "Temerin",
+      "name_ascii": "Temerin",
+      "name_cyrillic": "Темерин",
+      "search_variants": [
+        "Temerin",
+        "Temerinu",
+        "Temerina"
+      ],
+      "search_variants_cyrillic": [
+        "Темерин",
+        "Темерину",
+        "Темерина"
+      ],
+      "type": "municipality",
+      "district": "Južnobački okrug",
+      "region": "Vojvodina",
+      "population": 25780,
+      "population_census_year": 2022,
+      "area_km2": 170,
+      "settlement_count": 3,
+      "postal_codes": [
+        "21235"
+      ],
+      "landline_prefix": "021",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "titel",
+      "name_sr": "Titel",
+      "name_ascii": "Titel",
+      "name_cyrillic": "Тител",
+      "search_variants": [
+        "Titel",
+        "Titelu",
+        "Titela"
+      ],
+      "search_variants_cyrillic": [
+        "Тител",
+        "Тителу",
+        "Титела"
+      ],
+      "type": "municipality",
+      "district": "Južnobački okrug",
+      "region": "Vojvodina",
+      "population": 13984,
+      "population_census_year": 2022,
+      "area_km2": 261,
+      "settlement_count": 6,
+      "postal_codes": [
+        "21240"
+      ],
+      "landline_prefix": "021",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "topola",
+      "name_sr": "Topola",
+      "name_ascii": "Topola",
+      "name_cyrillic": "Топола",
+      "search_variants": [
+        "Topola",
+        "Topoli",
+        "Topole"
+      ],
+      "search_variants_cyrillic": [
+        "Топола",
+        "Тополи",
+        "Тополе"
+      ],
+      "type": "municipality",
+      "district": "Šumadijski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 19134,
+      "population_census_year": 2022,
+      "area_km2": 357,
+      "settlement_count": 31,
+      "postal_codes": [
+        "34310"
+      ],
+      "landline_prefix": "034",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "trgoviste",
+      "name_sr": "Trgovište",
+      "name_ascii": "Trgoviste",
+      "name_cyrillic": "Трговиште",
+      "search_variants": [
+        "Trgovište",
+        "Trgoviste",
+        "Trgovištu",
+        "Trgovistu",
+        "Trgovišta",
+        "Trgovista"
+      ],
+      "search_variants_cyrillic": [
+        "Трговиште",
+        "Трговишту",
+        "Трговишта"
+      ],
+      "type": "municipality",
+      "district": "Pčinjski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 4316,
+      "population_census_year": 2022,
+      "area_km2": 370,
+      "settlement_count": 35,
+      "postal_codes": [
+        "17525"
+      ],
+      "landline_prefix": "017",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "trstenik",
+      "name_sr": "Trstenik",
+      "name_ascii": "Trstenik",
+      "name_cyrillic": "Трстеник",
+      "search_variants": [
+        "Trstenik",
+        "Trsteniku",
+        "Trstenika"
+      ],
+      "search_variants_cyrillic": [
+        "Трстеник",
+        "Трстенику",
+        "Трстеника"
+      ],
+      "type": "municipality",
+      "district": "Rasinski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 35875,
+      "population_census_year": 2022,
+      "area_km2": 448,
+      "settlement_count": 51,
+      "postal_codes": [
+        "37240"
+      ],
+      "landline_prefix": "037",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "tutin",
+      "name_sr": "Tutin",
+      "name_ascii": "Tutin",
+      "name_cyrillic": "Тутин",
+      "search_variants": [
+        "Tutin",
+        "Tutinu",
+        "Tutina"
+      ],
+      "search_variants_cyrillic": [
+        "Тутин",
+        "Тутину",
+        "Тутина"
+      ],
+      "type": "municipality",
+      "district": "Raški okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 33053,
+      "population_census_year": 2022,
+      "area_km2": 742,
+      "settlement_count": 93,
+      "postal_codes": [
+        "36320"
+      ],
+      "landline_prefix": "020",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "ub",
+      "name_sr": "Ub",
+      "name_ascii": "Ub",
+      "name_cyrillic": "Уб",
+      "search_variants": [
+        "Ub",
+        "Ubu",
+        "Uba"
+      ],
+      "search_variants_cyrillic": [
+        "Уб",
+        "Убу",
+        "Уба"
+      ],
+      "type": "municipality",
+      "district": "Kolubarski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 25780,
+      "population_census_year": 2022,
+      "area_km2": 456,
+      "settlement_count": 38,
+      "postal_codes": [
+        "14210"
+      ],
+      "landline_prefix": "014",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "uzice",
+      "name_sr": "Užice",
+      "name_ascii": "Uzice",
+      "name_cyrillic": "Ужице",
+      "search_variants": [
+        "Užice",
+        "Uzice",
+        "Užicu",
+        "Uzicu",
+        "Užica",
+        "Uzica"
+      ],
+      "search_variants_cyrillic": [
+        "Ужице",
+        "Ужицу",
+        "Ужица"
+      ],
+      "type": "city",
+      "district": "Zlatiborski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 69997,
+      "population_census_year": 2022,
+      "area_km2": 667,
+      "settlement_count": 41,
+      "postal_codes": [
+        "31000"
+      ],
+      "landline_prefix": "031",
+      "landline_group_center": true,
+      "priority_tier": 1,
+      "parent_id": null
+    },
+    {
+      "id": "valjevo",
+      "name_sr": "Valjevo",
+      "name_ascii": "Valjevo",
+      "name_cyrillic": "Ваљево",
+      "search_variants": [
+        "Valjevo",
+        "Valjevu",
+        "Valjeva"
+      ],
+      "search_variants_cyrillic": [
+        "Ваљево",
+        "Ваљеву",
+        "Ваљева"
+      ],
+      "type": "city",
+      "district": "Kolubarski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 82169,
+      "population_census_year": 2022,
+      "area_km2": 905,
+      "settlement_count": 78,
+      "postal_codes": [
+        "14000"
+      ],
+      "landline_prefix": "014",
+      "landline_group_center": true,
+      "priority_tier": 1,
+      "parent_id": null
+    },
+    {
+      "id": "varvarin",
+      "name_sr": "Varvarin",
+      "name_ascii": "Varvarin",
+      "name_cyrillic": "Варварин",
+      "search_variants": [
+        "Varvarin",
+        "Varvarinu",
+        "Varvarina"
+      ],
+      "search_variants_cyrillic": [
+        "Варварин",
+        "Варварину",
+        "Варварина"
+      ],
+      "type": "municipality",
+      "district": "Rasinski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 14217,
+      "population_census_year": 2022,
+      "area_km2": 249,
+      "settlement_count": 21,
+      "postal_codes": [
+        "37260"
+      ],
+      "landline_prefix": "037",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "velika-plana",
+      "name_sr": "Velika Plana",
+      "name_ascii": "Velika Plana",
+      "name_cyrillic": "Велика Плана",
+      "search_variants": [
+        "Velika Plana",
+        "Velikoj Plani",
+        "Velike Plane"
+      ],
+      "search_variants_cyrillic": [
+        "Велика Плана",
+        "Великој Плани",
+        "Велике Плане"
+      ],
+      "type": "municipality",
+      "district": "Podunavski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 35451,
+      "population_census_year": 2022,
+      "area_km2": 345,
+      "settlement_count": 13,
+      "postal_codes": [
+        "11320"
+      ],
+      "landline_prefix": "026",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "veliko-gradiste",
+      "name_sr": "Veliko Gradište",
+      "name_ascii": "Veliko Gradiste",
+      "name_cyrillic": "Велико Градиште",
+      "search_variants": [
+        "Veliko Gradište",
+        "Veliko Gradiste",
+        "Velikom Gradištu",
+        "Velikom Gradistu",
+        "Velikog Gradišta",
+        "Velikog Gradista"
+      ],
+      "search_variants_cyrillic": [
+        "Велико Градиште",
+        "Великом Градишту",
+        "Великог Градишта"
+      ],
+      "type": "municipality",
+      "district": "Braničevski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 15455,
+      "population_census_year": 2022,
+      "area_km2": 344,
+      "settlement_count": 26,
+      "postal_codes": [
+        "12220"
+      ],
+      "landline_prefix": "012",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "vladicin-han",
+      "name_sr": "Vladičin Han",
+      "name_ascii": "Vladicin Han",
+      "name_cyrillic": "Владичин Хан",
+      "search_variants": [
+        "Vladičin Han",
+        "Vladicin Han",
+        "Vladičinom Hanu",
+        "Vladicinom Hanu",
+        "Vladičinog Hana",
+        "Vladicinog Hana"
+      ],
+      "search_variants_cyrillic": [
+        "Владичин Хан",
+        "Владичином Хану",
+        "Владичиног Хана"
+      ],
+      "type": "municipality",
+      "district": "Pčinjski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 17532,
+      "population_census_year": 2022,
+      "area_km2": 366,
+      "settlement_count": 51,
+      "postal_codes": [
+        "17510"
+      ],
+      "landline_prefix": "017",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "vladimirci",
+      "name_sr": "Vladimirci",
+      "name_ascii": "Vladimirci",
+      "name_cyrillic": "Владимирци",
+      "search_variants": [
+        "Vladimirci",
+        "Vladimircima",
+        "Vladimiraca"
+      ],
+      "search_variants_cyrillic": [
+        "Владимирци",
+        "Владимирцима",
+        "Владимираца"
+      ],
+      "type": "municipality",
+      "district": "Mačvanski okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 14427,
+      "population_census_year": 2022,
+      "area_km2": 338,
+      "settlement_count": 29,
+      "postal_codes": [
+        "15225"
+      ],
+      "landline_prefix": "015",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "vlasotince",
+      "name_sr": "Vlasotince",
+      "name_ascii": "Vlasotince",
+      "name_cyrillic": "Власотинце",
+      "search_variants": [
+        "Vlasotince",
+        "Vlasotincu",
+        "Vlasotinca"
+      ],
+      "search_variants_cyrillic": [
+        "Власотинце",
+        "Власотинцу",
+        "Власотинца"
+      ],
+      "type": "municipality",
+      "district": "Jablanički okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 25695,
+      "population_census_year": 2022,
+      "area_km2": 308,
+      "settlement_count": 48,
+      "postal_codes": [
+        "16210"
+      ],
+      "landline_prefix": "016",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "vranje",
+      "name_sr": "Vranje",
+      "name_ascii": "Vranje",
+      "name_cyrillic": "Врање",
+      "search_variants": [
+        "Vranje",
+        "Vranju",
+        "Vranja"
+      ],
+      "search_variants_cyrillic": [
+        "Врање",
+        "Врању",
+        "Врања"
+      ],
+      "type": "city",
+      "district": "Pčinjski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 74381,
+      "population_census_year": 2022,
+      "area_km2": 860,
+      "settlement_count": 105,
+      "postal_codes": [
+        "17500"
+      ],
+      "landline_prefix": "017",
+      "landline_group_center": true,
+      "priority_tier": 1,
+      "parent_id": null
+    },
+    {
+      "id": "vrbas",
+      "name_sr": "Vrbas",
+      "name_ascii": "Vrbas",
+      "name_cyrillic": "Врбас",
+      "search_variants": [
+        "Vrbas",
+        "Vrbasu",
+        "Vrbasa"
+      ],
+      "search_variants_cyrillic": [
+        "Врбас",
+        "Врбасу",
+        "Врбаса"
+      ],
+      "type": "municipality",
+      "district": "Južnobački okrug",
+      "region": "Vojvodina",
+      "population": 36601,
+      "population_census_year": 2022,
+      "area_km2": 376,
+      "settlement_count": 7,
+      "postal_codes": [
+        "21460"
+      ],
+      "landline_prefix": "021",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "vrnjacka-banja",
+      "name_sr": "Vrnjačka Banja",
+      "name_ascii": "Vrnjacka Banja",
+      "name_cyrillic": "Врњачка Бања",
+      "search_variants": [
+        "Vrnjačka Banja",
+        "Vrnjacka Banja",
+        "Vrnjačkoj Banji",
+        "Vrnjackoj Banji",
+        "Vrnjačke Banje",
+        "Vrnjacke Banje"
+      ],
+      "search_variants_cyrillic": [
+        "Врњачка Бања",
+        "Врњачкој Бањи",
+        "Врњачке Бање"
+      ],
+      "type": "municipality",
+      "district": "Raški okrug",
+      "region": "Šumadija i Zapadna Srbija",
+      "population": 25065,
+      "population_census_year": 2022,
+      "area_km2": 239,
+      "settlement_count": 14,
+      "postal_codes": [
+        "36210"
+      ],
+      "landline_prefix": "036",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "vrsac",
+      "name_sr": "Vršac",
+      "name_ascii": "Vrsac",
+      "name_cyrillic": "Вршац",
+      "search_variants": [
+        "Vršac",
+        "Vrsac",
+        "Vršcu",
+        "Vrscu",
+        "Vršca",
+        "Vrsca"
+      ],
+      "search_variants_cyrillic": [
+        "Вршац",
+        "Вршцу",
+        "Вршца"
+      ],
+      "type": "city",
+      "district": "Južnobanatski okrug",
+      "region": "Vojvodina",
+      "population": 45462,
+      "population_census_year": 2022,
+      "area_km2": 800,
+      "settlement_count": 24,
+      "postal_codes": [
+        "26300"
+      ],
+      "landline_prefix": "013",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "zabalj",
+      "name_sr": "Žabalj",
+      "name_ascii": "Zabalj",
+      "name_cyrillic": "Жабаљ",
+      "search_variants": [
+        "Žabalj",
+        "Zabalj",
+        "Žablju",
+        "Zablju",
+        "Žablja",
+        "Zablja"
+      ],
+      "search_variants_cyrillic": [
+        "Жабаљ",
+        "Жабљу",
+        "Жабља"
+      ],
+      "type": "municipality",
+      "district": "Južnobački okrug",
+      "region": "Vojvodina",
+      "population": 23853,
+      "population_census_year": 2022,
+      "area_km2": 400,
+      "settlement_count": 4,
+      "postal_codes": [
+        "21230"
+      ],
+      "landline_prefix": "021",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "zabari",
+      "name_sr": "Žabari",
+      "name_ascii": "Zabari",
+      "name_cyrillic": "Жабари",
+      "search_variants": [
+        "Žabari",
+        "Zabari",
+        "Žabarima",
+        "Zabarima",
+        "Žabara",
+        "Zabara"
+      ],
+      "search_variants_cyrillic": [
+        "Жабари",
+        "Жабарима",
+        "Жабара"
+      ],
+      "type": "municipality",
+      "district": "Braničevski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 9261,
+      "population_census_year": 2022,
+      "area_km2": 264,
+      "settlement_count": 15,
+      "postal_codes": [
+        "12374"
+      ],
+      "landline_prefix": "012",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "zagubica",
+      "name_sr": "Žagubica",
+      "name_ascii": "Zagubica",
+      "name_cyrillic": "Жагубица",
+      "search_variants": [
+        "Žagubica",
+        "Zagubica",
+        "Žagubici",
+        "Zagubici",
+        "Žagubice",
+        "Zagubice"
+      ],
+      "search_variants_cyrillic": [
+        "Жагубица",
+        "Жагубици",
+        "Жагубице"
+      ],
+      "type": "municipality",
+      "district": "Braničevski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 9712,
+      "population_census_year": 2022,
+      "area_km2": 760,
+      "settlement_count": 18,
+      "postal_codes": [
+        "12320"
+      ],
+      "landline_prefix": "012",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "zajecar",
+      "name_sr": "Zaječar",
+      "name_ascii": "Zajecar",
+      "name_cyrillic": "Зајечар",
+      "search_variants": [
+        "Zaječar",
+        "Zajecar",
+        "Zaječaru",
+        "Zajecaru",
+        "Zaječara",
+        "Zajecara"
+      ],
+      "search_variants_cyrillic": [
+        "Зајечар",
+        "Зајечару",
+        "Зајечара"
+      ],
+      "type": "city",
+      "district": "Zaječarski okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 47991,
+      "population_census_year": 2022,
+      "area_km2": 1069,
+      "settlement_count": 42,
+      "postal_codes": [
+        "19000"
+      ],
+      "landline_prefix": "019",
+      "landline_group_center": true,
+      "priority_tier": 2,
+      "parent_id": null
+    },
+    {
+      "id": "zitiste",
+      "name_sr": "Žitište",
+      "name_ascii": "Zitiste",
+      "name_cyrillic": "Житиште",
+      "search_variants": [
+        "Žitište",
+        "Zitiste",
+        "Žitištu",
+        "Zitistu",
+        "Žitišta",
+        "Zitista"
+      ],
+      "search_variants_cyrillic": [
+        "Житиште",
+        "Житишту",
+        "Житишта"
+      ],
+      "type": "municipality",
+      "district": "Srednjobanatski okrug",
+      "region": "Vojvodina",
+      "population": 13412,
+      "population_census_year": 2022,
+      "area_km2": 525,
+      "settlement_count": 12,
+      "postal_codes": [
+        "23210"
+      ],
+      "landline_prefix": "023",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "zitoradja",
+      "name_sr": "Žitorađa",
+      "name_ascii": "Zitoradja",
+      "name_cyrillic": "Житорађа",
+      "search_variants": [
+        "Žitorađa",
+        "Zitoradja",
+        "Žitorađi",
+        "Zitoradji",
+        "Žitorađe",
+        "Zitoradje"
+      ],
+      "search_variants_cyrillic": [
+        "Житорађа",
+        "Житорађи",
+        "Житорађе"
+      ],
+      "type": "municipality",
+      "district": "Toplički okrug",
+      "region": "Južna i Istočna Srbija",
+      "population": 13782,
+      "population_census_year": 2022,
+      "area_km2": 214,
+      "settlement_count": 30,
+      "postal_codes": [
+        "18412"
+      ],
+      "landline_prefix": "027",
+      "landline_group_center": false,
+      "priority_tier": 3,
+      "parent_id": null
+    },
+    {
+      "id": "zrenjanin",
+      "name_sr": "Zrenjanin",
+      "name_ascii": "Zrenjanin",
+      "name_cyrillic": "Зрењанин",
+      "search_variants": [
+        "Zrenjanin",
+        "Zrenjaninu",
+        "Zrenjanina"
+      ],
+      "search_variants_cyrillic": [
+        "Зрењанин",
+        "Зрењанину",
+        "Зрењанина"
+      ],
+      "type": "city",
+      "district": "Srednjobanatski okrug",
+      "region": "Vojvodina",
+      "population": 105722,
+      "population_census_year": 2022,
+      "area_km2": 1327,
+      "settlement_count": 22,
+      "postal_codes": [
+        "23000"
+      ],
+      "landline_prefix": "023",
+      "landline_group_center": true,
+      "priority_tier": 1,
+      "parent_id": null
+    },
+    {
+      "id": "beograd-barajevo",
+      "name_sr": "Barajevo",
+      "name_ascii": "Barajevo",
+      "name_cyrillic": "Барајево",
+      "search_variants": [
+        "Barajevo",
+        "Barajevu",
+        "Barajeva"
+      ],
+      "search_variants_cyrillic": [
+        "Барајево",
+        "Барајеву",
+        "Барајева"
+      ],
+      "type": "city_municipality",
+      "district": "Grad Beograd",
+      "region": "Beogradski region",
+      "population": 26431,
+      "population_census_year": 2022,
+      "area_km2": null,
+      "settlement_count": null,
+      "postal_codes": [
+        "11460"
+      ],
+      "landline_prefix": "011",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": "beograd"
+    },
+    {
+      "id": "beograd-cukarica",
+      "name_sr": "Čukarica",
+      "name_ascii": "Cukarica",
+      "name_cyrillic": "Чукарица",
+      "search_variants": [
+        "Čukarica",
+        "Cukarica",
+        "Čukarici",
+        "Cukarici",
+        "Čukarice",
+        "Cukarice"
+      ],
+      "search_variants_cyrillic": [
+        "Чукарица",
+        "Чукарици",
+        "Чукарице"
+      ],
+      "type": "city_municipality",
+      "district": "Grad Beograd",
+      "region": "Beogradski region",
+      "population": 175793,
+      "population_census_year": 2022,
+      "area_km2": null,
+      "settlement_count": null,
+      "postal_codes": [
+        "11030"
+      ],
+      "landline_prefix": "011",
+      "landline_group_center": false,
+      "priority_tier": 1,
+      "parent_id": "beograd"
+    },
+    {
+      "id": "beograd-grocka",
+      "name_sr": "Grocka",
+      "name_ascii": "Grocka",
+      "name_cyrillic": "Гроцка",
+      "search_variants": [
+        "Grocka",
+        "Grockoj",
+        "Grocke"
+      ],
+      "search_variants_cyrillic": [
+        "Гроцка",
+        "Гроцкој",
+        "Гроцке"
+      ],
+      "type": "city_municipality",
+      "district": "Grad Beograd",
+      "region": "Beogradski region",
+      "population": 82810,
+      "population_census_year": 2022,
+      "area_km2": null,
+      "settlement_count": null,
+      "postal_codes": [
+        "11306"
+      ],
+      "landline_prefix": "011",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": "beograd"
+    },
+    {
+      "id": "beograd-lazarevac",
+      "name_sr": "Lazarevac",
+      "name_ascii": "Lazarevac",
+      "name_cyrillic": "Лазаревац",
+      "search_variants": [
+        "Lazarevac",
+        "Lazarevcu",
+        "Lazarevca"
+      ],
+      "search_variants_cyrillic": [
+        "Лазаревац",
+        "Лазаревцу",
+        "Лазаревца"
+      ],
+      "type": "city_municipality",
+      "district": "Grad Beograd",
+      "region": "Beogradski region",
+      "population": 55146,
+      "population_census_year": 2022,
+      "area_km2": null,
+      "settlement_count": null,
+      "postal_codes": [
+        "11550"
+      ],
+      "landline_prefix": "011",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": "beograd"
+    },
+    {
+      "id": "beograd-mladenovac",
+      "name_sr": "Mladenovac",
+      "name_ascii": "Mladenovac",
+      "name_cyrillic": "Младеновац",
+      "search_variants": [
+        "Mladenovac",
+        "Mladenovcu",
+        "Mladenovca"
+      ],
+      "search_variants_cyrillic": [
+        "Младеновац",
+        "Младеновцу",
+        "Младеновца"
+      ],
+      "type": "city_municipality",
+      "district": "Grad Beograd",
+      "region": "Beogradski region",
+      "population": 56389,
+      "population_census_year": 2011,
+      "area_km2": null,
+      "settlement_count": null,
+      "postal_codes": [
+        "11400"
+      ],
+      "landline_prefix": "011",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": "beograd"
+    },
+    {
+      "id": "beograd-novi-beograd",
+      "name_sr": "Novi Beograd",
+      "name_ascii": "Novi Beograd",
+      "name_cyrillic": "Нови Београд",
+      "search_variants": [
+        "Novi Beograd",
+        "Novom Beogradu",
+        "Novog Beograda"
+      ],
+      "search_variants_cyrillic": [
+        "Нови Београд",
+        "Новом Београду",
+        "Новог Београда"
+      ],
+      "type": "city_municipality",
+      "district": "Grad Beograd",
+      "region": "Beogradski region",
+      "population": 209763,
+      "population_census_year": 2022,
+      "area_km2": null,
+      "settlement_count": null,
+      "postal_codes": [
+        "11070"
+      ],
+      "landline_prefix": "011",
+      "landline_group_center": false,
+      "priority_tier": 1,
+      "parent_id": "beograd"
+    },
+    {
+      "id": "beograd-obrenovac",
+      "name_sr": "Obrenovac",
+      "name_ascii": "Obrenovac",
+      "name_cyrillic": "Обреновац",
+      "search_variants": [
+        "Obrenovac",
+        "Obrenovcu",
+        "Obrenovca"
+      ],
+      "search_variants_cyrillic": [
+        "Обреновац",
+        "Обреновцу",
+        "Обреновца"
+      ],
+      "type": "city_municipality",
+      "district": "Grad Beograd",
+      "region": "Beogradski region",
+      "population": 68882,
+      "population_census_year": 2011,
+      "area_km2": null,
+      "settlement_count": null,
+      "postal_codes": [
+        "11500"
+      ],
+      "landline_prefix": "011",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": "beograd"
+    },
+    {
+      "id": "beograd-palilula",
+      "name_sr": "Palilula",
+      "name_ascii": "Palilula",
+      "name_cyrillic": "Палилула",
+      "search_variants": [
+        "Palilula",
+        "Paliluli",
+        "Palilule"
+      ],
+      "search_variants_cyrillic": [
+        "Палилула",
+        "Палилули",
+        "Палилуле"
+      ],
+      "type": "city_municipality",
+      "district": "Grad Beograd",
+      "region": "Beogradski region",
+      "population": 182624,
+      "population_census_year": 2022,
+      "area_km2": null,
+      "settlement_count": null,
+      "postal_codes": [
+        "11000"
+      ],
+      "landline_prefix": "011",
+      "landline_group_center": false,
+      "priority_tier": 1,
+      "parent_id": "beograd"
+    },
+    {
+      "id": "beograd-rakovica",
+      "name_sr": "Rakovica",
+      "name_ascii": "Rakovica",
+      "name_cyrillic": "Раковица",
+      "search_variants": [
+        "Rakovica",
+        "Rakovici",
+        "Rakovice"
+      ],
+      "search_variants_cyrillic": [
+        "Раковица",
+        "Раковици",
+        "Раковице"
+      ],
+      "type": "city_municipality",
+      "district": "Grad Beograd",
+      "region": "Beogradski region",
+      "population": 104456,
+      "population_census_year": 2022,
+      "area_km2": null,
+      "settlement_count": null,
+      "postal_codes": [
+        "11090"
+      ],
+      "landline_prefix": "011",
+      "landline_group_center": false,
+      "priority_tier": 1,
+      "parent_id": "beograd"
+    },
+    {
+      "id": "beograd-savski-venac",
+      "name_sr": "Savski Venac",
+      "name_ascii": "Savski Venac",
+      "name_cyrillic": "Савски Венац",
+      "search_variants": [
+        "Savski Venac",
+        "Savskom Vencu",
+        "Savskog Venca"
+      ],
+      "search_variants_cyrillic": [
+        "Савски Венац",
+        "Савском Венцу",
+        "Савског Венца"
+      ],
+      "type": "city_municipality",
+      "district": "Grad Beograd",
+      "region": "Beogradski region",
+      "population": 36699,
+      "population_census_year": 2022,
+      "area_km2": null,
+      "settlement_count": null,
+      "postal_codes": [
+        "11000"
+      ],
+      "landline_prefix": "011",
+      "landline_group_center": false,
+      "priority_tier": 1,
+      "parent_id": "beograd"
+    },
+    {
+      "id": "beograd-sopot",
+      "name_sr": "Sopot",
+      "name_ascii": "Sopot",
+      "name_cyrillic": "Сопот",
+      "search_variants": [
+        "Sopot",
+        "Sopotu",
+        "Sopota"
+      ],
+      "search_variants_cyrillic": [
+        "Сопот",
+        "Сопоту",
+        "Сопота"
+      ],
+      "type": "city_municipality",
+      "district": "Grad Beograd",
+      "region": "Beogradski region",
+      "population": 19126,
+      "population_census_year": 2022,
+      "area_km2": null,
+      "settlement_count": null,
+      "postal_codes": [
+        "11450"
+      ],
+      "landline_prefix": "011",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": "beograd"
+    },
+    {
+      "id": "beograd-stari-grad",
+      "name_sr": "Stari Grad",
+      "name_ascii": "Stari Grad",
+      "name_cyrillic": "Стари Град",
+      "search_variants": [
+        "Stari Grad",
+        "Starom Gradu",
+        "Starog Grada"
+      ],
+      "search_variants_cyrillic": [
+        "Стари Град",
+        "Старом Граду",
+        "Старог Града"
+      ],
+      "type": "city_municipality",
+      "district": "Grad Beograd",
+      "region": "Beogradski region",
+      "population": 44737,
+      "population_census_year": 2022,
+      "area_km2": null,
+      "settlement_count": null,
+      "postal_codes": [
+        "11000"
+      ],
+      "landline_prefix": "011",
+      "landline_group_center": false,
+      "priority_tier": 1,
+      "parent_id": "beograd"
+    },
+    {
+      "id": "beograd-surcin",
+      "name_sr": "Surčin",
+      "name_ascii": "Surcin",
+      "name_cyrillic": "Сурчин",
+      "search_variants": [
+        "Surčin",
+        "Surcin",
+        "Surčinu",
+        "Surcinu",
+        "Surčina",
+        "Surcina"
+      ],
+      "search_variants_cyrillic": [
+        "Сурчин",
+        "Сурчину",
+        "Сурчина"
+      ],
+      "type": "city_municipality",
+      "district": "Grad Beograd",
+      "region": "Beogradski region",
+      "population": 45452,
+      "population_census_year": 2011,
+      "area_km2": null,
+      "settlement_count": null,
+      "postal_codes": [
+        "11271"
+      ],
+      "landline_prefix": "011",
+      "landline_group_center": false,
+      "priority_tier": 2,
+      "parent_id": "beograd"
+    },
+    {
+      "id": "beograd-vozdovac",
+      "name_sr": "Voždovac",
+      "name_ascii": "Vozdovac",
+      "name_cyrillic": "Вождовац",
+      "search_variants": [
+        "Voždovac",
+        "Vozdovac",
+        "Voždovcu",
+        "Vozdovcu",
+        "Voždovca",
+        "Vozdovca"
+      ],
+      "search_variants_cyrillic": [
+        "Вождовац",
+        "Вождовцу",
+        "Вождовца"
+      ],
+      "type": "city_municipality",
+      "district": "Grad Beograd",
+      "region": "Beogradski region",
+      "population": 174864,
+      "population_census_year": 2022,
+      "area_km2": null,
+      "settlement_count": null,
+      "postal_codes": [
+        "11040"
+      ],
+      "landline_prefix": "011",
+      "landline_group_center": false,
+      "priority_tier": 1,
+      "parent_id": "beograd"
+    },
+    {
+      "id": "beograd-vracar",
+      "name_sr": "Vračar",
+      "name_ascii": "Vracar",
+      "name_cyrillic": "Врачар",
+      "search_variants": [
+        "Vračar",
+        "Vracar",
+        "Vračaru",
+        "Vracaru",
+        "Vračara",
+        "Vracara"
+      ],
+      "search_variants_cyrillic": [
+        "Врачар",
+        "Врачару",
+        "Врачара"
+      ],
+      "type": "city_municipality",
+      "district": "Grad Beograd",
+      "region": "Beogradski region",
+      "population": 55406,
+      "population_census_year": 2022,
+      "area_km2": null,
+      "settlement_count": null,
+      "postal_codes": [
+        "11000"
+      ],
+      "landline_prefix": "011",
+      "landline_group_center": false,
+      "priority_tier": 1,
+      "parent_id": "beograd"
+    },
+    {
+      "id": "beograd-zemun",
+      "name_sr": "Zemun",
+      "name_ascii": "Zemun",
+      "name_cyrillic": "Земун",
+      "search_variants": [
+        "Zemun",
+        "Zemunu",
+        "Zemuna"
+      ],
+      "search_variants_cyrillic": [
+        "Земун",
+        "Земуну",
+        "Земуна"
+      ],
+      "type": "city_municipality",
+      "district": "Grad Beograd",
+      "region": "Beogradski region",
+      "population": 177908,
+      "population_census_year": 2011,
+      "area_km2": null,
+      "settlement_count": null,
+      "postal_codes": [
+        "11080"
+      ],
+      "landline_prefix": "011",
+      "landline_group_center": false,
+      "priority_tier": 1,
+      "parent_id": "beograd"
+    },
+    {
+      "id": "beograd-zvezdara",
+      "name_sr": "Zvezdara",
+      "name_ascii": "Zvezdara",
+      "name_cyrillic": "Звездара",
+      "search_variants": [
+        "Zvezdara",
+        "Zvezdari",
+        "Zvezdare"
+      ],
+      "search_variants_cyrillic": [
+        "Звездара",
+        "Звездари",
+        "Звездаре"
+      ],
+      "type": "city_municipality",
+      "district": "Grad Beograd",
+      "region": "Beogradski region",
+      "population": 172625,
+      "population_census_year": 2022,
+      "area_km2": null,
+      "settlement_count": null,
+      "postal_codes": [
+        "11000"
+      ],
+      "landline_prefix": "011",
+      "landline_group_center": false,
+      "priority_tier": 1,
+      "parent_id": "beograd"
+    }
+  ]
+}
