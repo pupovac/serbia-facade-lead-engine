@@ -1,0 +1,462 @@
+{
+  "_meta": {
+    "description": "Term inventory for the Serbian search-query generator. Each term is the nominative Serbian Latin form with diacritics; src/lib/queries.ts derives the ASCII-folded and Cyrillic spellings and composes them against the inflected place names in data/serbia-geo.json.",
+    "generated_by": "hand-curated; counts verified by src/lib/queries.test.ts",
+    "precision_definitions": {
+      "narrow": "Almost every hit is the target business type. Run first, on every municipality.",
+      "medium": "Majority on target, with a predictable adjacent trade mixed in. Run on tier 1 and 2.",
+      "broad": "Target businesses are a minority of hits. Run only where narrow terms come back thin, and expect classification to discard most of it."
+    },
+    "counts": {
+      "templates": 65,
+      "facade_contractor_terms": 42,
+      "construction_material_store_terms": 26,
+      "narrow": 38,
+      "medium": 17,
+      "broad": 10
+    },
+    "fields": {
+      "term_cyrillic": "Optional. A string overrides the automatic transliteration; false suppresses Cyrillic output for terms built on a Latin brand or acronym."
+    }
+  },
+  "locative_prepositions": {
+    "default": "u",
+    "note": "Serbian takes \"u\" with almost every settlement name but \"na\" with most Belgrade city municipalities (\"na Vracaru\", \"na Novom Beogradu\"). Keys are municipality ids from data/serbia-geo.json.",
+    "overrides": {
+      "beograd-cukarica": "na",
+      "beograd-novi-beograd": "na",
+      "beograd-palilula": "na",
+      "beograd-savski-venac": "na",
+      "beograd-stari-grad": "na",
+      "beograd-vozdovac": "na",
+      "beograd-vracar": "na",
+      "beograd-zvezdara": "na"
+    }
+  },
+  "templates": [
+    {
+      "id": "fasader",
+      "term": "fasader",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow"
+    },
+    {
+      "id": "fasaderi",
+      "term": "fasaderi",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow"
+    },
+    {
+      "id": "fasaderski-radovi",
+      "term": "fasaderski radovi",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow"
+    },
+    {
+      "id": "fasaderske-usluge",
+      "term": "fasaderske usluge",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow"
+    },
+    {
+      "id": "fasaderska-firma",
+      "term": "fasaderska firma",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow"
+    },
+    {
+      "id": "fasaderski-majstor",
+      "term": "fasaderski majstor",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow",
+      "note": "Sole traders advertise as majstor rather than firma; high mobile-number yield."
+    },
+    {
+      "id": "majstori-za-fasadu",
+      "term": "majstori za fasadu",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow",
+      "note": "Classifieds phrasing — the listing usually is the phone number."
+    },
+    {
+      "id": "izrada-fasade",
+      "term": "izrada fasade",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow"
+    },
+    {
+      "id": "postavljanje-fasade",
+      "term": "postavljanje fasade",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow"
+    },
+    {
+      "id": "radovi-na-fasadi",
+      "term": "radovi na fasadi",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "medium",
+      "note": "Also matches public tender notices and news about building renovations."
+    },
+    {
+      "id": "demit-fasada",
+      "term": "demit fasada",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow",
+      "note": "Demit is a genericised ETICS brand in Serbia — the exact multi-step system our panel replaces."
+    },
+    {
+      "id": "termo-fasada",
+      "term": "termo fasada",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow"
+    },
+    {
+      "id": "stiropor-fasada",
+      "term": "stiropor fasada",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow"
+    },
+    {
+      "id": "fasada-od-stiropora",
+      "term": "fasada od stiropora",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow"
+    },
+    {
+      "id": "eps-fasada",
+      "term": "EPS fasada",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "medium",
+      "term_cyrillic": false,
+      "note": "EPS also abbreviates Elektroprivreda Srbije, the power utility — noisy on general search."
+    },
+    {
+      "id": "etics-fasada",
+      "term": "ETICS fasada",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow",
+      "term_cyrillic": false,
+      "note": "Precise but low-volume; used by engineering firms, rarely by installers."
+    },
+    {
+      "id": "akrilna-fasada",
+      "term": "akrilna fasada",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow"
+    },
+    {
+      "id": "silikonska-fasada",
+      "term": "silikonska fasada",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow"
+    },
+    {
+      "id": "silikatna-fasada",
+      "term": "silikatna fasada",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow"
+    },
+    {
+      "id": "bavalit-fasada",
+      "term": "bavalit fasada",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow",
+      "note": "Genericised finish-coat brand; still the everyday word for a scratched render finish."
+    },
+    {
+      "id": "dekorativna-fasada",
+      "term": "dekorativna fasada",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "medium",
+      "note": "Overlaps with decorative-stone and stucco suppliers."
+    },
+    {
+      "id": "ventilisana-fasada",
+      "term": "ventilisana fasada",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "medium",
+      "note": "Aluminium/glass curtain-wall trade — a different segment, but some firms do both."
+    },
+    {
+      "id": "renoviranje-fasade",
+      "term": "renoviranje fasade",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow"
+    },
+    {
+      "id": "sanacija-fasade",
+      "term": "sanacija fasade",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow"
+    },
+    {
+      "id": "obnova-fasade",
+      "term": "obnova fasade",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow"
+    },
+    {
+      "id": "farbanje-fasade",
+      "term": "farbanje fasade",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "medium",
+      "note": "Mostly painters; they subcontract or refer facade work."
+    },
+    {
+      "id": "pranje-fasade",
+      "term": "pranje fasade",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "medium",
+      "note": "Facade-cleaning and rope-access firms — adjacent trade, occasionally the same crew."
+    },
+    {
+      "id": "lepljenje-stiropora",
+      "term": "lepljenje stiropora",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow",
+      "note": "The literal step our 2-in-1 panel removes."
+    },
+    {
+      "id": "ugradnja-stiropora",
+      "term": "ugradnja stiropora",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow"
+    },
+    {
+      "id": "termoizolacija-fasade",
+      "term": "termoizolacija fasade",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow"
+    },
+    {
+      "id": "izolacija-fasade",
+      "term": "izolacija fasade",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow"
+    },
+    {
+      "id": "molersko-fasaderski-radovi",
+      "term": "molersko fasaderski radovi",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "narrow",
+      "note": "The standard trade-register phrasing for the combined painting/rendering trade."
+    },
+    {
+      "id": "moleraj-i-fasade",
+      "term": "moleraj i fasade",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "medium"
+    },
+    {
+      "id": "gradjevinske-firme-fasada",
+      "term": "građevinske firme fasada",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "medium"
+    },
+    {
+      "id": "zavrsni-gradjevinski-radovi",
+      "term": "završni građevinski radovi",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "broad",
+      "note": "Covers every finishing trade — tiling, drywall, flooring. Keep, but expect heavy filtering."
+    },
+    {
+      "id": "zidarski-radovi",
+      "term": "zidarski radovi",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "broad",
+      "note": "Masonry; many small crews do facade work but the term does not say so."
+    },
+    {
+      "id": "skele-za-fasadu",
+      "term": "skele za fasadu",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "broad",
+      "note": "Scaffolding rental, not the installer. Kept because rental firms list their contractor customers."
+    },
+    {
+      "id": "izolacija-kuce",
+      "term": "izolacija kuće",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "broad",
+      "note": "Pulls in roof, floor and window insulation alongside facades."
+    },
+    {
+      "id": "energetska-sanacija",
+      "term": "energetska sanacija",
+      "lead_types": ["FACADE_CONTRACTOR"],
+      "precision": "broad",
+      "note": "Dominated by municipal subsidy-programme pages rather than contractors."
+    },
+    {
+      "id": "gradjevinsko-stovariste",
+      "term": "građevinsko stovarište",
+      "lead_types": ["CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "narrow"
+    },
+    {
+      "id": "stovariste-gradjevinskog-materijala",
+      "term": "stovarište građevinskog materijala",
+      "lead_types": ["CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "narrow"
+    },
+    {
+      "id": "stovariste",
+      "term": "stovarište",
+      "lead_types": ["CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "broad",
+      "note": "On its own it also means timber, coal and pellet yards."
+    },
+    {
+      "id": "gradjevinski-materijal",
+      "term": "građevinski materijal",
+      "lead_types": ["CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "medium",
+      "note": "Matches manufacturers and webshops as well as physical yards."
+    },
+    {
+      "id": "prodaja-gradjevinskog-materijala",
+      "term": "prodaja građevinskog materijala",
+      "lead_types": ["CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "narrow"
+    },
+    {
+      "id": "prodavnica-gradjevinskog-materijala",
+      "term": "prodavnica građevinskog materijala",
+      "lead_types": ["CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "narrow"
+    },
+    {
+      "id": "veleprodaja-gradjevinskog-materijala",
+      "term": "veleprodaja građevinskog materijala",
+      "lead_types": ["CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "narrow",
+      "note": "Wholesalers — the highest-value store segment for a panel importer."
+    },
+    {
+      "id": "distributer-gradjevinskog-materijala",
+      "term": "distributer građevinskog materijala",
+      "lead_types": ["CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "narrow"
+    },
+    {
+      "id": "gradjevinski-centar",
+      "term": "građevinski centar",
+      "lead_types": ["CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "medium"
+    },
+    {
+      "id": "gradjevinska-radnja",
+      "term": "građevinska radnja",
+      "lead_types": ["CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "medium"
+    },
+    {
+      "id": "gradjara",
+      "term": "građara",
+      "lead_types": ["CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "medium",
+      "note": "Colloquial, but it is what small yards call themselves in local listings."
+    },
+    {
+      "id": "fasadni-materijal",
+      "term": "fasadni materijal",
+      "lead_types": ["CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "narrow"
+    },
+    {
+      "id": "prodaja-fasadnog-materijala",
+      "term": "prodaja fasadnog materijala",
+      "lead_types": ["CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "narrow"
+    },
+    {
+      "id": "termoizolacioni-materijal",
+      "term": "termoizolacioni materijal",
+      "lead_types": ["CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "narrow"
+    },
+    {
+      "id": "izolacioni-materijali",
+      "term": "izolacioni materijali",
+      "lead_types": ["CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "medium"
+    },
+    {
+      "id": "prodaja-stiropora",
+      "term": "prodaja stiropora",
+      "lead_types": ["CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "narrow",
+      "note": "Directly names our product category."
+    },
+    {
+      "id": "stiropor-cena",
+      "term": "stiropor cena",
+      "lead_types": ["CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "broad",
+      "note": "Price queries surface webshops and forums as much as yards."
+    },
+    {
+      "id": "eps-ploce",
+      "term": "EPS ploče",
+      "lead_types": ["CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "medium",
+      "term_cyrillic": false,
+      "note": "Same Elektroprivreda Srbije collision as eps-fasada."
+    },
+    {
+      "id": "lepak-za-stiropor",
+      "term": "lepak za stiropor",
+      "lead_types": ["CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "narrow"
+    },
+    {
+      "id": "mrezica-za-fasadu",
+      "term": "mrežica za fasadu",
+      "lead_types": ["CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "narrow"
+    },
+    {
+      "id": "prodaja-izolacije",
+      "term": "prodaja izolacije",
+      "lead_types": ["CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "medium"
+    },
+    {
+      "id": "gradjevinska-oprema",
+      "term": "građevinska oprema",
+      "lead_types": ["CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "broad",
+      "note": "Mostly tool and machinery dealers."
+    },
+    {
+      "id": "baumit-distributer",
+      "term": "Baumit distributer",
+      "lead_types": ["CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "medium",
+      "term_cyrillic": false,
+      "note": "Brand-distributor route: Baumit/Röfix/Nabersa dealers are the incumbent ETICS channel."
+    },
+    {
+      "id": "termoizolacija",
+      "term": "termoizolacija",
+      "lead_types": ["FACADE_CONTRACTOR", "CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "broad",
+      "note": "Window, roof and floor insulation firms come with it."
+    },
+    {
+      "id": "stiropor",
+      "term": "stiropor",
+      "lead_types": ["FACADE_CONTRACTOR", "CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "broad",
+      "note": "The single most common word for our product, and the least specific."
+    },
+    {
+      "id": "fasadni-sistemi",
+      "term": "fasadni sistemi",
+      "lead_types": ["FACADE_CONTRACTOR", "CONSTRUCTION_MATERIAL_STORE"],
+      "precision": "medium",
+      "note": "System suppliers and the contractors certified to install them."
+    }
+  ]
+}
