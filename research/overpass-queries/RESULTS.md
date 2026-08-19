@@ -15,14 +15,14 @@ curl -s -G https://overpass-api.de/api/interpreter \
 intermittently during this pass. Retry, or fall back to
 `https://overpass.kumi.systems/api/interpreter` — same query language, same data.
 
-| Query | Elements | With phone | With website |
-|---|---:|---:|---:|
-| `01-stores-all-tags.overpassql` | 794 | 339 (43%) | 286 |
-| `02-stores-with-phone.overpassql` | 339 | 339 (100%) | 244 |
-| `03-contractors-craft.overpassql` | 43 | 15 (35%) | 10 |
-| `04-contractors-office.overpassql` | 29 | 24 (83%) | 22 |
-| `05-craft-census.overpassql` | 697 | 285 (41%) | — |
-| `06-admin-units.overpassql` | 154 (admin_level=8 relations) | — | — |
+| Query                              |                      Elements | With phone | With website |
+| ---------------------------------- | ----------------------------: | ---------: | -----------: |
+| `01-stores-all-tags.overpassql`    |                           794 |  339 (43%) |          286 |
+| `02-stores-with-phone.overpassql`  |                           339 | 339 (100%) |          244 |
+| `03-contractors-craft.overpassql`  |                            43 |   15 (35%) |           10 |
+| `04-contractors-office.overpassql` |                            29 |   24 (83%) |           22 |
+| `05-craft-census.overpassql`       |                           697 |  285 (41%) |            — |
+| `06-admin-units.overpassql`        | 154 (admin_level=8 relations) |          — |            — |
 
 `.result.json` is kept for the two small contractor-side queries, which are the
 ones the recommendation turns on. The three large store/craft responses were
@@ -47,15 +47,15 @@ phone 94% of the time.
 
 ### Other counts collected during this pass
 
-| Measure | Value |
-|---|---:|
-| `office=construction_company`, Serbia | 29 (24 with phone) |
-| `place=city` nodes | 28 |
-| `place=town` nodes | 138 |
-| `place=village` nodes | 4,149 |
-| `admin_level=6` relations (okruzi) | 26 |
-| `admin_level=7` relations | 34 (incomplete in OSM — do not use) |
-| `admin_level=8` relations (opštine/gradovi) | 154 |
+| Measure                                     |                               Value |
+| ------------------------------------------- | ----------------------------------: |
+| `office=construction_company`, Serbia       |                  29 (24 with phone) |
+| `place=city` nodes                          |                                  28 |
+| `place=town` nodes                          |                                 138 |
+| `place=village` nodes                       |                               4,149 |
+| `admin_level=6` relations (okruzi)          |                                  26 |
+| `admin_level=7` relations                   | 34 (incomplete in OSM — do not use) |
+| `admin_level=8` relations (opštine/gradovi) |                                 154 |
 
 `admin_level=8` returns 154 against the 145 official local self-government
 units in `data/serbia-geo.json` (FUZZ-6); the surplus is Belgrade city

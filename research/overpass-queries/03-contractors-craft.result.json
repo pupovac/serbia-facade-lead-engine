@@ -7,623 +7,621 @@
     "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
   },
   "elements": [
-
-{
-  "type": "node",
-  "id": 3004614860,
-  "lat": 45.3370666,
-  "lon": 20.4937102,
-  "tags": {
-    "craft": "tiler",
-    "name": "Prva"
-  }
-},
-{
-  "type": "node",
-  "id": 3065409093,
-  "lat": 44.7831229,
-  "lon": 20.4776679,
-  "tags": {
-    "addr:city": "Београд",
-    "addr:housenumber": "25",
-    "addr:postcode": "11000",
-    "addr:street": "Љубићка",
-    "craft": "painter",
-    "name": "Elite Print",
-    "opening_hours": "Su-Fr 09:00-19:00; Sa 09:00-16:00",
-    "phone": "+381113974614",
-    "website": "https://www.eliteprint.rs/photobook.html",
-    "wheelchair": "yes"
-  }
-},
-{
-  "type": "node",
-  "id": 3177125751,
-  "lat": 45.8534944,
-  "lon": 19.7694536,
-  "tags": {
-    "craft": "carpenter",
-    "name": "Kasza Rudolf"
-  }
-},
-{
-  "type": "node",
-  "id": 5325442369,
-  "lat": 44.7786071,
-  "lon": 20.5159411,
-  "tags": {
-    "addr:housenumber": "8v",
-    "addr:street": "Светог Прохора Пчињског",
-    "craft": "carpenter",
-    "int_name": "Stolar",
-    "name": "Столар"
-  }
-},
-{
-  "type": "node",
-  "id": 6799954057,
-  "lat": 44.7965663,
-  "lon": 20.3768472,
-  "tags": {
-    "craft": "carpenter",
-    "int_name": "Tara",
-    "name": "Тара",
-    "name:sr-Latn": "Tara"
-  }
-},
-{
-  "type": "node",
-  "id": 7673512975,
-  "lat": 44.0572877,
-  "lon": 22.0947998,
-  "tags": {
-    "craft": "carpenter",
-    "name": "Total design"
-  }
-},
-{
-  "type": "node",
-  "id": 8158194018,
-  "lat": 44.2659958,
-  "lon": 19.9142576,
-  "tags": {
-    "craft": "carpenter"
-  }
-},
-{
-  "type": "node",
-  "id": 8302646846,
-  "lat": 43.8499422,
-  "lon": 19.8507362,
-  "tags": {
-    "craft": "stonemason",
-    "int_name": "Lazic",
-    "name": "Лазић",
-    "name:sr": "Лазић",
-    "name:sr-Latn": "Lazić",
-    "shop": "craft"
-  }
-},
-{
-  "type": "node",
-  "id": 8621310236,
-  "lat": 44.4313265,
-  "lon": 19.5327104,
-  "tags": {
-    "addr:city": "Komirić",
-    "craft": "stonemason",
-    "name": "Kamenorezačka Radnja „Kolarić”",
-    "opening_hours": "Mo-Su 09:00-17:00",
-    "phone": "+381642418787"
-  }
-},
-{
-  "type": "node",
-  "id": 8900413081,
-  "lat": 45.2796666,
-  "lon": 19.7909316,
-  "tags": {
-    "addr:housenumber": "50",
-    "addr:street": "Руменачки пут",
-    "craft": "stonemason",
-    "int_name": "Kamenorezac Milekic",
-    "name": "Каменорезац Милекић",
-    "name:sr-Latn": "Kamenorezac Milekić"
-  }
-},
-{
-  "type": "node",
-  "id": 8900413082,
-  "lat": 45.2797082,
-  "lon": 19.7904622,
-  "tags": {
-    "addr:housenumber": "52",
-    "addr:street": "Руменачки пут",
-    "craft": "stonemason",
-    "int_name": "Kamenorezac Vujicic",
-    "name": "Каменорезац Вујичић",
-    "name:sr-Latn": "Kamenorezac Vujičić",
-    "ref:RS:kucni_broj": "5514067"
-  }
-},
-{
-  "type": "node",
-  "id": 9667831969,
-  "lat": 44.7906489,
-  "lon": 20.5121800,
-  "tags": {
-    "addr:housenumber": "37",
-    "addr:street": "Живка Давидовића",
-    "craft": "carpenter",
-    "name": "Darex",
-    "ref:RS:kucni_broj": "7411679"
-  }
-},
-{
-  "type": "node",
-  "id": 9858726722,
-  "lat": 42.3022582,
-  "lon": 21.6715701,
-  "tags": {
-    "carpenter": "cabinetmaker",
-    "contact:facebook": "https://www.facebook.com/people/Zdruktharia-Jetoni/100063741092572/",
-    "contact:instagram": "https://www.instagram.com/zdrukthtaria_jetoni/",
-    "craft": "carpenter",
-    "name": "Zdrukthtaria Jetoni",
-    "phone": "+381 63 763 2214"
-  }
-},
-{
-  "type": "node",
-  "id": 11010514005,
-  "lat": 44.8319545,
-  "lon": 20.4003326,
-  "tags": {
-    "craft": "carpenter",
-    "name:en": "Malibu DOO"
-  }
-},
-{
-  "type": "node",
-  "id": 11919268869,
-  "lat": 44.8387788,
-  "lon": 20.3893039,
-  "tags": {
-    "addr:street": "Мозерова",
-    "craft": "carpenter",
-    "name": "Uni3"
-  }
-},
-{
-  "type": "node",
-  "id": 12209357157,
-  "lat": 44.4544065,
-  "lon": 20.0747944,
-  "tags": {
-    "craft": "plasterer",
-    "name": "Marić"
-  }
-},
-{
-  "type": "node",
-  "id": 12369565515,
-  "lat": 43.3092902,
-  "lon": 21.9044564,
-  "tags": {
-    "carpenter": "furniture",
-    "craft": "carpenter",
-    "email": "bugi.design.nis@gmail.com",
-    "name": "Bugi Design",
-    "phone": "+381 65 5251017",
-    "product": "furniture"
-  }
-},
-{
-  "type": "node",
-  "id": 12692657632,
-  "lat": 45.2396926,
-  "lon": 19.6763650,
-  "tags": {
-    "craft": "stonemason",
-    "email": "office@vectorgroupdoo.com",
-    "mobile": "+381 63 1020250",
-    "name": "Vector group",
-    "phone": "+381 62 1883199",
-    "website": "https://vectorgroupdoo.com/"
-  }
-},
-{
-  "type": "node",
-  "id": 13038672541,
-  "lat": 44.8163119,
-  "lon": 20.3699439,
-  "tags": {
-    "craft": "stonemason",
-    "name": "Prijić - Mermeri i graniti"
-  }
-},
-{
-  "type": "node",
-  "id": 13609292544,
-  "lat": 44.3826755,
-  "lon": 20.2323361,
-  "tags": {
-    "craft": "stonemason",
-    "email": "lazarmisic90@gmail.com",
-    "int_name": "Kamen Misic",
-    "name": "Kamen Mišić",
-    "name:sr": "Камен Мишић",
-    "name:sr-Latn": "Kamen Mišić",
-    "opening_hours": "Mo-Sa 09:00-17:00",
-    "phone": "+381 63 8080691;+381 63 8275528;+381 66 6839207;+381 66 6839206;+381 63 8080691",
-    "website": "https://www.kamen-misic.rs"
-  }
-},
-{
-  "type": "node",
-  "id": 13609292571,
-  "lat": 42.9982937,
-  "lon": 21.9689262,
-  "tags": {
-    "craft": "stonemason",
-    "name": "Gran Pi",
-    "name:sr": "Гран Пи",
-    "name:sr-Latn": "Gran Pi",
-    "opening_hours": "Mo-Sa 08:00-16:00",
-    "phone": "+381 60 4574570",
-    "website": "https://granpi.com"
-  }
-},
-{
-  "type": "node",
-  "id": 13609292574,
-  "lat": 45.3995938,
-  "lon": 19.8838659,
-  "tags": {
-    "craft": "stonemason",
-    "email": "info@gemstonealati.rs",
-    "name": "Gem stone",
-    "opening_hours": "Mo-Fr 08:00-17:00; Sa 08:00-15:00",
-    "phone": "+381 63 611244;+381 63 8680550",
-    "website": "https://gemstonealati.rs"
-  }
-},
-{
-  "type": "node",
-  "id": 13945887801,
-  "lat": 42.5469445,
-  "lon": 21.8949310,
-  "tags": {
-    "craft": "stonemason"
-  }
-},
-{
-  "type": "node",
-  "id": 14006924359,
-  "lat": 44.7725431,
-  "lon": 20.5210200,
-  "tags": {
-    "craft": "stonemason",
-    "name": "Invest garden",
-    "phone": "+381 60 5255029"
-  }
-},
-{
-  "type": "node",
-  "id": 14088270683,
-  "lat": 45.0881618,
-  "lon": 20.0763862,
-  "tags": {
-    "contact:facebook": "https://www.facebook.com/people/Satim-Granit-DOO/61560511574307/",
-    "contact:instagram": "https://www.instagram.com/satimgranit/",
-    "craft": "stonemason",
-    "email": "sava.mandic@satimgranit.rs",
-    "name": "Satim granit",
-    "opening_hours": "Mo-Fr 08:00-17:00; Sa 08:00-13:00",
-    "phone": "+381 64 1073307",
-    "website": "https://www.satimgranit.com"
-  }
-},
-{
-  "type": "node",
-  "id": 14096529675,
-  "lat": 43.2166711,
-  "lon": 22.3096570,
-  "tags": {
-    "craft": "stonemason"
-  }
-},
-{
-  "type": "way",
-  "id": 299135708,
-  "center": {
-    "lat": 45.2431580,
-    "lon": 19.7962697
-  },
-  "tags": {
-    "addr:housenumber": "6a",
-    "addr:street": "Кочи Ивана",
-    "building": "commercial",
-    "craft": "carpenter",
-    "name": "Stilles",
-    "name:sr": "Стиллес",
-    "name:sr-Latn": "Stilles",
-    "phone": "+381 021 6800900;+381 021 6800 909",
-    "ref:RS:kucni_broj": "5500508",
-    "survey:date": "2024-12-19",
-    "website": "https://stilles.rs/en/"
-  }
-},
-{
-  "type": "way",
-  "id": 490405884,
-  "center": {
-    "lat": 45.2028175,
-    "lon": 19.7573640
-  },
-  "tags": {
-    "building": "yes",
-    "craft": "carpenter"
-  }
-},
-{
-  "type": "way",
-  "id": 504416123,
-  "center": {
-    "lat": 43.7625961,
-    "lon": 20.1040651
-  },
-  "tags": {
-    "addr:city": "Arilje",
-    "addr:postcode": "31230",
-    "addr:street": "Слободана Пенезића Крцуна",
-    "building": "yes",
-    "craft": "carpenter"
-  }
-},
-{
-  "type": "way",
-  "id": 558559541,
-  "center": {
-    "lat": 44.0632855,
-    "lon": 22.1034903
-  },
-  "tags": {
-    "building": "commercial",
-    "craft": "carpenter"
-  }
-},
-{
-  "type": "way",
-  "id": 686119000,
-  "center": {
-    "lat": 45.2753692,
-    "lon": 19.7999721
-  },
-  "tags": {
-    "addr:housenumber": "61a",
-    "addr:postcode": "21000",
-    "addr:street": "Руменачки пут",
-    "building": "yes",
-    "craft": "stonemason",
-    "name": "Medić",
-    "opening_hours": "Mo-Fr 08:00-17:00",
-    "phone": "+38163501180",
-    "product": "stone;stone_tombs;granite;marble;interior_stone",
-    "website": "https://medic.co.rs/"
-  }
-},
-{
-  "type": "way",
-  "id": 870593018,
-  "center": {
-    "lat": 43.3292018,
-    "lon": 21.9221841
-  },
-  "tags": {
-    "addr:housenumber": "68",
-    "addr:street": "Књажевачка",
-    "building": "house",
-    "craft": "painter",
-    "int_name": "Nijansa",
-    "name": "Нијанса",
-    "name:sr": "Нијанса",
-    "name:sr-Latn": "Nijansa",
-    "ref:RS:kucni_broj": "5960095"
-  }
-},
-{
-  "type": "way",
-  "id": 872343054,
-  "center": {
-    "lat": 45.2097292,
-    "lon": 19.7018318
-  },
-  "tags": {
-    "building": "industrial",
-    "craft": "carpenter",
-    "email": "office@prowood.rs",
-    "fax": "+381 21 2100679",
-    "mobile": "+381 63 7794391",
-    "name": "Prowood",
-    "opening_hours": "Mo-Sa 06:00-23:00",
-    "phone": "+381 21 2100677;+381 21 2100678",
-    "website": "https://www.prowood.rs/"
-  }
-},
-{
-  "type": "way",
-  "id": 884133913,
-  "center": {
-    "lat": 45.2603354,
-    "lon": 19.7699231
-  },
-  "tags": {
-    "addr:housenumber": "94",
-    "addr:postcode": "21000",
-    "addr:street": "Краља Петра I",
-    "building": "yes",
-    "craft": "stonemason",
-    "ref:RS:kucni_broj": "5498932"
-  }
-},
-{
-  "type": "way",
-  "id": 1035841274,
-  "center": {
-    "lat": 44.8160872,
-    "lon": 20.3697291
-  },
-  "tags": {
-    "building": "yes",
-    "craft": "stonemason"
-  }
-},
-{
-  "type": "way",
-  "id": 1035841275,
-  "center": {
-    "lat": 44.8164631,
-    "lon": 20.3699151
-  },
-  "tags": {
-    "building": "yes",
-    "craft": "stonemason"
-  }
-},
-{
-  "type": "way",
-  "id": 1035841276,
-  "center": {
-    "lat": 44.8161713,
-    "lon": 20.3699302
-  },
-  "tags": {
-    "building": "yes",
-    "craft": "stonemason"
-  }
-},
-{
-  "type": "way",
-  "id": 1035841277,
-  "center": {
-    "lat": 44.8162215,
-    "lon": 20.3700214
-  },
-  "tags": {
-    "building": "yes",
-    "craft": "stonemason"
-  }
-},
-{
-  "type": "way",
-  "id": 1035841278,
-  "center": {
-    "lat": 44.8161290,
-    "lon": 20.3698559
-  },
-  "tags": {
-    "building": "yes",
-    "craft": "stonemason"
-  }
-},
-{
-  "type": "way",
-  "id": 1106101946,
-  "center": {
-    "lat": 44.7587832,
-    "lon": 19.6499136
-  },
-  "tags": {
-    "addr:city": "Мајур",
-    "addr:housenumber": "116",
-    "addr:postcode": "15353",
-    "addr:street": "Цара Лазара",
-    "building": "yes",
-    "craft": "carpenter",
-    "fax": "+381 15 343-226",
-    "name": "Мими",
-    "name:en": "Mimi",
-    "name:sr": "Мими",
-    "name:sr-Latn": "Mimi",
-    "operator": "Мими д.о.о.",
-    "phone": "+381 15 343-226",
-    "ref:RS:kucni_broj": "7046738"
-  }
-},
-{
-  "type": "way",
-  "id": 1115340190,
-  "center": {
-    "lat": 44.7693849,
-    "lon": 19.6578454
-  },
-  "tags": {
-    "addr:city": "Мајур",
-    "addr:housenumber": "22",
-    "addr:postcode": "15353",
-    "addr:street": "Светог Саве",
-    "building": "yes",
-    "craft": "carpenter",
-    "name": "Даријо Буинац",
-    "name:en": "Darijo Buinac",
-    "name:sr": "Даријо Буинац",
-    "name:sr-Latn": "Darijo Buinac",
-    "operator": "Даријо Буинац",
-    "ref:RS:kucni_broj": "5633726",
-    "ref:vatin": "RS113051808",
-    "start_date": "2022-05-20"
-  }
-},
-{
-  "type": "way",
-  "id": 1190427184,
-  "center": {
-    "lat": 44.7679388,
-    "lon": 19.6834300
-  },
-  "tags": {
-    "addr:city": "Шабац",
-    "addr:housenumber": "10",
-    "addr:postcode": "15000",
-    "addr:street": "Кнеза Мирослава",
-    "building": "yes",
-    "craft": "painter",
-    "name": "Ентеријер-А.П.",
-    "name:en": "Enterijer-A.P.",
-    "name:sr": "Ентеријер-А.П.",
-    "name:sr-Latn": "Enterijer-A.P.",
-    "operator": "Александар Вуковић",
-    "ref:RS:kucni_broj": "5622416"
-  }
-},
-{
-  "type": "way",
-  "id": 1215713382,
-  "center": {
-    "lat": 45.0326122,
-    "lon": 20.0973087
-  },
-  "tags": {
-    "addr:housenumber": "164",
-    "addr:pak": "346154",
-    "addr:postcode": "22320",
-    "addr:street": "Краља Петра I",
-    "building": "commercial",
-    "contact:facebook": "https://www.facebook.com/idealstonedoo",
-    "contact:instagram": "https://www.instagram.com/idealstone.rs/",
-    "contact:youtube": "https://www.youtube.com/channel/UCCRTqmVmwVLjyocrE-ec4ww",
-    "craft": "stonemason",
-    "email": "office@idealstone.rs",
-    "name": "Ideal stone",
-    "name:sr": "Идеал стоне",
-    "name:sr-Latn": "Ideal stone",
-    "opening_hours": "Mo-Fr 08:00-16:00; Sa 08:00-14:00",
-    "phone": "+381 65 4022022",
-    "ref:RS:kucni_broj": "4269086",
-    "website": "https://idealstone.rs/"
-  }
-}
-
+    {
+      "type": "node",
+      "id": 3004614860,
+      "lat": 45.3370666,
+      "lon": 20.4937102,
+      "tags": {
+        "craft": "tiler",
+        "name": "Prva"
+      }
+    },
+    {
+      "type": "node",
+      "id": 3065409093,
+      "lat": 44.7831229,
+      "lon": 20.4776679,
+      "tags": {
+        "addr:city": "Београд",
+        "addr:housenumber": "25",
+        "addr:postcode": "11000",
+        "addr:street": "Љубићка",
+        "craft": "painter",
+        "name": "Elite Print",
+        "opening_hours": "Su-Fr 09:00-19:00; Sa 09:00-16:00",
+        "phone": "+381113974614",
+        "website": "https://www.eliteprint.rs/photobook.html",
+        "wheelchair": "yes"
+      }
+    },
+    {
+      "type": "node",
+      "id": 3177125751,
+      "lat": 45.8534944,
+      "lon": 19.7694536,
+      "tags": {
+        "craft": "carpenter",
+        "name": "Kasza Rudolf"
+      }
+    },
+    {
+      "type": "node",
+      "id": 5325442369,
+      "lat": 44.7786071,
+      "lon": 20.5159411,
+      "tags": {
+        "addr:housenumber": "8v",
+        "addr:street": "Светог Прохора Пчињског",
+        "craft": "carpenter",
+        "int_name": "Stolar",
+        "name": "Столар"
+      }
+    },
+    {
+      "type": "node",
+      "id": 6799954057,
+      "lat": 44.7965663,
+      "lon": 20.3768472,
+      "tags": {
+        "craft": "carpenter",
+        "int_name": "Tara",
+        "name": "Тара",
+        "name:sr-Latn": "Tara"
+      }
+    },
+    {
+      "type": "node",
+      "id": 7673512975,
+      "lat": 44.0572877,
+      "lon": 22.0947998,
+      "tags": {
+        "craft": "carpenter",
+        "name": "Total design"
+      }
+    },
+    {
+      "type": "node",
+      "id": 8158194018,
+      "lat": 44.2659958,
+      "lon": 19.9142576,
+      "tags": {
+        "craft": "carpenter"
+      }
+    },
+    {
+      "type": "node",
+      "id": 8302646846,
+      "lat": 43.8499422,
+      "lon": 19.8507362,
+      "tags": {
+        "craft": "stonemason",
+        "int_name": "Lazic",
+        "name": "Лазић",
+        "name:sr": "Лазић",
+        "name:sr-Latn": "Lazić",
+        "shop": "craft"
+      }
+    },
+    {
+      "type": "node",
+      "id": 8621310236,
+      "lat": 44.4313265,
+      "lon": 19.5327104,
+      "tags": {
+        "addr:city": "Komirić",
+        "craft": "stonemason",
+        "name": "Kamenorezačka Radnja „Kolarić”",
+        "opening_hours": "Mo-Su 09:00-17:00",
+        "phone": "+381642418787"
+      }
+    },
+    {
+      "type": "node",
+      "id": 8900413081,
+      "lat": 45.2796666,
+      "lon": 19.7909316,
+      "tags": {
+        "addr:housenumber": "50",
+        "addr:street": "Руменачки пут",
+        "craft": "stonemason",
+        "int_name": "Kamenorezac Milekic",
+        "name": "Каменорезац Милекић",
+        "name:sr-Latn": "Kamenorezac Milekić"
+      }
+    },
+    {
+      "type": "node",
+      "id": 8900413082,
+      "lat": 45.2797082,
+      "lon": 19.7904622,
+      "tags": {
+        "addr:housenumber": "52",
+        "addr:street": "Руменачки пут",
+        "craft": "stonemason",
+        "int_name": "Kamenorezac Vujicic",
+        "name": "Каменорезац Вујичић",
+        "name:sr-Latn": "Kamenorezac Vujičić",
+        "ref:RS:kucni_broj": "5514067"
+      }
+    },
+    {
+      "type": "node",
+      "id": 9667831969,
+      "lat": 44.7906489,
+      "lon": 20.51218,
+      "tags": {
+        "addr:housenumber": "37",
+        "addr:street": "Живка Давидовића",
+        "craft": "carpenter",
+        "name": "Darex",
+        "ref:RS:kucni_broj": "7411679"
+      }
+    },
+    {
+      "type": "node",
+      "id": 9858726722,
+      "lat": 42.3022582,
+      "lon": 21.6715701,
+      "tags": {
+        "carpenter": "cabinetmaker",
+        "contact:facebook": "https://www.facebook.com/people/Zdruktharia-Jetoni/100063741092572/",
+        "contact:instagram": "https://www.instagram.com/zdrukthtaria_jetoni/",
+        "craft": "carpenter",
+        "name": "Zdrukthtaria Jetoni",
+        "phone": "+381 63 763 2214"
+      }
+    },
+    {
+      "type": "node",
+      "id": 11010514005,
+      "lat": 44.8319545,
+      "lon": 20.4003326,
+      "tags": {
+        "craft": "carpenter",
+        "name:en": "Malibu DOO"
+      }
+    },
+    {
+      "type": "node",
+      "id": 11919268869,
+      "lat": 44.8387788,
+      "lon": 20.3893039,
+      "tags": {
+        "addr:street": "Мозерова",
+        "craft": "carpenter",
+        "name": "Uni3"
+      }
+    },
+    {
+      "type": "node",
+      "id": 12209357157,
+      "lat": 44.4544065,
+      "lon": 20.0747944,
+      "tags": {
+        "craft": "plasterer",
+        "name": "Marić"
+      }
+    },
+    {
+      "type": "node",
+      "id": 12369565515,
+      "lat": 43.3092902,
+      "lon": 21.9044564,
+      "tags": {
+        "carpenter": "furniture",
+        "craft": "carpenter",
+        "email": "bugi.design.nis@gmail.com",
+        "name": "Bugi Design",
+        "phone": "+381 65 5251017",
+        "product": "furniture"
+      }
+    },
+    {
+      "type": "node",
+      "id": 12692657632,
+      "lat": 45.2396926,
+      "lon": 19.676365,
+      "tags": {
+        "craft": "stonemason",
+        "email": "office@vectorgroupdoo.com",
+        "mobile": "+381 63 1020250",
+        "name": "Vector group",
+        "phone": "+381 62 1883199",
+        "website": "https://vectorgroupdoo.com/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13038672541,
+      "lat": 44.8163119,
+      "lon": 20.3699439,
+      "tags": {
+        "craft": "stonemason",
+        "name": "Prijić - Mermeri i graniti"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13609292544,
+      "lat": 44.3826755,
+      "lon": 20.2323361,
+      "tags": {
+        "craft": "stonemason",
+        "email": "lazarmisic90@gmail.com",
+        "int_name": "Kamen Misic",
+        "name": "Kamen Mišić",
+        "name:sr": "Камен Мишић",
+        "name:sr-Latn": "Kamen Mišić",
+        "opening_hours": "Mo-Sa 09:00-17:00",
+        "phone": "+381 63 8080691;+381 63 8275528;+381 66 6839207;+381 66 6839206;+381 63 8080691",
+        "website": "https://www.kamen-misic.rs"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13609292571,
+      "lat": 42.9982937,
+      "lon": 21.9689262,
+      "tags": {
+        "craft": "stonemason",
+        "name": "Gran Pi",
+        "name:sr": "Гран Пи",
+        "name:sr-Latn": "Gran Pi",
+        "opening_hours": "Mo-Sa 08:00-16:00",
+        "phone": "+381 60 4574570",
+        "website": "https://granpi.com"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13609292574,
+      "lat": 45.3995938,
+      "lon": 19.8838659,
+      "tags": {
+        "craft": "stonemason",
+        "email": "info@gemstonealati.rs",
+        "name": "Gem stone",
+        "opening_hours": "Mo-Fr 08:00-17:00; Sa 08:00-15:00",
+        "phone": "+381 63 611244;+381 63 8680550",
+        "website": "https://gemstonealati.rs"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13945887801,
+      "lat": 42.5469445,
+      "lon": 21.894931,
+      "tags": {
+        "craft": "stonemason"
+      }
+    },
+    {
+      "type": "node",
+      "id": 14006924359,
+      "lat": 44.7725431,
+      "lon": 20.52102,
+      "tags": {
+        "craft": "stonemason",
+        "name": "Invest garden",
+        "phone": "+381 60 5255029"
+      }
+    },
+    {
+      "type": "node",
+      "id": 14088270683,
+      "lat": 45.0881618,
+      "lon": 20.0763862,
+      "tags": {
+        "contact:facebook": "https://www.facebook.com/people/Satim-Granit-DOO/61560511574307/",
+        "contact:instagram": "https://www.instagram.com/satimgranit/",
+        "craft": "stonemason",
+        "email": "sava.mandic@satimgranit.rs",
+        "name": "Satim granit",
+        "opening_hours": "Mo-Fr 08:00-17:00; Sa 08:00-13:00",
+        "phone": "+381 64 1073307",
+        "website": "https://www.satimgranit.com"
+      }
+    },
+    {
+      "type": "node",
+      "id": 14096529675,
+      "lat": 43.2166711,
+      "lon": 22.309657,
+      "tags": {
+        "craft": "stonemason"
+      }
+    },
+    {
+      "type": "way",
+      "id": 299135708,
+      "center": {
+        "lat": 45.243158,
+        "lon": 19.7962697
+      },
+      "tags": {
+        "addr:housenumber": "6a",
+        "addr:street": "Кочи Ивана",
+        "building": "commercial",
+        "craft": "carpenter",
+        "name": "Stilles",
+        "name:sr": "Стиллес",
+        "name:sr-Latn": "Stilles",
+        "phone": "+381 021 6800900;+381 021 6800 909",
+        "ref:RS:kucni_broj": "5500508",
+        "survey:date": "2024-12-19",
+        "website": "https://stilles.rs/en/"
+      }
+    },
+    {
+      "type": "way",
+      "id": 490405884,
+      "center": {
+        "lat": 45.2028175,
+        "lon": 19.757364
+      },
+      "tags": {
+        "building": "yes",
+        "craft": "carpenter"
+      }
+    },
+    {
+      "type": "way",
+      "id": 504416123,
+      "center": {
+        "lat": 43.7625961,
+        "lon": 20.1040651
+      },
+      "tags": {
+        "addr:city": "Arilje",
+        "addr:postcode": "31230",
+        "addr:street": "Слободана Пенезића Крцуна",
+        "building": "yes",
+        "craft": "carpenter"
+      }
+    },
+    {
+      "type": "way",
+      "id": 558559541,
+      "center": {
+        "lat": 44.0632855,
+        "lon": 22.1034903
+      },
+      "tags": {
+        "building": "commercial",
+        "craft": "carpenter"
+      }
+    },
+    {
+      "type": "way",
+      "id": 686119000,
+      "center": {
+        "lat": 45.2753692,
+        "lon": 19.7999721
+      },
+      "tags": {
+        "addr:housenumber": "61a",
+        "addr:postcode": "21000",
+        "addr:street": "Руменачки пут",
+        "building": "yes",
+        "craft": "stonemason",
+        "name": "Medić",
+        "opening_hours": "Mo-Fr 08:00-17:00",
+        "phone": "+38163501180",
+        "product": "stone;stone_tombs;granite;marble;interior_stone",
+        "website": "https://medic.co.rs/"
+      }
+    },
+    {
+      "type": "way",
+      "id": 870593018,
+      "center": {
+        "lat": 43.3292018,
+        "lon": 21.9221841
+      },
+      "tags": {
+        "addr:housenumber": "68",
+        "addr:street": "Књажевачка",
+        "building": "house",
+        "craft": "painter",
+        "int_name": "Nijansa",
+        "name": "Нијанса",
+        "name:sr": "Нијанса",
+        "name:sr-Latn": "Nijansa",
+        "ref:RS:kucni_broj": "5960095"
+      }
+    },
+    {
+      "type": "way",
+      "id": 872343054,
+      "center": {
+        "lat": 45.2097292,
+        "lon": 19.7018318
+      },
+      "tags": {
+        "building": "industrial",
+        "craft": "carpenter",
+        "email": "office@prowood.rs",
+        "fax": "+381 21 2100679",
+        "mobile": "+381 63 7794391",
+        "name": "Prowood",
+        "opening_hours": "Mo-Sa 06:00-23:00",
+        "phone": "+381 21 2100677;+381 21 2100678",
+        "website": "https://www.prowood.rs/"
+      }
+    },
+    {
+      "type": "way",
+      "id": 884133913,
+      "center": {
+        "lat": 45.2603354,
+        "lon": 19.7699231
+      },
+      "tags": {
+        "addr:housenumber": "94",
+        "addr:postcode": "21000",
+        "addr:street": "Краља Петра I",
+        "building": "yes",
+        "craft": "stonemason",
+        "ref:RS:kucni_broj": "5498932"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1035841274,
+      "center": {
+        "lat": 44.8160872,
+        "lon": 20.3697291
+      },
+      "tags": {
+        "building": "yes",
+        "craft": "stonemason"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1035841275,
+      "center": {
+        "lat": 44.8164631,
+        "lon": 20.3699151
+      },
+      "tags": {
+        "building": "yes",
+        "craft": "stonemason"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1035841276,
+      "center": {
+        "lat": 44.8161713,
+        "lon": 20.3699302
+      },
+      "tags": {
+        "building": "yes",
+        "craft": "stonemason"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1035841277,
+      "center": {
+        "lat": 44.8162215,
+        "lon": 20.3700214
+      },
+      "tags": {
+        "building": "yes",
+        "craft": "stonemason"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1035841278,
+      "center": {
+        "lat": 44.816129,
+        "lon": 20.3698559
+      },
+      "tags": {
+        "building": "yes",
+        "craft": "stonemason"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1106101946,
+      "center": {
+        "lat": 44.7587832,
+        "lon": 19.6499136
+      },
+      "tags": {
+        "addr:city": "Мајур",
+        "addr:housenumber": "116",
+        "addr:postcode": "15353",
+        "addr:street": "Цара Лазара",
+        "building": "yes",
+        "craft": "carpenter",
+        "fax": "+381 15 343-226",
+        "name": "Мими",
+        "name:en": "Mimi",
+        "name:sr": "Мими",
+        "name:sr-Latn": "Mimi",
+        "operator": "Мими д.о.о.",
+        "phone": "+381 15 343-226",
+        "ref:RS:kucni_broj": "7046738"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1115340190,
+      "center": {
+        "lat": 44.7693849,
+        "lon": 19.6578454
+      },
+      "tags": {
+        "addr:city": "Мајур",
+        "addr:housenumber": "22",
+        "addr:postcode": "15353",
+        "addr:street": "Светог Саве",
+        "building": "yes",
+        "craft": "carpenter",
+        "name": "Даријо Буинац",
+        "name:en": "Darijo Buinac",
+        "name:sr": "Даријо Буинац",
+        "name:sr-Latn": "Darijo Buinac",
+        "operator": "Даријо Буинац",
+        "ref:RS:kucni_broj": "5633726",
+        "ref:vatin": "RS113051808",
+        "start_date": "2022-05-20"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1190427184,
+      "center": {
+        "lat": 44.7679388,
+        "lon": 19.68343
+      },
+      "tags": {
+        "addr:city": "Шабац",
+        "addr:housenumber": "10",
+        "addr:postcode": "15000",
+        "addr:street": "Кнеза Мирослава",
+        "building": "yes",
+        "craft": "painter",
+        "name": "Ентеријер-А.П.",
+        "name:en": "Enterijer-A.P.",
+        "name:sr": "Ентеријер-А.П.",
+        "name:sr-Latn": "Enterijer-A.P.",
+        "operator": "Александар Вуковић",
+        "ref:RS:kucni_broj": "5622416"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1215713382,
+      "center": {
+        "lat": 45.0326122,
+        "lon": 20.0973087
+      },
+      "tags": {
+        "addr:housenumber": "164",
+        "addr:pak": "346154",
+        "addr:postcode": "22320",
+        "addr:street": "Краља Петра I",
+        "building": "commercial",
+        "contact:facebook": "https://www.facebook.com/idealstonedoo",
+        "contact:instagram": "https://www.instagram.com/idealstone.rs/",
+        "contact:youtube": "https://www.youtube.com/channel/UCCRTqmVmwVLjyocrE-ec4ww",
+        "craft": "stonemason",
+        "email": "office@idealstone.rs",
+        "name": "Ideal stone",
+        "name:sr": "Идеал стоне",
+        "name:sr-Latn": "Ideal stone",
+        "opening_hours": "Mo-Fr 08:00-16:00; Sa 08:00-14:00",
+        "phone": "+381 65 4022022",
+        "ref:RS:kucni_broj": "4269086",
+        "website": "https://idealstone.rs/"
+      }
+    }
   ]
 }

@@ -21,7 +21,7 @@
       "category": "open_dataset",
       "priority": "High",
       "role": "primary_discovery",
-      "cost": {"model": "free", "amount_usd": 0, "api_key_required": false},
+      "cost": { "model": "free", "amount_usd": 0, "api_key_required": false },
       "license": "CDLA-Permissive-2.0 and Apache-2.0",
       "license_notes": "Places theme contains no OpenStreetMap data and carries no ODbL share-alike obligation. Storage and redistribution permitted. Joining to OSM data may make the derivative database ODbL.",
       "robots_txt": "not applicable — bulk object storage, no crawling",
@@ -45,8 +45,27 @@
         "name_regex_only_gain": 61
       },
       "how_measured": "DuckDB httpfs against the public S3 release, filtered to addresses[1].country='RS' inside bbox 18.8-23.1 x 42.2-46.3, then taxonomy.primary in 16 target categories OR a Serbian-name regex.",
-      "source_mix": {"meta": 103504, "Foursquare": 2538, "Microsoft": 1258, "AllThePlaces": 1064, "PinMeTo": 376},
-      "fields_exposed": ["name", "phones", "websites", "emails", "socials", "addresses", "categories", "taxonomy", "confidence", "lat", "lon", "gers_id"],
+      "source_mix": {
+        "meta": 103504,
+        "Foursquare": 2538,
+        "Microsoft": 1258,
+        "AllThePlaces": 1064,
+        "PinMeTo": 376
+      },
+      "fields_exposed": [
+        "name",
+        "phones",
+        "websites",
+        "emails",
+        "socials",
+        "addresses",
+        "categories",
+        "taxonomy",
+        "confidence",
+        "lat",
+        "lon",
+        "gers_id"
+      ],
       "duplicate_risk": "High against any Facebook-derived source, since ~95% of Serbian records are Meta-sourced. Dedup on normalized phone first, per the project rule.",
       "implementation_notes": [
         "Releases from December 2025 use taxonomy.primary, not categories.primary.",
@@ -62,7 +81,7 @@
       "category": "directory_geographic_sweep",
       "priority": "High",
       "role": "geographic_sweep",
-      "cost": {"model": "free", "amount_usd": 0, "api_key_required": false},
+      "cost": { "model": "free", "amount_usd": 0, "api_key_required": false },
       "robots_txt": "Allow: / — only /admin*/ and /pretraga/ disallowed. City-suffixed category pages are permitted.",
       "requires_javascript": false,
       "pagination": "none — each category-city page is one static response",
@@ -71,7 +90,7 @@
         "national_page_firms": 60,
         "union_national_plus_49_city_pages": 108,
         "firms_found_only_via_city_page": 48,
-        "additive_gain": 0.80,
+        "additive_gain": 0.8,
         "city_urls_tried": 49,
         "city_urls_http_500": 14,
         "belgrade_firms_via_city_municipalities": 52,
@@ -79,7 +98,22 @@
       },
       "how_measured": "Sweep at 1 req/s with an honest project user agent over the 32 most populous units plus all 17 Belgrade city municipalities from data/serbia-geo.json; firm names extracted from h2.nazivfirme and de-duplicated.",
       "corrects_prior_finding": "research/sources-contractors.md (FUZZ-4) records these city pages as 'strict subsets — crawl the national page only'. Measured, they are not: the national page truncates and 48 of 108 firms appear only on a city page.",
-      "broken_slugs_http_500": ["beograd", "pirot", "kikinda", "vrsac", "ruma", "backa-palanka", "zajecar", "paracin", "aleksinac", "cukarica", "grocka", "obrenovac", "rakovica", "sopot"],
+      "broken_slugs_http_500": [
+        "beograd",
+        "pirot",
+        "kikinda",
+        "vrsac",
+        "ruma",
+        "backa-palanka",
+        "zajecar",
+        "paracin",
+        "aleksinac",
+        "cukarica",
+        "grocka",
+        "obrenovac",
+        "rakovica",
+        "sopot"
+      ],
       "workaround": "beograd 500s; iterate Belgrade through its 17 city municipalities instead — novi-beograd (15 firms), zemun (10), vozdovac (7), vracar (6), stari-grad (4), surcin (4) all return 200.",
       "crawl_budget": "9 categories x ~162 units = ~1,458 requests, ~25 minutes at 1 req/s",
       "duplicate_risk": "High within the source (city pages overlap the national page); dedup on normalized phone."
@@ -91,14 +125,14 @@
       "category": "directory_geographic_sweep",
       "priority": "Low",
       "role": "rejected_as_sweep",
-      "cost": {"model": "free", "amount_usd": 0},
+      "cost": { "model": "free", "amount_usd": 0 },
       "robots_txt": "permissive for /firme/ listing pages; /firme/ajax and /firme/noviajax disallowed",
       "measured": {
-        "fasaderski_radovi_beograd": {"http": 200, "tel_links": 26},
-        "fasaderski_radovi_novi_sad": {"http": 200, "tel_links": 9},
-        "fasaderski_radovi_nis": {"http": 404},
-        "fasaderski_radovi_kragujevac": {"http": 404},
-        "gradjevinski_materijal_beograd": {"http": 404}
+        "fasaderski_radovi_beograd": { "http": 200, "tel_links": 26 },
+        "fasaderski_radovi_novi_sad": { "http": 200, "tel_links": 9 },
+        "fasaderski_radovi_nis": { "http": 404 },
+        "fasaderski_radovi_kragujevac": { "http": 404 },
+        "gradjevinski_materijal_beograd": { "http": 404 }
       },
       "verdict": "The taxonomy is sparse, not a cross product. Generating city x category URLs yields mostly 404s. Enumerate from sitemap-companies-001.xml.gz (13,408 companies) instead."
     },
@@ -110,7 +144,7 @@
       "category": "official_register",
       "priority": "High",
       "role": "coverage_frame_and_classification_ground_truth",
-      "cost": {"model": "free", "amount_usd": 0, "api_key_required": false},
+      "cost": { "model": "free", "amount_usd": 0, "api_key_required": false },
       "license": "sodl (Serbian Open Data Licence)",
       "publisher": "Agencija za privredne registre",
       "robots_txt": "openapi.apr.gov.rs publishes no robots.txt (HTTP 404). This is the documented open-data delivery channel, so the apr.gov.rs site-wide Disallow: / does not apply to it.",
@@ -128,21 +162,34 @@
         "contractor_side_all_codes": 10806,
         "store_side_all_codes": 1786,
         "by_code": {
-          "4331": {"label": "Malterisanje", "n": 100},
-          "4334": {"label": "Bojenje i zastakljivanje", "n": 155},
-          "4339": {"label": "Ostali zavrsni radovi", "n": 564},
-          "4329": {"label": "Ostali instalacioni radovi u gradjevinarstvu", "n": 266},
-          "4673": {"label": "Veleprodaja drveta, gradj. materijala i sanitarije", "n": 1119},
-          "4752": {"label": "Maloprodaja metalne robe, boja i stakla", "n": 609},
-          "4120": {"label": "Izgradnja stambenih i nestambenih zgrada", "n": 6609},
-          "4399": {"label": "Ostali specificni gradjevinski radovi", "n": 1399}
+          "4331": { "label": "Malterisanje", "n": 100 },
+          "4334": { "label": "Bojenje i zastakljivanje", "n": 155 },
+          "4339": { "label": "Ostali zavrsni radovi", "n": 564 },
+          "4329": { "label": "Ostali instalacioni radovi u gradjevinarstvu", "n": 266 },
+          "4673": { "label": "Veleprodaja drveta, gradj. materijala i sanitarije", "n": 1119 },
+          "4752": { "label": "Maloprodaja metalne robe, boja i stakla", "n": 609 },
+          "4120": { "label": "Izgradnja stambenih i nestambenih zgrada", "n": 6609 },
+          "4399": { "label": "Ostali specificni gradjevinski radovi", "n": 1399 }
         }
       },
-      "fields_exposed": ["maticni_broj", "PoslovnoIme", "SifraOpstine", "NazivOpstine", "NazivStatus", "DatumOsnivanja", "NazivPravneForme", "SifraDelatnosti"],
+      "fields_exposed": [
+        "maticni_broj",
+        "PoslovnoIme",
+        "SifraOpstine",
+        "NazivOpstine",
+        "NazivStatus",
+        "DatumOsnivanja",
+        "NazivPravneForme",
+        "SifraDelatnosti"
+      ],
       "phone_present": false,
       "address_present": false,
       "limitation": "Covers privredna drustva (DOO/AD) only. Does NOT cover preduzetnici — the sole traders the project brief names as a large share of Serbian fasaderi. /api/opendata/entrepreneurs and /api/opendata/preduzetnici both return 404, and data.gov.rs has no preduzetnici dataset. This is the single largest structural coverage gap in the project.",
-      "uses": ["coverage measurement against a complete national frame", "classification ground truth via registered activity code", "ranked enrichment worklist of frame companies with no phone yet"]
+      "uses": [
+        "coverage measurement against a complete national frame",
+        "classification ground truth via registered activity code",
+        "ranked enrichment worklist of frame companies with no phone yet"
+      ]
     },
     {
       "id": "openstreetmap-overpass",
@@ -151,7 +198,7 @@
       "category": "open_dataset",
       "priority": "Low",
       "role": "store_side_topup",
-      "cost": {"model": "free", "amount_usd": 0, "api_key_required": false},
+      "cost": { "model": "free", "amount_usd": 0, "api_key_required": false },
       "license": "ODbL",
       "license_warning": "Merging OSM records into the lead database can make the derivative database ODbL and pull share-alike onto the whole export. Keep OSM-sourced records flagged by source id so the choice stays reversible.",
       "robots_txt": "not applicable — public API, no rate-limit fee, 2 concurrent slots",
@@ -182,7 +229,7 @@
       "name": "General web search result scraping (Google / Bing / DuckDuckGo)",
       "category": "search_engine",
       "priority": "Rejected",
-      "cost": {"model": "free", "amount_usd": 0},
+      "cost": { "model": "free", "amount_usd": 0 },
       "robots_txt": "google.com Disallow: /search; bing.com Disallow: /search; duckduckgo.com Disallow: /html and Disallow: /lite",
       "requires_javascript": "duckduckgo.com root ?q= form is a JavaScript SPA and returns no results without a browser; the two no-JS endpoints are the disallowed ones",
       "verdict": "No compliant free path exists. All three engines disallow their result pages, and the project brief commits to respecting robots.txt. Building around it with rotating proxies would contradict a standing project rule."
@@ -257,9 +304,18 @@
       "monthly_refresh_usd": 6.0,
       "blocker": "licence, not price",
       "blocking_clauses": [
-        {"ref": "Google Maps Platform Terms of Service §3.2.3(a) No Scraping", "text": "Customer will not export, extract, or otherwise scrape Google Maps Content for use outside the Services."},
-        {"ref": "Google Maps Platform Terms of Service §3.2.3(b) No Caching", "text": "Customer will not cache Google Maps Content except as expressly permitted under the Maps Service Specific Terms."},
-        {"ref": "Maps Service Specific Terms §14.3 Caching", "text": "Customer may temporarily cache latitude and longitude values from the Places API for up to 30 consecutive calendar days, after which Customer must delete the cached latitude and longitude values."}
+        {
+          "ref": "Google Maps Platform Terms of Service §3.2.3(a) No Scraping",
+          "text": "Customer will not export, extract, or otherwise scrape Google Maps Content for use outside the Services."
+        },
+        {
+          "ref": "Google Maps Platform Terms of Service §3.2.3(b) No Caching",
+          "text": "Customer will not cache Google Maps Content except as expressly permitted under the Maps Service Specific Terms."
+        },
+        {
+          "ref": "Maps Service Specific Terms §14.3 Caching",
+          "text": "Customer may temporarily cache latitude and longitude values from the Places API for up to 30 consecutive calendar days, after which Customer must delete the cached latitude and longitude values."
+        }
       ],
       "verdict": "Rejected, and should be recorded as rejected rather than deferred. place_id may be cached indefinitely and lat/lng for 30 days; the business name, address and above all the phone number may not be stored at all. This product is a permanent SQLite system of record holding phone numbers with a review UI and an XLSX export — every one of those is storage that §3.2.3(b) forbids and §14.3 does not excuse. Buying more quota does not fix it, because quota was never the constraint."
     },
@@ -280,7 +336,7 @@
       "url": "https://data.gov.rs/api/1/datasets/",
       "category": "open_data_portal",
       "priority": "Low",
-      "measured": {"datasets_total": 3516, "organizations": 216},
+      "measured": { "datasets_total": 3516, "organizations": 216 },
       "verdict": "Apart from the APR company register, no dataset on the portal is a business directory with contact data. Negative result recorded so nobody re-checks."
     },
     {
@@ -292,10 +348,30 @@
     }
   ],
   "stage_3_build_order": [
-    {"step": 1, "source": "overture-places", "output": "~1,856 records, ~1,764 phones", "effort": "one DuckDB COPY, ~90 seconds, no crawler"},
-    {"step": 2, "source": "directory-city-iteration", "output": "+80% over national category pages", "effort": "~1,458 requests, ~25 minutes at 1 req/s"},
-    {"step": 3, "source": "apr-opendata", "output": "133,634-company coverage frame + classification ground truth", "effort": "one 57.7 MB GET, monthly"},
-    {"step": 4, "source": "openstreetmap-overpass", "output": "339 store records", "effort": "one Overpass request, flagged by source for the ODbL question"}
+    {
+      "step": 1,
+      "source": "overture-places",
+      "output": "~1,856 records, ~1,764 phones",
+      "effort": "one DuckDB COPY, ~90 seconds, no crawler"
+    },
+    {
+      "step": 2,
+      "source": "directory-city-iteration",
+      "output": "+80% over national category pages",
+      "effort": "~1,458 requests, ~25 minutes at 1 req/s"
+    },
+    {
+      "step": 3,
+      "source": "apr-opendata",
+      "output": "133,634-company coverage frame + classification ground truth",
+      "effort": "one 57.7 MB GET, monthly"
+    },
+    {
+      "step": 4,
+      "source": "openstreetmap-overpass",
+      "output": "339 store records",
+      "effort": "one Overpass request, flagged by source for the ODbL question"
+    }
   ],
   "revisit_triggers": {
     "yield_trigger": "Fewer than 2,000 unique phone-bearing leads nationally at the end of Stage 3, OR fewer than 100 of the 145 local self-government units covered by at least one lead. Overture alone should clear both (1,752 distinct phones, 179 localities), so falling short means something upstream broke — fix that before buying anything.",

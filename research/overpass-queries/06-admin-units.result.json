@@ -7,18 +7,16 @@
     "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
   },
   "elements": [
-
-{
-  "type": "count",
-  "id": 0,
-  "tags": {
-    "nodes": "0",
-    "ways": "0",
-    "relations": "154",
-    "areas": "0",
-    "total": "154"
-  }
-}
-
+    {
+      "type": "count",
+      "id": 0,
+      "tags": {
+        "nodes": "0",
+        "ways": "0",
+        "relations": "154",
+        "areas": "0",
+        "total": "154"
+      }
+    }
   ]
 }

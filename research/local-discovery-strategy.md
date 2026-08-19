@@ -23,15 +23,15 @@ numbers, exported to XLSX and handed to a sales team, is the specific thing
 §3.2.3(b) forbids. Places is not a deferred purchase for this product; it is
 an unavailable one.
 
-| Option | Records reachable | With phone | Cost | Verdict |
-|---|---:|---:|---|---|
-| **Overture Maps Places** | **1,856** | **1,764 (95%)** | free | **Primary** |
-| **Directory city-iteration** | +80% over national pages | ~95% | free | **Sweep** |
-| **APR open-data register** | 133,634 companies | 0 | free | **Frame, not leads** |
-| OpenStreetMap / Overpass | 794 stores + 72 contractors | 378 (44%) | free | Top-up only |
-| General web search (scraped) | — | — | — | Rejected — robots |
-| Brave Search API | URLs only | — | ~$13/sweep | Named fallback |
-| Google Places API | ~6,000 est. | ~95% | ~$102/sweep | **Rejected — licence** |
+| Option                       |           Records reachable |      With phone | Cost        | Verdict                |
+| ---------------------------- | --------------------------: | --------------: | ----------- | ---------------------- |
+| **Overture Maps Places**     |                   **1,856** | **1,764 (95%)** | free        | **Primary**            |
+| **Directory city-iteration** |    +80% over national pages |            ~95% | free        | **Sweep**              |
+| **APR open-data register**   |           133,634 companies |               0 | free        | **Frame, not leads**   |
+| OpenStreetMap / Overpass     | 794 stores + 72 contractors |       378 (44%) | free        | Top-up only            |
+| General web search (scraped) |                           — |               — | —           | Rejected — robots      |
+| Brave Search API             |                   URLs only |               — | ~$13/sweep  | Named fallback         |
+| Google Places API            |                 ~6,000 est. |            ~95% | ~$102/sweep | **Rejected — licence** |
 
 ---
 
@@ -56,7 +56,7 @@ only contractor-side tag with usable density is `office=construction_company`
 at 29 elements, 24 of them with a phone.
 
 This is not a wrong-tag problem that a cleverer query fixes. The census of
-*every* `craft=*` value in Serbia (`05-craft-census.overpassql`) returns **697
+_every_ `craft=*` value in Serbia (`05-craft-census.overpassql`) returns **697
 businesses in total** — for a country of 6.6 million. The largest single value
 is `metal_construction` at 92. OSM contributors in Serbia map roads and shops;
 they do not map tradespeople. No query rescues data that was never entered.
@@ -64,17 +64,17 @@ they do not map tradespeople. No query rescues data that was never entered.
 **The store side is real but thin where it counts.** 794 elements across
 `shop=doityourself|hardware|trade|paint|building_materials|tiles|bathroom_furnishing|flooring`:
 
-| `shop=` | n | with phone | with website |
-|---|---:|---:|---:|
-| hardware | 297 | 148 (49%) | 123 |
-| paint | 113 | 30 (26%) | 15 |
-| doityourself | 112 | 23 (20%) | 27 |
-| bathroom_furnishing | 106 | 44 (41%) | 46 |
-| flooring | 71 | 53 (74%) | 42 |
-| trade | 60 | 17 (28%) | 16 |
-| building_materials | 23 | 18 (78%) | 13 |
-| tiles | 12 | 5 (41%) | 4 |
-| **total** | **794** | **339 (43%)** | **286** |
+| `shop=`             |       n |    with phone | with website |
+| ------------------- | ------: | ------------: | -----------: |
+| hardware            |     297 |     148 (49%) |          123 |
+| paint               |     113 |      30 (26%) |           15 |
+| doityourself        |     112 |      23 (20%) |           27 |
+| bathroom_furnishing |     106 |      44 (41%) |           46 |
+| flooring            |      71 |      53 (74%) |           42 |
+| trade               |      60 |      17 (28%) |           16 |
+| building_materials  |      23 |      18 (78%) |           13 |
+| tiles               |      12 |       5 (41%) |            4 |
+| **total**           | **794** | **339 (43%)** |      **286** |
 
 794 records for ~339 phone numbers, and OSM's `addr:city` is absent on 723 of
 them, so city has to be derived from coordinates anyway.
@@ -113,12 +113,12 @@ WHERE addresses[1].country='RS'
 Serbian-name regex (`fasad|termoizolac|izolacij|stiropor|stovarišt|
 građevinsk|gradjevin|demit|moler|malter`):
 
-| | Contractor-side | Store-side | Union incl. name-match |
-|---|---:|---:|---:|
-| Records | 990 | 788 | **1,856** |
-| With a phone | 958 (96%) | 741 (94%) | **1,764 (95%)** |
-| With a website | 710 | 452 | — |
-| With an email | 778 | 515 | — |
+|                | Contractor-side | Store-side | Union incl. name-match |
+| -------------- | --------------: | ---------: | ---------------------: |
+| Records        |             990 |        788 |              **1,856** |
+| With a phone   |       958 (96%) |  741 (94%) |        **1,764 (95%)** |
+| With a website |             710 |        452 |                      — |
+| With an email  |             778 |        515 |                      — |
 
 By category in the current `2026-08-19.0` release (`taxonomy.primary`):
 
@@ -188,11 +188,11 @@ Sweep executed at 1 request/second with an honest project user agent, category
 `termo-izolacija-zvucna-izolacija`, over the 32 most populous units plus all 17
 Belgrade city municipalities from `data/serbia-geo.json`:
 
-| | Firms |
-|---|---:|
-| National category page alone | 60 |
+|                                   |   Firms |
+| --------------------------------- | ------: |
+| National category page alone      |      60 |
 | Union of national + 49 city pages | **108** |
-| Found **only** via a city page | **48** |
+| Found **only** via a city page    |  **48** |
 
 That is **+80% over the national page, on one category.** Nine of the twelve
 firms on the Novi Sad page (`Izomonter`, `Termodom`, `Domino gradjevinski
@@ -231,7 +231,7 @@ Generating city × category URLs there produces mostly 404s. Enumerate from its
 sitemap (`sitemap-companies-001.xml.gz`, 13,408 companies) instead.
 
 **Verdict: High as a sweep, but understand what it is.** Directory
-city-iteration is not geographic *discovery* — it re-slices a corpus that is
+city-iteration is not geographic _discovery_ — it re-slices a corpus that is
 already enumerable from the same site. Its value is that the slicing is lossy
 in the site's own favour: the national view silently truncates, and only the
 city view shows the tail. Run it, and budget for the 500s.
@@ -294,8 +294,8 @@ third pages    12% need one                    =   428
                                           total = 5,061 Text Search calls
 ```
 
-**Plan A — two-step, the cheap one.** Text Search *Pro* to enumerate place IDs,
-Place Details *Enterprise* only for unique places, to fetch the phone.
+**Plan A — two-step, the cheap one.** Text Search _Pro_ to enumerate place IDs,
+Place Details _Enterprise_ only for unique places, to fetch the phone.
 
 ```
 Text Search Pro          (5,061 − 5,000 free) ×  $32/1000  =    $1.95
@@ -309,7 +309,7 @@ companies under the six core activity codes. Google Maps additionally carries
 preduzetnici that neither source lists. The plausible band is 4,000–9,000
 unique places, which puts the sweep between **$62 and $162**.
 
-**Plan B — one-step.** Text Search *Enterprise*, phone in the search response,
+**Plan B — one-step.** Text Search _Enterprise_, phone in the search response,
 no Details call: `(5,061 − 1,000) × $35/1000 = $142.14`. More expensive, and it
 returns phones only for the ≤60 results each query can reach. Plan A wins.
 
@@ -351,7 +351,7 @@ blocker is a licence term that no amount of measurement moves.
 
 **No.**
 
-The legal reason is the sentence quoted above: §3.2.3(a) *No Scraping* is not
+The legal reason is the sentence quoted above: §3.2.3(a) _No Scraping_ is not
 about the API, it covers Google Maps Content however obtained, so scraping the
 maps front end is a more explicit violation than paying for the API, not a way
 around it. Scraping is what the API is licensed to replace, and doing it
@@ -400,19 +400,19 @@ Each record carries matični broj, business name, municipality code and name,
 status, founding date, legal form, and **registered activity code**. Counts by
 the codes that matter:
 
-| Code | Activity | Companies |
-|---|---|---:|
-| 4331 | Malterisanje | 100 |
-| 4334 | Bojenje i zastakljivanje | 155 |
-| 4339 | Ostali završni radovi | 564 |
-| 4329 | Ostali instalacioni radovi u građevinarstvu | 266 |
-| 4673 | Veleprodaja drveta, građ. materijala i sanitarije | 1,119 |
-| 4752 | Maloprodaja metalne robe, boja i stakla | 609 |
-| | **core six** | **2,813** |
-| 4120 | Izgradnja stambenih i nestambenih zgrada | 6,609 |
-| 4399 | Ostali specifični građevinski radovi | 1,399 |
-| | contractor-side, all codes | 10,806 |
-| | store-side, all codes | 1,786 |
+| Code | Activity                                          | Companies |
+| ---- | ------------------------------------------------- | --------: |
+| 4331 | Malterisanje                                      |       100 |
+| 4334 | Bojenje i zastakljivanje                          |       155 |
+| 4339 | Ostali završni radovi                             |       564 |
+| 4329 | Ostali instalacioni radovi u građevinarstvu       |       266 |
+| 4673 | Veleprodaja drveta, građ. materijala i sanitarije |     1,119 |
+| 4752 | Maloprodaja metalne robe, boja i stakla           |       609 |
+|      | **core six**                                      | **2,813** |
+| 4120 | Izgradnja stambenih i nestambenih zgrada          |     6,609 |
+| 4399 | Ostali specifični građevinski radovi              |     1,399 |
+|      | contractor-side, all codes                        |    10,806 |
+|      | store-side, all codes                             |     1,786 |
 
 The core six span **168 municipalities**.
 
@@ -431,8 +431,8 @@ national frame available. Three concrete uses:
 3. **Targeted enrichment.** Companies in the frame with no phone yet are a
    ranked worklist for the enrichment crawler, ordered by municipality.
 
-**The honest limitation, and it is a big one.** This dataset covers *privredna
-društva* only — DOO and AD. It does **not** cover *preduzetnici*, the sole
+**The honest limitation, and it is a big one.** This dataset covers _privredna
+društva_ only — DOO and AD. It does **not** cover _preduzetnici_, the sole
 traders that the project brief names as a large share of Serbian fasaderi. The
 endpoints `/api/opendata/entrepreneurs` and `/api/opendata/preduzetnici` were
 probed and both return 404, and `data.gov.rs` has no preduzetnici dataset. The
@@ -452,7 +452,7 @@ AllThePlaces 1,064, PinMeTo 376 — all already in the Overture download.
 
 1. **Overture Maps Places** — one DuckDB `COPY` against the pinned release,
    filtered by `taxonomy.primary` plus the Serbian name regex, `confidence >=
-   0.3`. ~1,856 records, ~1,764 phones. No crawler.
+0.3`. ~1,856 records, ~1,764 phones. No crawler.
 2. **Directory city-iteration on portal-srbija.com** — 9 categories × 162 units
    from `data/serbia-geo.json`, Belgrade via its 17 city municipalities, 1 req/s,
    14 known-500 slugs skipped. ~1,458 requests, ~25 minutes.

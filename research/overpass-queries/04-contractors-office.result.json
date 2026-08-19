@@ -7,496 +7,494 @@
     "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
   },
   "elements": [
-
-{
-  "type": "node",
-  "id": 10647465443,
-  "lat": 43.2770387,
-  "lon": 19.9897217,
-  "tags": {
-    "description": "Construction company",
-    "name": "Euroline",
-    "office": "construction_company"
-  }
-},
-{
-  "type": "node",
-  "id": 12813109534,
-  "lat": 44.8383693,
-  "lon": 20.3858906,
-  "tags": {
-    "addr:housenumber": "41",
-    "addr:street": "Железничка",
-    "contact:facebook": "astutaplus",
-    "contact:mobile": "+381 63 211 119",
-    "email": "astutaplus@gmail.com",
-    "name": "Astuta Plus",
-    "office": "construction_company",
-    "operator": "Astuta Plus d.o.o.",
-    "phone": "+381112616480;+381113162353",
-    "website": "https://www.astutaplus.com/"
-  }
-},
-{
-  "type": "node",
-  "id": 13026192595,
-  "lat": 44.8069431,
-  "lon": 20.4202235,
-  "tags": {
-    "addr:housenumber": "3b",
-    "addr:street": "Милутина Миланковића",
-    "email": "karriere@strabag.com",
-    "level": "5;6;7;8",
-    "name": "Strabag",
-    "office": "construction_company",
-    "phone": "+381 11 2221700",
-    "website": "https://karriere.strabag.com/rs"
-  }
-},
-{
-  "type": "node",
-  "id": 13026249351,
-  "lat": 44.8072777,
-  "lon": 20.4195870,
-  "tags": {
-    "addr:housenumber": "3v",
-    "addr:street": "Милутина Миланковића",
-    "email": "karriere@strabag.com",
-    "level": "8",
-    "name": "Strabag",
-    "office": "construction_company",
-    "phone": "+381 11 2221700",
-    "website": "https://karriere.strabag.com/rs"
-  }
-},
-{
-  "type": "node",
-  "id": 13049686424,
-  "lat": 44.8463269,
-  "lon": 20.3940302,
-  "tags": {
-    "addr:housenumber": "2e",
-    "addr:street": "Драгана Ракића",
-    "email": "info@baufirma.rs",
-    "mobile": "+381 63 378087",
-    "name": "BAU firma",
-    "name:sr": "БАУ фирма",
-    "name:sr-Latn": "BAU firma",
-    "office": "construction_company",
-    "opening_hours": "Mo-Fr 09:00-20:00; Sa 09:00-15:00",
-    "phone": "+381 63 378077",
-    "website": "https://baufirma.rs"
-  }
-},
-{
-  "type": "node",
-  "id": 13049737014,
-  "lat": 45.2485777,
-  "lon": 19.8384031,
-  "tags": {
-    "addr:housenumber": "88",
-    "addr:street": "Булевар ослобођења",
-    "level": "7",
-    "name": "Zoned",
-    "name:sr": "Зонед",
-    "name:sr-Latn": "Zoned",
-    "office": "construction_company",
-    "opening_hours": "Mo-Fr 08:00-15:00",
-    "phone": "+381 62 600900",
-    "website": "https://zoned.rs/"
-  }
-},
-{
-  "type": "node",
-  "id": 13049737015,
-  "lat": 45.2485625,
-  "lon": 19.8384061,
-  "tags": {
-    "addr:housenumber": "88",
-    "addr:street": "Булевар ослобођења",
-    "level": "7",
-    "name": "Zibo inženjering",
-    "name:sr": "Зибо инжењеринг",
-    "name:sr-Latn": "Zibo inženjering",
-    "office": "construction_company"
-  }
-},
-{
-  "type": "node",
-  "id": 13073017360,
-  "lat": 45.0493184,
-  "lon": 20.1064768,
-  "tags": {
-    "addr:housenumber": "147",
-    "addr:pak": "346827",
-    "addr:postcode": "22320",
-    "addr:street": "Саве Ковачевића",
-    "email": "office@inbdkop.rs",
-    "name": "In B&D kop",
-    "name:sr": "Ин Б&Д коп",
-    "name:sr-Latn": "In B&D kop",
-    "office": "construction_company",
-    "phone": "+381 65 8969101",
-    "website": "https://inbdkop.rs/"
-  }
-},
-{
-  "type": "node",
-  "id": 13089293327,
-  "lat": 44.8012483,
-  "lon": 20.4725335,
-  "tags": {
-    "addr:city": "Београд",
-    "addr:housenumber": "16",
-    "addr:postcode": "11000",
-    "addr:street": "Коче Капетана",
-    "email": "kolos@eunet.rs",
-    "name": "Tim Kolos Plus",
-    "office": "construction_company",
-    "phone": "+381 11 2445402;+381 11 2443009",
-    "website": "https://tim-kolos.co.rs/",
-    "wheelchair": "no"
-  }
-},
-{
-  "type": "node",
-  "id": 13131148166,
-  "lat": 44.8000106,
-  "lon": 20.4717030,
-  "tags": {
-    "addr:city": "Београд",
-    "addr:housenumber": "57",
-    "addr:level": "VI",
-    "addr:postcode": "11000",
-    "addr:street": "Макензијева",
-    "email": "office@cestra.rs",
-    "fax": "+381 11 3835037",
-    "name": "Cestra",
-    "office": "construction_company",
-    "operator": "CESTRA d.o.o.",
-    "phone": "+381 11 3835040",
-    "website": "https://cestra.rs/"
-  }
-},
-{
-  "type": "node",
-  "id": 13138357917,
-  "lat": 44.7998662,
-  "lon": 20.4662797,
-  "tags": {
-    "addr:city": "Београд",
-    "addr:housenumber": "2",
-    "addr:postcode": "11000",
-    "addr:street": "Кнегиње Зорке",
-    "contact:instagram": "https://www.instagram.com/neimarv.rs/",
-    "email": "office@neimarv.rs",
-    "fax": "+381 11 30 84 134",
-    "name": "Neimar-V",
-    "office": "construction_company",
-    "opening_hours": "Mo-Fr 09:00-16:30; Sa 09:00-14:00; Su off",
-    "phone": "+381 11 30 84 101",
-    "website": "https://neimarv.rs/"
-  }
-},
-{
-  "type": "node",
-  "id": 13231560211,
-  "lat": 44.9416363,
-  "lon": 20.2927910,
-  "tags": {
-    "email": "office@resagradnja.com",
-    "name": "Resa gradnja",
-    "name:sr": "Реса градња",
-    "name:sr-Latn": "Resa gradnja",
-    "office": "construction_company",
-    "opening_hours": "Mo-Fr 07:00-20:00; Sa 07:00-14:00",
-    "phone": "+381 22 342803",
-    "website": "https://resagradnja.rs"
-  }
-},
-{
-  "type": "node",
-  "id": 13260353267,
-  "lat": 43.5792171,
-  "lon": 21.1345610,
-  "tags": {
-    "industrial": "distributor",
-    "name": "Boss Construction",
-    "office": "construction_company"
-  }
-},
-{
-  "type": "node",
-  "id": 13298154631,
-  "lat": 44.7531978,
-  "lon": 19.6891668,
-  "tags": {
-    "contact:facebook": "https://www.facebook.com/setdoo/",
-    "contact:youtube": "https://www.youtube.com/channel/UCeiM6NGJWprm-89bq-JlD1w/featured",
-    "name": "Set",
-    "name:sr": "Сет",
-    "name:sr-Latn": "Set",
-    "office": "construction_company",
-    "opening_hours": "Mo-Fr 07:30-15:30",
-    "phone": "+381 15 355588",
-    "website": "https://set.rs"
-  }
-},
-{
-  "type": "node",
-  "id": 13628565077,
-  "lat": 45.2803192,
-  "lon": 19.7730238,
-  "tags": {
-    "int_name": "Gemmax gradnja",
-    "name": "Gemmax gradnja",
-    "office": "construction_company",
-    "opening_hours": "Mo-Fr 07:00-17:00; Sa-Su 07:00-15:00",
-    "phone": "+381 63 459999;+381 66 8098095",
-    "website": "https://gemmaxgradnja.com"
-  }
-},
-{
-  "type": "node",
-  "id": 13650410832,
-  "lat": 43.5930755,
-  "lon": 20.2232987,
-  "tags": {
-    "contact:facebook": "https://www.facebook.com/Gra%C4%91evinar-107681085156011",
-    "contact:instagram": "https://www.instagram.com/gradjevinarhouse/",
-    "email": "office@gradjevinar.house",
-    "int_name": "Gradjevinar",
-    "name": "Građevinar",
-    "name:sr": "Грађевинар",
-    "name:sr-Latn": "Građevinar",
-    "office": "construction_company",
-    "phone": "+381 32 661131",
-    "website": "https://www.gradjevinar.house/"
-  }
-},
-{
-  "type": "node",
-  "id": 13922850273,
-  "lat": 45.2420712,
-  "lon": 19.6429213,
-  "tags": {
-    "name": "JNJ skela rent",
-    "office": "construction_company"
-  }
-},
-{
-  "type": "node",
-  "id": 14023890740,
-  "lat": 45.2891674,
-  "lon": 19.8075949,
-  "tags": {
-    "addr:street": "Приморска",
-    "name": "Most NS",
-    "office": "construction_company",
-    "opening_hours": "Mo-Sa 06:00-16:00",
-    "phone": "+381 62 200888"
-  }
-},
-{
-  "type": "node",
-  "id": 14023890758,
-  "lat": 45.2860296,
-  "lon": 19.8065066,
-  "tags": {
-    "addr:country": "RS",
-    "addr:housenumber": "84b",
-    "addr:street": "Приморска",
-    "email": "office@bonus-systems.com",
-    "name": "Bonus systems",
-    "office": "construction_company",
-    "opening_hours": "Mo-Sa 08:00-16:00",
-    "phone": "+381 63 519925",
-    "survey:date": "2014-08-31",
-    "website": "https://bonus-systems.com"
-  }
-},
-{
-  "type": "node",
-  "id": 14024239952,
-  "lat": 45.2849164,
-  "lon": 19.8167255,
-  "tags": {
-    "contact:facebook": "https://www.facebook.com/bestizgradnja/",
-    "contact:instagram": "https://www.instagram.com/bestizgradnja/",
-    "email": "office@best-izgradnja.co.rs",
-    "name": "Best izgradnja",
-    "office": "construction_company",
-    "opening_hours": "Mo-Fr 07:00-15:00",
-    "phone": "+381 21 494195",
-    "website": "https://www.best-izgradnja.co.rs/"
-  }
-},
-{
-  "type": "node",
-  "id": 14026481380,
-  "lat": 45.2792570,
-  "lon": 19.8081571,
-  "tags": {
-    "addr:housenumber": "8a",
-    "addr:street": "Привредникова",
-    "name": "Galens inženjering",
-    "office": "construction_company",
-    "opening_hours": "Mo-Fr 08:00-16:00",
-    "phone": "+381 21 6500012",
-    "website": "http://www.galensinzenjering.rs"
-  }
-},
-{
-  "type": "node",
-  "id": 14027369503,
-  "lat": 45.2757643,
-  "lon": 19.8103757,
-  "tags": {
-    "addr:street": "Пут новосадског партизанског одреда",
-    "contact:facebook": "https://www.facebook.com/BulevarCompany/",
-    "contact:linkedin": "https://www.linkedin.com/company/bulevar-company/",
-    "email": "office@bulevar-company.rs",
-    "name": "Bulevar company",
-    "office": "construction_company",
-    "phone": "+381 21 531997",
-    "website": "https://www.bulevar-company.rs"
-  }
-},
-{
-  "type": "node",
-  "id": 14027369504,
-  "lat": 45.2548435,
-  "lon": 19.8269437,
-  "tags": {
-    "contact:facebook": "https://www.facebook.com/BulevarCompany/",
-    "contact:linkedin": "https://www.linkedin.com/company/bulevar-company/",
-    "email": "office@bulevar-company.rs",
-    "name": "Bulevar company",
-    "office": "construction_company",
-    "phone": "+381 21 531996",
-    "website": "https://www.bulevar-company.rs"
-  }
-},
-{
-  "type": "node",
-  "id": 14027369519,
-  "lat": 45.2767888,
-  "lon": 19.8109085,
-  "tags": {
-    "int_name": "Bobar Beska",
-    "name": "Bobar Beška",
-    "name:sr": "Бобар Бешка",
-    "name:sr-Latn": "Bobar Beška",
-    "office": "construction_company"
-  }
-},
-{
-  "type": "node",
-  "id": 14027369541,
-  "lat": 45.2770774,
-  "lon": 19.8085625,
-  "tags": {
-    "addr:housenumber": "10",
-    "addr:street": "Пут новосадског партизанског одреда",
-    "name": "Ex ing inox i aluminijum",
-    "office": "construction_company",
-    "opening_hours": "Mo-Fr 09:00-15:00",
-    "phone": "+381 21 4770412;+381 21 4770408",
-    "website": "https://exing.co.rs/"
-  }
-},
-{
-  "type": "node",
-  "id": 14027408199,
-  "lat": 45.2726283,
-  "lon": 19.8210765,
-  "tags": {
-    "name": "Expert monter",
-    "office": "construction_company",
-    "phone": "+381 64 2149338"
-  }
-},
-{
-  "type": "way",
-  "id": 635396072,
-  "center": {
-    "lat": 44.9905587,
-    "lon": 20.1944979
-  },
-  "tags": {
-    "addr:city": "Стара Пазова",
-    "addr:housenumber": "3a",
-    "addr:pak": "340490",
-    "addr:postcode": "22300",
-    "addr:street": "Европска",
-    "building": "yes",
-    "email": "office@ponsgradnja.com",
-    "name": "Pons gradnja",
-    "name:sr": "Понс градња",
-    "name:sr-Latn": "Pons gradnja",
-    "note": "Approximate location",
-    "office": "construction_company",
-    "opening_hours": "Mo-Fr 07:00-15:00",
-    "phone": "+381 11 4140524",
-    "ref:RS:kucni_broj": "7308338",
-    "website": "https://www.ponsgradnja.com/"
-  }
-},
-{
-  "type": "way",
-  "id": 1194110156,
-  "center": {
-    "lat": 44.7494837,
-    "lon": 19.6590270
-  },
-  "tags": {
-    "addr:city": "Шабац",
-    "addr:housenumber": "12a",
-    "addr:postcode": "15000",
-    "addr:street": "Далматинска",
-    "air_conditioning": "yes",
-    "building": "yes",
-    "email": "office@masinokop.com",
-    "fax": "+381 15 370-664",
-    "name": "Машинокоп",
-    "name:en": "Mašinokop",
-    "name:sr": "Машинокоп",
-    "name:sr-Latn": "Mašinokop",
-    "office": "construction_company",
-    "operator": "Машинокоп д.о.о. Шабац",
-    "phone": "+381 15 370-125",
-    "ref:RS:kucni_broj": "5645362",
-    "ref:vatin": "106917561",
-    "smoking": "outside",
-    "website": "https://www.masinokop.com"
-  }
-},
-{
-  "type": "way",
-  "id": 1215713411,
-  "center": {
-    "lat": 45.0336146,
-    "lon": 20.1015286
-  },
-  "tags": {
-    "addr:housenumber": "211d",
-    "addr:pak": "346152",
-    "addr:postcode": "22320",
-    "addr:street": "Краља Петра I",
-    "building": "commercial",
-    "contact:instagram": "https://www.instagram.com/letacconstruction/",
-    "contact:linkedin": "https://rs.linkedin.com/company/letacserbia",
-    "contact:youtube": "https://www.youtube.com/channel/UChp1KB0HRn4a4R0zPZsXv8g",
-    "email": "info@letac.rs",
-    "name": "Letač",
-    "name:sr": "Летач",
-    "name:sr-Latn": "Letač",
-    "office": "construction_company",
-    "phone": "+381 22 2150666",
-    "ref:RS:kucni_broj": "6840281",
-    "website": "https://letac.rs/"
-  }
-}
-
+    {
+      "type": "node",
+      "id": 10647465443,
+      "lat": 43.2770387,
+      "lon": 19.9897217,
+      "tags": {
+        "description": "Construction company",
+        "name": "Euroline",
+        "office": "construction_company"
+      }
+    },
+    {
+      "type": "node",
+      "id": 12813109534,
+      "lat": 44.8383693,
+      "lon": 20.3858906,
+      "tags": {
+        "addr:housenumber": "41",
+        "addr:street": "Железничка",
+        "contact:facebook": "astutaplus",
+        "contact:mobile": "+381 63 211 119",
+        "email": "astutaplus@gmail.com",
+        "name": "Astuta Plus",
+        "office": "construction_company",
+        "operator": "Astuta Plus d.o.o.",
+        "phone": "+381112616480;+381113162353",
+        "website": "https://www.astutaplus.com/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13026192595,
+      "lat": 44.8069431,
+      "lon": 20.4202235,
+      "tags": {
+        "addr:housenumber": "3b",
+        "addr:street": "Милутина Миланковића",
+        "email": "karriere@strabag.com",
+        "level": "5;6;7;8",
+        "name": "Strabag",
+        "office": "construction_company",
+        "phone": "+381 11 2221700",
+        "website": "https://karriere.strabag.com/rs"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13026249351,
+      "lat": 44.8072777,
+      "lon": 20.419587,
+      "tags": {
+        "addr:housenumber": "3v",
+        "addr:street": "Милутина Миланковића",
+        "email": "karriere@strabag.com",
+        "level": "8",
+        "name": "Strabag",
+        "office": "construction_company",
+        "phone": "+381 11 2221700",
+        "website": "https://karriere.strabag.com/rs"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13049686424,
+      "lat": 44.8463269,
+      "lon": 20.3940302,
+      "tags": {
+        "addr:housenumber": "2e",
+        "addr:street": "Драгана Ракића",
+        "email": "info@baufirma.rs",
+        "mobile": "+381 63 378087",
+        "name": "BAU firma",
+        "name:sr": "БАУ фирма",
+        "name:sr-Latn": "BAU firma",
+        "office": "construction_company",
+        "opening_hours": "Mo-Fr 09:00-20:00; Sa 09:00-15:00",
+        "phone": "+381 63 378077",
+        "website": "https://baufirma.rs"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13049737014,
+      "lat": 45.2485777,
+      "lon": 19.8384031,
+      "tags": {
+        "addr:housenumber": "88",
+        "addr:street": "Булевар ослобођења",
+        "level": "7",
+        "name": "Zoned",
+        "name:sr": "Зонед",
+        "name:sr-Latn": "Zoned",
+        "office": "construction_company",
+        "opening_hours": "Mo-Fr 08:00-15:00",
+        "phone": "+381 62 600900",
+        "website": "https://zoned.rs/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13049737015,
+      "lat": 45.2485625,
+      "lon": 19.8384061,
+      "tags": {
+        "addr:housenumber": "88",
+        "addr:street": "Булевар ослобођења",
+        "level": "7",
+        "name": "Zibo inženjering",
+        "name:sr": "Зибо инжењеринг",
+        "name:sr-Latn": "Zibo inženjering",
+        "office": "construction_company"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13073017360,
+      "lat": 45.0493184,
+      "lon": 20.1064768,
+      "tags": {
+        "addr:housenumber": "147",
+        "addr:pak": "346827",
+        "addr:postcode": "22320",
+        "addr:street": "Саве Ковачевића",
+        "email": "office@inbdkop.rs",
+        "name": "In B&D kop",
+        "name:sr": "Ин Б&Д коп",
+        "name:sr-Latn": "In B&D kop",
+        "office": "construction_company",
+        "phone": "+381 65 8969101",
+        "website": "https://inbdkop.rs/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13089293327,
+      "lat": 44.8012483,
+      "lon": 20.4725335,
+      "tags": {
+        "addr:city": "Београд",
+        "addr:housenumber": "16",
+        "addr:postcode": "11000",
+        "addr:street": "Коче Капетана",
+        "email": "kolos@eunet.rs",
+        "name": "Tim Kolos Plus",
+        "office": "construction_company",
+        "phone": "+381 11 2445402;+381 11 2443009",
+        "website": "https://tim-kolos.co.rs/",
+        "wheelchair": "no"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13131148166,
+      "lat": 44.8000106,
+      "lon": 20.471703,
+      "tags": {
+        "addr:city": "Београд",
+        "addr:housenumber": "57",
+        "addr:level": "VI",
+        "addr:postcode": "11000",
+        "addr:street": "Макензијева",
+        "email": "office@cestra.rs",
+        "fax": "+381 11 3835037",
+        "name": "Cestra",
+        "office": "construction_company",
+        "operator": "CESTRA d.o.o.",
+        "phone": "+381 11 3835040",
+        "website": "https://cestra.rs/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13138357917,
+      "lat": 44.7998662,
+      "lon": 20.4662797,
+      "tags": {
+        "addr:city": "Београд",
+        "addr:housenumber": "2",
+        "addr:postcode": "11000",
+        "addr:street": "Кнегиње Зорке",
+        "contact:instagram": "https://www.instagram.com/neimarv.rs/",
+        "email": "office@neimarv.rs",
+        "fax": "+381 11 30 84 134",
+        "name": "Neimar-V",
+        "office": "construction_company",
+        "opening_hours": "Mo-Fr 09:00-16:30; Sa 09:00-14:00; Su off",
+        "phone": "+381 11 30 84 101",
+        "website": "https://neimarv.rs/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13231560211,
+      "lat": 44.9416363,
+      "lon": 20.292791,
+      "tags": {
+        "email": "office@resagradnja.com",
+        "name": "Resa gradnja",
+        "name:sr": "Реса градња",
+        "name:sr-Latn": "Resa gradnja",
+        "office": "construction_company",
+        "opening_hours": "Mo-Fr 07:00-20:00; Sa 07:00-14:00",
+        "phone": "+381 22 342803",
+        "website": "https://resagradnja.rs"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13260353267,
+      "lat": 43.5792171,
+      "lon": 21.134561,
+      "tags": {
+        "industrial": "distributor",
+        "name": "Boss Construction",
+        "office": "construction_company"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13298154631,
+      "lat": 44.7531978,
+      "lon": 19.6891668,
+      "tags": {
+        "contact:facebook": "https://www.facebook.com/setdoo/",
+        "contact:youtube": "https://www.youtube.com/channel/UCeiM6NGJWprm-89bq-JlD1w/featured",
+        "name": "Set",
+        "name:sr": "Сет",
+        "name:sr-Latn": "Set",
+        "office": "construction_company",
+        "opening_hours": "Mo-Fr 07:30-15:30",
+        "phone": "+381 15 355588",
+        "website": "https://set.rs"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13628565077,
+      "lat": 45.2803192,
+      "lon": 19.7730238,
+      "tags": {
+        "int_name": "Gemmax gradnja",
+        "name": "Gemmax gradnja",
+        "office": "construction_company",
+        "opening_hours": "Mo-Fr 07:00-17:00; Sa-Su 07:00-15:00",
+        "phone": "+381 63 459999;+381 66 8098095",
+        "website": "https://gemmaxgradnja.com"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13650410832,
+      "lat": 43.5930755,
+      "lon": 20.2232987,
+      "tags": {
+        "contact:facebook": "https://www.facebook.com/Gra%C4%91evinar-107681085156011",
+        "contact:instagram": "https://www.instagram.com/gradjevinarhouse/",
+        "email": "office@gradjevinar.house",
+        "int_name": "Gradjevinar",
+        "name": "Građevinar",
+        "name:sr": "Грађевинар",
+        "name:sr-Latn": "Građevinar",
+        "office": "construction_company",
+        "phone": "+381 32 661131",
+        "website": "https://www.gradjevinar.house/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 13922850273,
+      "lat": 45.2420712,
+      "lon": 19.6429213,
+      "tags": {
+        "name": "JNJ skela rent",
+        "office": "construction_company"
+      }
+    },
+    {
+      "type": "node",
+      "id": 14023890740,
+      "lat": 45.2891674,
+      "lon": 19.8075949,
+      "tags": {
+        "addr:street": "Приморска",
+        "name": "Most NS",
+        "office": "construction_company",
+        "opening_hours": "Mo-Sa 06:00-16:00",
+        "phone": "+381 62 200888"
+      }
+    },
+    {
+      "type": "node",
+      "id": 14023890758,
+      "lat": 45.2860296,
+      "lon": 19.8065066,
+      "tags": {
+        "addr:country": "RS",
+        "addr:housenumber": "84b",
+        "addr:street": "Приморска",
+        "email": "office@bonus-systems.com",
+        "name": "Bonus systems",
+        "office": "construction_company",
+        "opening_hours": "Mo-Sa 08:00-16:00",
+        "phone": "+381 63 519925",
+        "survey:date": "2014-08-31",
+        "website": "https://bonus-systems.com"
+      }
+    },
+    {
+      "type": "node",
+      "id": 14024239952,
+      "lat": 45.2849164,
+      "lon": 19.8167255,
+      "tags": {
+        "contact:facebook": "https://www.facebook.com/bestizgradnja/",
+        "contact:instagram": "https://www.instagram.com/bestizgradnja/",
+        "email": "office@best-izgradnja.co.rs",
+        "name": "Best izgradnja",
+        "office": "construction_company",
+        "opening_hours": "Mo-Fr 07:00-15:00",
+        "phone": "+381 21 494195",
+        "website": "https://www.best-izgradnja.co.rs/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 14026481380,
+      "lat": 45.279257,
+      "lon": 19.8081571,
+      "tags": {
+        "addr:housenumber": "8a",
+        "addr:street": "Привредникова",
+        "name": "Galens inženjering",
+        "office": "construction_company",
+        "opening_hours": "Mo-Fr 08:00-16:00",
+        "phone": "+381 21 6500012",
+        "website": "http://www.galensinzenjering.rs"
+      }
+    },
+    {
+      "type": "node",
+      "id": 14027369503,
+      "lat": 45.2757643,
+      "lon": 19.8103757,
+      "tags": {
+        "addr:street": "Пут новосадског партизанског одреда",
+        "contact:facebook": "https://www.facebook.com/BulevarCompany/",
+        "contact:linkedin": "https://www.linkedin.com/company/bulevar-company/",
+        "email": "office@bulevar-company.rs",
+        "name": "Bulevar company",
+        "office": "construction_company",
+        "phone": "+381 21 531997",
+        "website": "https://www.bulevar-company.rs"
+      }
+    },
+    {
+      "type": "node",
+      "id": 14027369504,
+      "lat": 45.2548435,
+      "lon": 19.8269437,
+      "tags": {
+        "contact:facebook": "https://www.facebook.com/BulevarCompany/",
+        "contact:linkedin": "https://www.linkedin.com/company/bulevar-company/",
+        "email": "office@bulevar-company.rs",
+        "name": "Bulevar company",
+        "office": "construction_company",
+        "phone": "+381 21 531996",
+        "website": "https://www.bulevar-company.rs"
+      }
+    },
+    {
+      "type": "node",
+      "id": 14027369519,
+      "lat": 45.2767888,
+      "lon": 19.8109085,
+      "tags": {
+        "int_name": "Bobar Beska",
+        "name": "Bobar Beška",
+        "name:sr": "Бобар Бешка",
+        "name:sr-Latn": "Bobar Beška",
+        "office": "construction_company"
+      }
+    },
+    {
+      "type": "node",
+      "id": 14027369541,
+      "lat": 45.2770774,
+      "lon": 19.8085625,
+      "tags": {
+        "addr:housenumber": "10",
+        "addr:street": "Пут новосадског партизанског одреда",
+        "name": "Ex ing inox i aluminijum",
+        "office": "construction_company",
+        "opening_hours": "Mo-Fr 09:00-15:00",
+        "phone": "+381 21 4770412;+381 21 4770408",
+        "website": "https://exing.co.rs/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 14027408199,
+      "lat": 45.2726283,
+      "lon": 19.8210765,
+      "tags": {
+        "name": "Expert monter",
+        "office": "construction_company",
+        "phone": "+381 64 2149338"
+      }
+    },
+    {
+      "type": "way",
+      "id": 635396072,
+      "center": {
+        "lat": 44.9905587,
+        "lon": 20.1944979
+      },
+      "tags": {
+        "addr:city": "Стара Пазова",
+        "addr:housenumber": "3a",
+        "addr:pak": "340490",
+        "addr:postcode": "22300",
+        "addr:street": "Европска",
+        "building": "yes",
+        "email": "office@ponsgradnja.com",
+        "name": "Pons gradnja",
+        "name:sr": "Понс градња",
+        "name:sr-Latn": "Pons gradnja",
+        "note": "Approximate location",
+        "office": "construction_company",
+        "opening_hours": "Mo-Fr 07:00-15:00",
+        "phone": "+381 11 4140524",
+        "ref:RS:kucni_broj": "7308338",
+        "website": "https://www.ponsgradnja.com/"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1194110156,
+      "center": {
+        "lat": 44.7494837,
+        "lon": 19.659027
+      },
+      "tags": {
+        "addr:city": "Шабац",
+        "addr:housenumber": "12a",
+        "addr:postcode": "15000",
+        "addr:street": "Далматинска",
+        "air_conditioning": "yes",
+        "building": "yes",
+        "email": "office@masinokop.com",
+        "fax": "+381 15 370-664",
+        "name": "Машинокоп",
+        "name:en": "Mašinokop",
+        "name:sr": "Машинокоп",
+        "name:sr-Latn": "Mašinokop",
+        "office": "construction_company",
+        "operator": "Машинокоп д.о.о. Шабац",
+        "phone": "+381 15 370-125",
+        "ref:RS:kucni_broj": "5645362",
+        "ref:vatin": "106917561",
+        "smoking": "outside",
+        "website": "https://www.masinokop.com"
+      }
+    },
+    {
+      "type": "way",
+      "id": 1215713411,
+      "center": {
+        "lat": 45.0336146,
+        "lon": 20.1015286
+      },
+      "tags": {
+        "addr:housenumber": "211d",
+        "addr:pak": "346152",
+        "addr:postcode": "22320",
+        "addr:street": "Краља Петра I",
+        "building": "commercial",
+        "contact:instagram": "https://www.instagram.com/letacconstruction/",
+        "contact:linkedin": "https://rs.linkedin.com/company/letacserbia",
+        "contact:youtube": "https://www.youtube.com/channel/UChp1KB0HRn4a4R0zPZsXv8g",
+        "email": "info@letac.rs",
+        "name": "Letač",
+        "name:sr": "Летач",
+        "name:sr-Latn": "Letač",
+        "office": "construction_company",
+        "phone": "+381 22 2150666",
+        "ref:RS:kucni_broj": "6840281",
+        "website": "https://letac.rs/"
+      }
+    }
   ]
 }
