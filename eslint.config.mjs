@@ -23,8 +23,8 @@ export default tseslint.config(
     },
   },
   {
-    // The scraper CLI reports progress on stdout by design.
-    files: ['src/scraper/**/*.ts'],
+    // The scraper CLI and the reporting scripts print to stdout by design.
+    files: ['src/scraper/**/*.ts', 'scripts/**/*.ts'],
     rules: { 'no-console': 'off' },
   },
   prettier,
