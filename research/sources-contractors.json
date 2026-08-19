@@ -45,12 +45,7 @@
       "has_stores": true,
       "estimated_records": 642,
       "estimate_method": "Fetched each facade-relevant category page and counted unique company detail links in the HTML: termo-izolacija-zvucna-izolacija=141, zavrsni-radovi-restauracije=156, hidroizolacija=135, za-gradjevinske-radove=94, ciscenje-fasada-skidanje-grafita=51, grubi-gradjevinski-radovi=32, proizvodnja-stiropora=26, sanacije-gradjevinskih-objekata=17, radovi-na-visini=16. Sum = 668 before cross-category overlap; ~642 after discounting ~4% duplicate slugs seen in more than one category. Sitemap index (sitemap1..8.xml) holds 64,818 unique slugs, of which 867 are category roots (a slug S is a category when S and S-beograd both exist).",
-      "fields_available": [
-        "phone",
-        "address",
-        "website",
-        "city"
-      ],
+      "fields_available": ["phone", "address", "website", "city"],
       "phone_coverage_estimate": "~100% of listing rows; measured 195 unique phones across 141 companies on /termo-izolacija-zvucna-izolacija, 213 across 156 on /zavrsni-radovi-restauracije, 199 across 94 on /za-gradjevinske-radove (many firms list a landline plus a mobile). No mailto: links found on any category page - this source is phone-only.",
       "pagination": {
         "exists": false,
@@ -77,13 +72,7 @@
       "has_stores": true,
       "estimated_records": 11291,
       "estimate_method": "Fetched https://gradjevinarstvo.rs/firme-sitemap (2.0 MB XML) and counted <loc> entries: exactly 11,291 company URLs. Facade-relevant slice sized from category pages: /kategorije/252/zastakljeni-zidovi-fasade = 20 firms, /kategorije/143/izolacija = 21 firms per page; the register spans the whole construction sector, so the facade-relevant subset must be recovered by keyword classification over the 11,291 pages rather than by category alone.",
-      "fields_available": [
-        "phone",
-        "address",
-        "website",
-        "city",
-        "description"
-      ],
+      "fields_available": ["phone", "address", "website", "city", "description"],
       "phone_coverage_estimate": "~90%. Sampled 10 company pages spread evenly across the sitemap (every 1200th entry): 9 of 10 carried at least one phone (1-4 numbers each); the only miss was /firme/3370/skupstina-opstine, a municipal body rather than a business. No usable mailto: - the only mailto: on the page is a share-by-email link.",
       "pagination": {
         "exists": true,
@@ -110,14 +99,7 @@
       "has_stores": true,
       "estimated_records": 330,
       "estimate_method": "Downloaded https://www.navidiku.rs/sitemap/sitemap-companies-001.xml.gz: 13,408 company URLs across 1,606 category-city segments. Counted companies whose URL segment matches a facade-relevant keyword (fasad|izolacij|moler|gradjevin|stovar|gips|adaptacij|izvodjenje-radova|zavrsn|termoizol|stiropor|krec): 68 segments, 330 companies. Largest: adaptacija-renoviranje-stana-beograd=38, molerski-radovi-beograd=32, gradjevinski-materijal-beograd=31, izvodjenje-radova-beograd=23, stovarista-beograd=21, gipsani-radovi-beograd=15, izolacija-beograd=13. This is a floor: the /firme/fasaderski-radovi/beograd filter view returned 10 firms that are filed under other primary segments.",
-      "fields_available": [
-        "phone",
-        "address",
-        "city",
-        "opening_hours",
-        "rating",
-        "description"
-      ],
+      "fields_available": ["phone", "address", "city", "opening_hours", "rating", "description"],
       "phone_coverage_estimate": "~100%. Sampled 9 company pages spread across the sitemap: all 9 carried tel: links (3-14 per page). The /firme/fasaderski-radovi/beograd listing showed 9 tel: links across 10 result cards, with a 'Pozovi' button wired to e.g. tel:0615300597. Email is not exposed - 0 mailto: on every sampled page.",
       "pagination": {
         "exists": true,
@@ -144,13 +126,7 @@
       "has_stores": true,
       "estimated_records": 3000,
       "estimate_method": "Site states '400 gradova i preko 3000 gradjevinskih firmi'. Verified the Belgrade branch by fetching /beograd/: 50 company detail links per page and pagination links up to /beograd/18, i.e. ~868 Belgrade firms (the homepage independently claims 868 for Beograd, 225 Novi Sad, 108 Nis - consistent with 50/page x 18). Scaling that ratio to the claimed national total gives ~3,000, which the per-city counters corroborate.",
-      "fields_available": [
-        "phone",
-        "address",
-        "website",
-        "city",
-        "short_description"
-      ],
+      "fields_available": ["phone", "address", "website", "city", "short_description"],
       "phone_coverage_estimate": "High on detail pages, ~0% on listing pages. /beograd/ itself contains no phone; the detail page /beograd/012-prima-doo-beograd/ carries +381 11 3349 936. Homepage documents the record shape as 'Naziv preduzeca, adresa, telefon, web sajt, kratak opis delatnosti'.",
       "pagination": {
         "exists": true,
@@ -177,13 +153,7 @@
       "has_stores": false,
       "estimated_records": 746,
       "estimate_method": "https://poslovnikontakt.com/ait-dir-item-sitemap.xml contains 746 <loc> entries (all directory items, all trades). Four facade/moler categories were confirmed present in ait-dir-item-category-sitemap.xml: /kategorija/molerski-fasaderski-gipsarski-radovi-srbija/ (10 shown at the default page size, with a Count selector offering 5/10/20/30/40/50/100), /kategorija/moleri-i-gipsari-beograd/, /kategorija/molerski-radovi-novi-sad-moleri/ and /kategorija/moleri-gipsari-fasaderi-loznica/.",
-      "fields_available": [
-        "phone",
-        "contact_person",
-        "city",
-        "services",
-        "description"
-      ],
+      "fields_available": ["phone", "contact_person", "city", "services", "description"],
       "phone_coverage_estimate": "~100% on the listing page itself. Every card renders one to three numbers inline, e.g. 'Moler Dragomir - 069 1484637, 064 1484637, 011 2778129' and 'Moler Dragan - 064 0 666 219'. Address and email are largely absent - this is a phone-first directory, which is exactly the ranking criterion.",
       "pagination": {
         "exists": true,
@@ -210,13 +180,7 @@
       "has_stores": true,
       "estimated_records": 400,
       "estimate_method": "Category pages are small but numerous: /izolacija-hidroizolacija-termoizolacija shows 2 firms on page 1 of 2. The construction hub /gradjevinarstvo links 67 subcategories, of which the relevant ones are izolacija-hidroizolacija-termoizolacija, gradjevinski-materijal, stovarista, stovarista-ogreva and gradjevinske-firme-usluge. Estimating ~20-40 firms per relevant subcategory across those 5 plus their pagination gives roughly 150-400 Belgrade records; 400 is the optimistic bound and should be re-measured before committing crawler budget.",
-      "fields_available": [
-        "phone",
-        "address",
-        "website",
-        "description",
-        "multiple_locations"
-      ],
+      "fields_available": ["phone", "address", "website", "description", "multiple_locations"],
       "phone_coverage_estimate": "0% on listing cards, high on detail pages. /izolacija-hidroizolacija-termoizolacija shows only name + address + blurb; the detail page /izolacija-hidroizolacija-termoizolacija/bimax-doo contains 6 distinct numbers.",
       "pagination": {
         "exists": true,
@@ -243,13 +207,7 @@
       "has_stores": false,
       "estimated_records": 12033,
       "estimate_method": "Category page states '1-25 od 12033 rezultata' - 12,033 ads at 25 per page = 482 pages. Facade-specific subsets via ?q=: 'Potrebni fasaderi' and 'izrada fasada' both return live result sets.",
-      "fields_available": [
-        "title",
-        "date",
-        "city",
-        "price",
-        "outbound_source_url"
-      ],
+      "fields_available": ["title", "date", "city", "price", "outbound_source_url"],
       "phone_coverage_estimate": "0% on Goglasi itself. Result cards carry no phone; Goglasi links out to the originating site (netoglasi.net, netoglasi.rs, lalafo.rs and others), where the number lives. Effective phone yield therefore depends entirely on the downstream site.",
       "pagination": {
         "exists": true,
@@ -310,15 +268,7 @@
       "has_stores": true,
       "estimated_records": 5,
       "estimate_method": "Direct count on the category page: 5 companies rendered, no pagination controls. 7 unique phone-shaped strings in the page HTML.",
-      "fields_available": [
-        "phone",
-        "address",
-        "city",
-        "PIB",
-        "maticni_broj",
-        "legal_name",
-        "tags"
-      ],
+      "fields_available": ["phone", "address", "city", "PIB", "maticni_broj", "legal_name", "tags"],
       "phone_coverage_estimate": "~100% of the 5 listings, e.g. Fermax - 'Telefon (01112345xx): 0113118085'.",
       "pagination": {
         "exists": false,
@@ -345,13 +295,7 @@
       "has_stores": true,
       "estimated_records": 6,
       "estimate_method": "Fetched all 16 sitemap pages (https://www.pttimenik.com/sitemap.xml?page=1..16): 31,608 URLs total. Keyword counts across that set: fasad=6, izolacij=6, moler=12, stiropor=2 - versus stovarist=643 and gradjevinsk=280. The facade contractor slice is genuinely 6 URLs; /demit-fasade lists 2 companies.",
-      "fields_available": [
-        "phone",
-        "email",
-        "address",
-        "city",
-        "category"
-      ],
+      "fields_available": ["phone", "email", "address", "city", "category"],
       "phone_coverage_estimate": "High on detail pages - /demit-fasade-beograd/farbara-hemoluks-demit-fasada carries 011 993698 and mailto:hemoluks@beotel.rs. 0% on the category listing page.",
       "pagination": {
         "exists": true,
@@ -378,12 +322,7 @@
       "has_stores": true,
       "estimated_records": 200,
       "estimate_method": "Construction category page 1 rendered 9-18 phone-shaped strings in a 275 KB response; page 2 rendered 10 more and exists as /gra%C4%91evinarstvo/page/2/. Assuming the observed ~10 firms/page holds and the pager runs to roughly 20 pages, ~200 construction records. This is the least precise estimate in the registry - the pager depth was not walked to the end.",
-      "fields_available": [
-        "phone",
-        "address",
-        "city",
-        "description"
-      ],
+      "fields_available": ["phone", "address", "city", "description"],
       "phone_coverage_estimate": "Moderate to high on listing pages - ~10 distinct numbers per category page were visible without following detail links.",
       "pagination": {
         "exists": true,
@@ -410,12 +349,7 @@
       "has_stores": false,
       "estimated_records": 13,
       "estimate_method": "Category page states '7 oglasa odgovara vasoj pretrazi' on the default view while the category counter reads 'Fasader 13' - 13 total ads in the fasader category.",
-      "fields_available": [
-        "title",
-        "city",
-        "description",
-        "phone_in_body"
-      ],
+      "fields_available": ["title", "city", "description", "phone_in_body"],
       "phone_coverage_estimate": "Moderate. Numbers appear inside ad body text rather than a structured field (e.g. '063 290 238' in a listing preview). Regex over the description is required.",
       "pagination": {
         "exists": true,
@@ -442,11 +376,7 @@
       "has_stores": true,
       "estimated_records": 40,
       "estimate_method": "Direct count on the Zavrsni radovi subcategory page: ~40 company entries rendered in a continuous feed with no pager visible. Gradjevinarstvo is the parent (k67) with Zavrsni radovi (p85) and Gradjevinske firme (p70) as the relevant children.",
-      "fields_available": [
-        "company_name",
-        "description",
-        "detail_page"
-      ],
+      "fields_available": ["company_name", "description", "detail_page"],
       "phone_coverage_estimate": "0% on the category page - names and blurbs only. Phone requires the detail page /k67-p85-ko{id}/... , which was not sampled in depth.",
       "pagination": {
         "exists": false,
@@ -473,14 +403,7 @@
       "has_stores": true,
       "estimated_records": 4,
       "estimate_method": "Ran a live Overpass query over area[\"ISO3166-1\"=\"RS\"]: nwr[craft~\"^(plasterer|painter|insulation|builder)$\"] plus nwr[shop~\"^(trade|doityourself|hardware)$\"]. 473 elements returned: hardware=296, doityourself=112, trade=60, painter=3, key_cutter=1, plasterer=1. 189 elements carry phone or contact:phone (40%), 167 carry a website.",
-      "fields_available": [
-        "phone",
-        "website",
-        "address",
-        "coordinates",
-        "opening_hours",
-        "name"
-      ],
+      "fields_available": ["phone", "website", "address", "coordinates", "opening_hours", "name"],
       "phone_coverage_estimate": "40% measured (189 of 473), and the tags are already normalized - OSM phone values are usually in +381 form.",
       "pagination": {
         "exists": false,
@@ -507,12 +430,7 @@
       "has_stores": false,
       "estimated_records": 60,
       "estimate_method": "Directory index rendered 16 distinct phone-shaped strings across the visible professional cards; taxonomy is /profesionalci/kategorije/{arhitektura-i-dizajn|gradnja-i-opremanje|investitori|proizvodaci-i-dobavljaci|usluge} plus /profesionalci/lokacije/{grad}. Extrapolating the visible card density across the 5 categories gives roughly 60 entries; there is no facade-specific category.",
-      "fields_available": [
-        "phone",
-        "website",
-        "city",
-        "description"
-      ],
+      "fields_available": ["phone", "website", "city", "description"],
       "phone_coverage_estimate": "Moderate - phones present on the index, but the population is architects, manufacturers and suppliers rather than fasaderi.",
       "pagination": {
         "exists": true,
@@ -539,13 +457,7 @@
       "has_stores": false,
       "estimated_records": 75,
       "estimate_method": "/imenik/fasade/beograd states '15 najboljih rezultata za: fasaderi u Beogradu' with a 5-page pager, i.e. ~75 Belgrade contractors. Twelve city pages are linked from /imenik/fasade (beograd, novi_sad, kragujevac, nis and 8 more), so the national figure is larger - but the record count is not the limiting factor here.",
-      "fields_available": [
-        "company_name",
-        "city",
-        "rating",
-        "reviews",
-        "profile_page"
-      ],
+      "fields_available": ["company_name", "city", "rating", "reviews", "profile_page"],
       "phone_coverage_estimate": "0% obtainable. Contractor phone numbers are never rendered in the HTML. Fetching the profile /izvodjac/rading_doo_beograd returned exactly one number, +381 11 418 2607, which is Daibau's own switchboard. The contractor's number is served by /autosecretary/getPhoneNumber/ - and that is the first line of their robots.txt Disallow list.",
       "pagination": {
         "exists": true,
@@ -608,12 +520,7 @@
       "has_stores": false,
       "estimated_records": 56,
       "estimate_method": "Category page states '1 - 20 od 56' with a 3-page pager - 56 registered fasaderi nationally.",
-      "fields_available": [
-        "craftsman_name",
-        "city",
-        "average_rating",
-        "service_type"
-      ],
+      "fields_available": ["craftsman_name", "city", "average_rating", "service_type"],
       "phone_coverage_estimate": "0% measured. I fetched 5 profile pages (andrija-petkovic--4169, bojan-nikolic--4162, david-ivkovic--3816, djordje-pantovic-ribnica-28, gzim-jahirovic--3788): zero phone-shaped strings on any of them. Contact runs through an on-site form.",
       "pagination": {
         "exists": true,
@@ -640,11 +547,7 @@
       "has_stores": false,
       "estimated_records": 1720,
       "estimate_method": "Pager runs to page 171 ('poslednja') at ~10 entries per page = ~1,720 directory entries across all trades. There is no fasader or fasada category - trades listed are elektricari, vodoinstalateri, stolari, molerofarbari, arhitekte and similar; facade work would surface only inside molerofarbari.",
-      "fields_available": [
-        "business_name",
-        "trade",
-        "description"
-      ],
+      "fields_available": ["business_name", "trade", "description"],
       "phone_coverage_estimate": "~0% on listings - one phone-shaped string on the whole index page. Phones are not part of the listing shape.",
       "pagination": {
         "exists": true,
@@ -671,10 +574,7 @@
       "has_stores": true,
       "estimated_records": 0,
       "estimate_method": "Homepage renders hundreds of company entries including facade-relevant ones ('UGRADNJA VENTILISANE FASADE FUNDERMAX MD ALU SISTEM', 'Fasade Bekament Mladenovac - DJIKA STZR') but publishes no total count and exposes no per-listing phone. No countable, phone-bearing unit was found, so the usable record count is recorded as 0 rather than guessed.",
-      "fields_available": [
-        "company_name",
-        "service_description"
-      ],
+      "fields_available": ["company_name", "service_description"],
       "phone_coverage_estimate": "0% on listings. The only numbers on the site are in a 'Vazni telefoni' block of national emergency numbers - police, fire, ambulance - which is not lead data.",
       "pagination": {
         "exists": true,
@@ -685,9 +585,7 @@
       "recommended_approach": "Skip. Fully crawlable and irrelevant - it is an SEO keyword directory, not a contact directory.",
       "duplicate_risk": "N/A.",
       "priority": "Low",
-      "sample_urls": [
-        "https://www.privredniimenik.rs/"
-      ],
+      "sample_urls": ["https://www.privredniimenik.rs/"],
       "notes": "Ranks well for Serbian 'privredni imenik' queries and looks substantial, which is exactly why it is worth recording as a negative: the listings are keyword-stuffed service descriptions with no contact channel attached."
     },
     {
@@ -699,9 +597,7 @@
       "has_stores": true,
       "estimated_records": 0,
       "estimate_method": "Homepage (113 KB) contained zero phone-shaped strings. /pretraga?q=fasade returns HTTP 404 - the search path guessed from the UI does not exist, and no working category path for fasade was found in the time budgeted.",
-      "fields_available": [
-        "company_name"
-      ],
+      "fields_available": ["company_name"],
       "phone_coverage_estimate": "0% measured on the homepage; the real listing shape was never reached.",
       "pagination": {
         "exists": true,
@@ -712,9 +608,7 @@
       "recommended_approach": "Skip for now. If revisited, find the real category URL scheme first - the guessed /pretraga?q= path 404s - and budget for Crawl-delay: 10.",
       "duplicate_risk": "Unknown.",
       "priority": "Low",
-      "sample_urls": [
-        "https://imenik.rs/"
-      ],
+      "sample_urls": ["https://imenik.rs/"],
       "notes": "Recorded as an incomplete evaluation rather than a verified dead end. Free registration for new companies suggests thin, self-submitted data; combined with Crawl-delay: 10 it does not justify further time ahead of the six High sources."
     },
     {
@@ -726,9 +620,7 @@
       "has_stores": false,
       "estimated_records": null,
       "estimate_method": "Not measurable in this pass. /usluge and /usluge/gradjevinske-usluge both returned HTTP 403 to a plain browser-UA curl and to the fetch tool, so no listing was ever rendered and no count could be taken.",
-      "fields_available": [
-        "unknown - page never rendered"
-      ],
+      "fields_available": ["unknown - page never rendered"],
       "phone_coverage_estimate": "Unknown.",
       "pagination": {
         "exists": null,
@@ -739,9 +631,7 @@
       "recommended_approach": "Requires Playwright with a real browser context to get past the 403 - which is the one case the project stack reserves Playwright for. Worth one timeboxed spike to measure whether phones are in the ad body or behind a click-gate like KupujemProdajem; if gated, drop it permanently.",
       "duplicate_risk": "High against KupujemProdajem and Goglasi.",
       "priority": "Low",
-      "sample_urls": [
-        "https://www.halooglasi.com/usluge"
-      ],
+      "sample_urls": ["https://www.halooglasi.com/usluge"],
       "notes": "Deliberately not ranked Medium or High: no page was ever successfully retrieved, so every field above except robots.txt would be a guess. Recorded as unmeasured rather than estimated. It is the one Low entry that could move up after a Playwright spike."
     },
     {
@@ -770,9 +660,7 @@
       "recommended_approach": "REJECTED. Do not crawl. The register would be the authoritative way to enumerate every preduzetnik with a facade-related sifra delatnosti, and it is the single most tempting source in this space - but a blanket Disallow: / leaves no compliant crawl path. It also serves TLS with an incomplete certificate chain, and it is JS-driven. If APR data is ever needed, pursue the official bulk/API licensing route with the agency, not a scraper.",
       "duplicate_risk": "N/A.",
       "priority": "Low",
-      "sample_urls": [
-        "https://pretraga2.apr.gov.rs/unifiedentitysearch"
-      ],
+      "sample_urls": ["https://pretraga2.apr.gov.rs/unifiedentitysearch"],
       "notes": "REJECTED (robots.txt blanket disallow). Flagged for the project owner rather than silently dropped, because the legal/commercial route to APR data is a real option and it is the only source that would give complete national coverage of registered fasaderi."
     },
     {
@@ -784,13 +672,7 @@
       "has_stores": true,
       "estimated_records": null,
       "estimate_method": "Not estimated - source rejected on terms/robots grounds before measurement.",
-      "fields_available": [
-        "page_name",
-        "phone",
-        "address",
-        "website",
-        "messenger"
-      ],
+      "fields_available": ["page_name", "phone", "address", "website", "messenger"],
       "phone_coverage_estimate": "Likely high in reality - Serbian fasaderi advertise heavily on Facebook with a mobile number in the page's contact block - but unobtainable compliantly.",
       "pagination": {
         "exists": null,
@@ -801,9 +683,7 @@
       "recommended_approach": "REJECTED for scraping. The compliant alternatives are (a) manual, human review of specific pages, or (b) Meta's official Graph API within its terms - neither of which is a crawler task. Do not build an adapter.",
       "duplicate_risk": "N/A.",
       "priority": "Low",
-      "sample_urls": [
-        "https://www.facebook.com/robots.txt"
-      ],
+      "sample_urls": ["https://www.facebook.com/robots.txt"],
       "notes": "REJECTED (platform terms prohibit automated collection). This is the highest-value population we cannot legally reach with a scraper: the issue explicitly asked about 'publicly searchable Facebook and Instagram business pages', and the answer is that public visibility does not grant collection rights here. Flagging to the project owner as a decision, not a technical gap."
     },
     {
@@ -815,11 +695,7 @@
       "has_stores": false,
       "estimated_records": null,
       "estimate_method": "Not estimated - source rejected on terms/robots grounds before measurement.",
-      "fields_available": [
-        "profile_name",
-        "bio_phone",
-        "website_link"
-      ],
+      "fields_available": ["profile_name", "bio_phone", "website_link"],
       "phone_coverage_estimate": "Unobtainable compliantly.",
       "pagination": {
         "exists": null,
@@ -830,9 +706,7 @@
       "recommended_approach": "REJECTED for scraping. Same reasoning as Facebook.",
       "duplicate_risk": "N/A.",
       "priority": "Low",
-      "sample_urls": [
-        "https://www.instagram.com/robots.txt"
-      ],
+      "sample_urls": ["https://www.instagram.com/robots.txt"],
       "notes": "REJECTED (platform terms prohibit automated collection)."
     },
     {
@@ -844,9 +718,7 @@
       "has_stores": true,
       "estimated_records": 0,
       "estimate_method": "Searched in Serbian for authorized-installer lists from each vendor and fetched the candidates. baumit.rs homepage exposes no partner or installer link; https://www.baumit.rs/prodajna-mesta returns HTTP 404. Bekament publishes a training centre for fasaderi and gipsari but no roster of trained crews. JUB Srbija has no public Master-klub installer list. Austrotherm describes 'preko 200 partnera' but those are distributors and stovarista, not contractors, and no list page is published. No vendor in this group publishes a public installer directory for Serbia.",
-      "fields_available": [
-        "none published"
-      ],
+      "fields_available": ["none published"],
       "phone_coverage_estimate": "0% - no list exists to have coverage.",
       "pagination": {
         "exists": false,
@@ -873,9 +745,7 @@
       "has_stores": false,
       "estimated_records": 0,
       "estimate_method": "Fetched the homepage and category pages. It presents as a national platform ('besplatna online platforma koja vas povezuje sa profesionalnim majstorima') but every page routes to one call-centre number, 062 497 000. There is no per-craftsman listing and no fasade category at all - services stop at molerski radovi, elektricar, vodoinstalater.",
-      "fields_available": [
-        "single operator phone"
-      ],
+      "fields_available": ["single operator phone"],
       "phone_coverage_estimate": "One number for the whole site.",
       "pagination": {
         "exists": false,
@@ -902,9 +772,7 @@
       "has_stores": true,
       "estimated_records": null,
       "estimate_method": "Not measurable - /gradnja-i-opremanje/ and /gradnja-i-opremanje/fasade/lista/ both returned HTTP 403 with a 773-byte body to every request tried.",
-      "fields_available": [
-        "unknown - page never rendered"
-      ],
+      "fields_available": ["unknown - page never rendered"],
       "phone_coverage_estimate": "Unknown.",
       "pagination": {
         "exists": null,
@@ -929,9 +797,7 @@
       "has_stores": false,
       "estimated_records": null,
       "estimate_method": "Not measurable - every category path tried (/serbia/gradjevinarstvo, /serbia/uslugi) returned HTTP 404 while serving a large SPA shell. The correct category slugs were not identified in the time budgeted; it surfaced only as a Goglasi outbound destination.",
-      "fields_available": [
-        "unknown"
-      ],
+      "fields_available": ["unknown"],
       "phone_coverage_estimate": "Unknown.",
       "pagination": {
         "exists": null,
@@ -956,11 +822,7 @@
       "has_stores": true,
       "estimated_records": 0,
       "estimate_method": "Fetched /stovarista-beograd/ (91 KB): zero phone-shaped strings on the listing page, one mailto:. There is no contractor content whatsoever - the site is exclusively stovarista.",
-      "fields_available": [
-        "store_name",
-        "city",
-        "address"
-      ],
+      "fields_available": ["store_name", "city", "address"],
       "phone_coverage_estimate": "0% on listing pages; detail pages not sampled since this issue is contractor-scoped.",
       "pagination": {
         "exists": true,

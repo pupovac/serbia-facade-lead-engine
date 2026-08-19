@@ -6,17 +6,17 @@ Researched 2026-08-19. Every source was opened over HTTP during the pass — no 
 
 ### Headline numbers
 
-| | |
-|---|---|
-| Sources evaluated | 30 |
-| High | 6 |
-| Medium | 6 |
-| Low | 10 |
-| Rejected | 8 |
+|                                                 |        |
+| ----------------------------------------------- | ------ |
+| Sources evaluated                               | 30     |
+| High                                            | 6      |
+| Medium                                          | 6      |
+| Low                                             | 10     |
+| Rejected                                        | 8      |
 | Raw records reachable across the 6 High sources | 16,409 |
-| Facade-relevant after classification | ~2,600 |
-| Estimated unique after cross-source dedup | ~1,900 |
-| Expected phone-bearing share of those | 85–90% |
+| Facade-relevant after classification            | ~2,600 |
+| Estimated unique after cross-source dedup       | ~1,900 |
+| Expected phone-bearing share of those           | 85–90% |
 
 ### How the ranking was decided
 
@@ -25,7 +25,7 @@ The project brief is unambiguous: rank by phone-number yield above everything el
 Three sources look like obvious winners on any other criterion and are ranked Low on this one:
 
 - **Daibau.rs** is the best-known facade contractor directory in Serbia, facade-named, city-segmented, top of every Serbian search result. Its contractor phone numbers are served by `/autosecretary/getPhoneNumber/` — which is the **first line** of its `robots.txt` Disallow list. Fetching the profile page for a real contractor (`/izvodjac/rading_doo_beograd`) returns exactly one phone number: `+381 11 418 2607`, Daibau's own switchboard. Lead routing is their business model; the gate is deliberate.
-- **KupujemProdajem** is Serbia's largest classifieds site (5,733,201 live ads) and structurally holds more active fasaderi than every directory in this registry combined. I fetched a real facade ad and inspected the raw HTML: the embedded state carries `"phone":""` and `"Phones":[]`, and the page renders a *Klik za broj telefona* button. `robots.txt` disallows `/phone_*` and `/ad_phone_image.php`. There is no compliant path to the number.
+- **KupujemProdajem** is Serbia's largest classifieds site (5,733,201 live ads) and structurally holds more active fasaderi than every directory in this registry combined. I fetched a real facade ad and inspected the raw HTML: the embedded state carries `"phone":""` and `"Phones":[]`, and the page renders a _Klik za broj telefona_ button. `robots.txt` disallows `/phone_*` and `/ad_phone_image.php`. There is no compliant path to the number.
 - **NadjiMajstora.rs** has a clean, crawlable, facade-named category with 56 registered fasaderi and a permissive `robots.txt`. I fetched five profile pages. Zero phone numbers on any of them — contact runs through an on-site form.
 
 Conversely, **Portal Srbija** would not stand out on brand recognition at all, and it is the best source in the registry, because it prints the phone number directly in the category listing HTML.
@@ -34,15 +34,15 @@ A methodological note on the numbers: phone counts came from applying `(\+381|00
 
 ### The six High sources
 
-**1. Portal Srbija — `portal-srbija.com`.** Phones are inline on the category listing page, so one request yields ~150 companies *with numbers*. Measured: 195 unique phones across 141 companies on `/termo-izolacija-zvucna-izolacija`, 213 across 156 on `/zavrsni-radovi-restauracije`, 199 across 94 on `/za-gradjevinske-radove`. No pagination anywhere — every company in a category renders on one static page. Nine relevant categories, ~642 companies, roughly ten requests for the entire source. `robots.txt` says `Allow: /` and restricts only `/admin*/` and `/pretraga/`. The one real caveat: sitemap `lastmod` values are uniformly `2019-04-13`, so expect stale numbers.
+**1. Portal Srbija — `portal-srbija.com`.** Phones are inline on the category listing page, so one request yields ~150 companies _with numbers_. Measured: 195 unique phones across 141 companies on `/termo-izolacija-zvucna-izolacija`, 213 across 156 on `/zavrsni-radovi-restauracije`, 199 across 94 on `/za-gradjevinske-radove`. No pagination anywhere — every company in a category renders on one static page. Nine relevant categories, ~642 companies, roughly ten requests for the entire source. `robots.txt` says `Allow: /` and restricts only `/admin*/` and `/pretraga/`. The one real caveat: sitemap `lastmod` values are uniformly `2019-04-13`, so expect stale numbers.
 
 **2. Gradjevinarstvo.rs.** Highest absolute volume that is compliantly reachable: `firme-sitemap` contains exactly **11,291** company URLs. Nine of ten sampled company pages carried at least one phone (the single miss was a municipal body, not a business). It is sector-wide rather than facade-specific, so classification decides the real yield — sampling suggests 8–12% are facade/insulation/finishing firms, i.e. ~900–1,350 usable records. Important detail: the category UI loads companies through `/Kategorije/GetFirme/`, which `robots.txt` disallows, but the sitemap is explicitly advertised in the same file. Enumerate from the sitemap, not the category pager.
 
-**3. Navidiku.rs.** Best per-record data quality measured: the phone lives in a `tel:` href *and* in a `data-fg-phone-options` JSON attribute carrying every number with its display label. All nine sampled company pages carried `tel:` links. 13,408 companies overall; 330 in 68 facade-relevant category-city segments — a floor, since the `/firme/fasaderski-radovi/beograd` filter view surfaces firms filed under other primary segments. Note `robots.txt` gives ClaudeBot its own `Disallow: /` block; use an honest project-specific user agent.
+**3. Navidiku.rs.** Best per-record data quality measured: the phone lives in a `tel:` href _and_ in a `data-fg-phone-options` JSON attribute carrying every number with its display label. All nine sampled company pages carried `tel:` links. 13,408 companies overall; 330 in 68 facade-relevant category-city segments — a floor, since the `/firme/fasaderski-radovi/beograd` filter view surfaces firms filed under other primary segments. Note `robots.txt` gives ClaudeBot its own `Disallow: /` block; use an honest project-specific user agent.
 
 **4. Gradjevinskefirme.cu.rs.** ~3,000 firms across ~400 cities, 50 per page, phone on the detail page (verified: `+381 11 3349 936`). Old static site, ~10 KB detail pages, no anti-bot. It publishes **no `robots.txt` at all** (HTTP 404) — no restrictions expressed, so crawl politely and identify the bot honestly.
 
-**5. Poslovni Kontakt.** Smallest of the six (746 directory items total) and the highest phone density per listing: every card renders one to three numbers inline — *"Moler Dragomir — 069 1484637, 064 1484637, 011 2778129"*. `robots.txt` is `User-agent: *` / `Disallow:` (empty — allow everything). It reaches exactly the buyer profile the product targets: sole-trader fasaderi with a mobile and no company website. That also makes it the source where the ZZPL personal-data handling in the project brief bites hardest, since preduzetnici business numbers are personal data.
+**5. Poslovni Kontakt.** Smallest of the six (746 directory items total) and the highest phone density per listing: every card renders one to three numbers inline — _"Moler Dragomir — 069 1484637, 064 1484637, 011 2778129"_. `robots.txt` is `User-agent: *` / `Disallow:` (empty — allow everything). It reaches exactly the buyer profile the product targets: sole-trader fasaderi with a mobile and no company website. That also makes it the source where the ZZPL personal-data handling in the project brief bites hardest, since preduzetnici business numbers are personal data.
 
 **6. 011info.** Belgrade only, no facade-specific subcategory (closest is `izolacija-hidroizolacija-termoizolacija`), and phones appear on detail pages rather than cards — six distinct numbers on `/izolacija-hidroizolacija-termoizolacija/bimax-doo`. `robots.txt` is `Allow: /` with no Disallow rules at all. Ranked High on phone quality and permissiveness, not volume. Its record estimate (~400) is the weakest number in the registry and should be re-measured before crawler budget is committed; the site search at `/pretraga?q=` returns navigation only and must not be built on.
 
@@ -72,7 +72,7 @@ Additional numbers appear as `span.phone-number-2`, `-3`, … so select on the `
 
 #### Gradjevinarstvo.rs
 
-Entry: `https://gradjevinarstvo.rs/firme-sitemap` — one 2.0 MB XML, 11,291 `<loc>` entries of the form `https://www.gradjevinarstvo.rs/firme/{id}/{slug}`. **Pagination: not applicable** — the sitemap *is* the enumeration, and the category pager must be avoided because it calls the robots-disallowed `/Kategorije/GetFirme/`.
+Entry: `https://gradjevinarstvo.rs/firme-sitemap` — one 2.0 MB XML, 11,291 `<loc>` entries of the form `https://www.gradjevinarstvo.rs/firme/{id}/{slug}`. **Pagination: not applicable** — the sitemap _is_ the enumeration, and the category pager must be avoided because it calls the robots-disallowed `/Kategorije/GetFirme/`.
 
 Detail shape is a Bootstrap grid with no semantic classes, so anchor on the icon rather than the container:
 
@@ -111,16 +111,16 @@ Parse `data-fg-phone-options` rather than the single `href` — it carries every
 
 Eight sources were rejected outright. Each is in the JSON with its full reasoning; the short version:
 
-| Source | Reason |
-|---|---|
-| **APR** (Agencija za privredne registre) | `robots.txt` is exactly `User-agent: *` / `Disallow: /`. No exceptions. This is the most painful rejection in the registry — the register is the only route to complete national coverage of every preduzetnik with a facade-related activity code. **Flagging to the project owner:** the compliant route is official bulk-data or API licensing from the agency, which is a commercial conversation rather than an engineering task. |
-| **Facebook** | `robots.txt` opens with *"Collection of data on Facebook through automated means is prohibited unless you have express written permission from Facebook."* Only named authorized agents are permitted. |
-| **Instagram** | Identical Meta notice. |
+| Source                                                                                      | Reason                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **APR** (Agencija za privredne registre)                                                    | `robots.txt` is exactly `User-agent: *` / `Disallow: /`. No exceptions. This is the most painful rejection in the registry — the register is the only route to complete national coverage of every preduzetnik with a facade-related activity code. **Flagging to the project owner:** the compliant route is official bulk-data or API licensing from the agency, which is a commercial conversation rather than an engineering task.                                                     |
+| **Facebook**                                                                                | `robots.txt` opens with _"Collection of data on Facebook through automated means is prohibited unless you have express written permission from Facebook."_ Only named authorized agents are permitted.                                                                                                                                                                                                                                                                                     |
+| **Instagram**                                                                               | Identical Meta notice.                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | **Manufacturer installer lists** (Baumit, Bekament, JUB, Röfix, Austrotherm, Knauf, Maxima) | The issue's hypothesis was sound — vendor installer rosters are usually high-quality and rarely scraped — but **for Serbia these lists are not on the public web.** `baumit.rs` exposes no partner link and `/prodajna-mesta` returns 404; Bekament runs a training centre for fasaderi but publishes no alumni roster; JUB has no public Master-klub list; Austrotherm's "200+ partnera" are distributors, unlisted. Not dead as an idea, just not a scrape: it is a partnership request. |
-| **e-majstori.rs** | Presents as a national platform, is one operator — every page routes to `062 497 000`, and there is no fasade category. The same applies to `majstorfasada.rs`, `supermajstor.rs`, `majstorukuci018.rs` and `majstorbeograd.com`: individual contractors' own sites, each worth exactly one lead. |
-| **Nekretnine.rs** | HTTP 403 on every attempt; unmeasured. Recorded so the block is not rediscovered. |
-| **Lalafo.rs** | Every guessed category path 404s behind an SPA shell. Recoverable later — Goglasi links to working `/belgrade/ads/…` URLs, so the slug pattern can be lifted from outbound links rather than guessed. |
-| **Stovarista.rs** | Zero contractor content — exclusively stovarišta. Out of scope here, forwarded to the store registry (unrestricted `robots.txt` is a point in its favour there). |
+| **e-majstori.rs**                                                                           | Presents as a national platform, is one operator — every page routes to `062 497 000`, and there is no fasade category. The same applies to `majstorfasada.rs`, `supermajstor.rs`, `majstorukuci018.rs` and `majstorbeograd.com`: individual contractors' own sites, each worth exactly one lead.                                                                                                                                                                                          |
+| **Nekretnine.rs**                                                                           | HTTP 403 on every attempt; unmeasured. Recorded so the block is not rediscovered.                                                                                                                                                                                                                                                                                                                                                                                                          |
+| **Lalafo.rs**                                                                               | Every guessed category path 404s behind an SPA shell. Recoverable later — Goglasi links to working `/belgrade/ads/…` URLs, so the slug pattern can be lifted from outbound links rather than guessed.                                                                                                                                                                                                                                                                                      |
+| **Stovarista.rs**                                                                           | Zero contractor content — exclusively stovarišta. Out of scope here, forwarded to the store registry (unrestricted `robots.txt` is a point in its favour there).                                                                                                                                                                                                                                                                                                                           |
 
 `Halo Oglasi` is **not** in that table but is worth calling out: it returned HTTP 403 to every request, so no page was ever rendered. Its `robots.txt` actually permits a project crawler (`Allow: /`) — it is the Cloudflare edge that blocks. Rather than estimate fields I could not observe, it is recorded as Low with `estimated_records: null` and every unknown field marked unknown. It is the one Low entry that could move up, after a timeboxed Playwright spike to check whether phones sit in the ad body or behind a KupujemProdajem-style click-gate.
 
