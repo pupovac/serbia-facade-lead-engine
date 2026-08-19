@@ -4,14 +4,16 @@ Companion to `research/sources-contractors.json`. That file is the machine-reada
 
 Researched 2026-08-19. Every source was opened over HTTP during the pass — no source in the registry was rated from search-engine snippets alone.
 
+**Amended 2026-08-20 (FUZZ-28)** with two corrections FUZZ-8 measured against this registry: Portal Srbija's city pages are not strict subsets of the national page, and the APR register is free open data rather than a commercial conversation. Both are marked _Corrected by FUZZ-8_ inline, and the superseded FUZZ-4 wording is kept beside them so the change is auditable. Where the two passes disagree, the measured FUZZ-8 finding wins. Nothing else was re-measured. See `research/local-discovery-strategy.md` for the full FUZZ-8 pass.
+
 ### Headline numbers
 
 |                                                 |        |
 | ----------------------------------------------- | ------ |
-| Sources evaluated                               | 30     |
+| Sources evaluated                               | 31     |
 | High                                            | 6      |
 | Medium                                          | 6      |
-| Low                                             | 10     |
+| Low                                             | 11     |
 | Rejected                                        | 8      |
 | Raw records reachable across the 6 High sources | 16,409 |
 | Facade-relevant after classification            | ~2,600 |
@@ -34,7 +36,7 @@ A methodological note on the numbers: phone counts came from applying `(\+381|00
 
 ### The six High sources
 
-**1. Portal Srbija — `portal-srbija.com`.** Phones are inline on the category listing page, so one request yields ~150 companies _with numbers_. Measured: 195 unique phones across 141 companies on `/termo-izolacija-zvucna-izolacija`, 213 across 156 on `/zavrsni-radovi-restauracije`, 199 across 94 on `/za-gradjevinske-radove`. No pagination anywhere — every company in a category renders on one static page. Nine relevant categories, ~642 companies, roughly ten requests for the entire source. `robots.txt` says `Allow: /` and restricts only `/admin*/` and `/pretraga/`. The one real caveat: sitemap `lastmod` values are uniformly `2019-04-13`, so expect stale numbers.
+**1. Portal Srbija — `portal-srbija.com`.** Phones are inline on the category listing page, so one request yields ~150 companies _with numbers_. Measured: 195 unique phones across 141 companies on `/termo-izolacija-zvucna-izolacija`, 213 across 156 on `/zavrsni-radovi-restauracije`, 199 across 94 on `/za-gradjevinske-radove`. No pagination anywhere — every company in a category renders on one static page. Nine relevant categories, ~642 companies — but see the FUZZ-8 correction below: 642 is a floor, the national pages truncate, and the source needs a city-iterated sweep of roughly 1,458 requests rather than the ten estimated here. `robots.txt` says `Allow: /` and restricts only `/admin*/` and `/pretraga/`. The one real caveat: sitemap `lastmod` values are uniformly `2019-04-13`, so expect stale numbers.
 
 **2. Gradjevinarstvo.rs.** Highest absolute volume that is compliantly reachable: `firme-sitemap` contains exactly **11,291** company URLs. Nine of ten sampled company pages carried at least one phone (the single miss was a municipal body, not a business). It is sector-wide rather than facade-specific, so classification decides the real yield — sampling suggests 8–12% are facade/insulation/finishing firms, i.e. ~900–1,350 usable records. Important detail: the category UI loads companies through `/Kategorije/GetFirme/`, which `robots.txt` disallows, but the sitemap is explicitly advertised in the same file. Enumerate from the sitemap, not the category pager.
 
@@ -50,7 +52,27 @@ A methodological note on the numbers: phone counts came from applying `(\+381|00
 
 #### Portal Srbija
 
-Entry: the nine category URLs listed in the JSON — `https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija` and siblings. **Pagination: none.** The full category is one static response (`/zavrsni-radovi-restauracije` is 147 KB carrying all 156 firms). City-scoped `<category>-<grad>` pages exist and are strict subsets — crawl the national page only, or you will re-fetch the same records 100 times.
+Entry: the nine category URLs listed in the JSON — `https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija` and siblings. **Pagination: none.** The full category is one static response (`/zavrsni-radovi-restauracije` is 147 KB carrying all 156 firms).
+
+> **Corrected by FUZZ-8 — the city pages are not subsets, and crawling the national page alone loses 44% of the firms.**
+>
+> FUZZ-4 wrote here: _"City-scoped `<category>-<grad>` pages exist and are strict subsets — crawl the national page only, or you will re-fetch the same records 100 times."_ **That is wrong.** The national page silently truncates its listing; only the city view shows the tail.
+>
+> Measured in FUZZ-8 at 1 request/second on `termo-izolacija-zvucna-izolacija`, over the 32 most populous units plus all 17 Belgrade city municipalities from `data/serbia-geo.json`:
+>
+> |                                   |   Firms |
+> | --------------------------------- | ------: |
+> | National category page alone      |      60 |
+> | Union of national + 49 city pages | **108** |
+> | Found **only** via a city page    |  **48** |
+>
+> **+80% over the national page, on one category.** Nine of the twelve firms on the Novi Sad page (`Izomonter`, `Termodom`, `Domino gradjevinski centar`, `Eko dom`, `Hit - promet`, …) do not appear nationally at all. Belgrade alone contributes 52 firms through its city municipalities, 26 of them new.
+>
+> Two operational rules follow. First, **14 of the 49 city slugs return a deterministic HTTP 500** — `beograd`, `pirot`, `kikinda`, `vrsac`, `ruma`, `backa-palanka`, `zajecar`, `paracin`, `aleksinac`, `cukarica`, `grocka`, `obrenovac`, `rakovica`, `sopot`. Retried twice each; not transient, a site defect. Treat a 500 on a city slug as expected and keep going. Second, **`beograd` itself is one of them** — the most valuable slug in the country 500s — so **iterate Belgrade through its 17 city municipalities in `data/serbia-geo.json`, never through `beograd`**. `novi-beograd` (15 firms), `zemun` (10), `vozdovac` (7), `vracar` (6), `stari-grad` (4) and `surcin` (4) all return 200.
+>
+> Cost of the full sweep: 9 categories × ~162 units ≈ **1,458 requests, ~25 minutes at 1 req/s**, against the ~10 requests FUZZ-4 budgeted. `robots.txt` permits it — the city-suffixed pages are not under `/pretraga/`. Overlap between the national and city views is real, so dedup on normalized phone.
+>
+> Do not generalise this to Navidiku: its `/firme/{kategorija}/{grad}` taxonomy is sparse rather than a matrix (`/fasaderski-radovi/nis` and `/fasaderski-radovi/kragujevac` both 404), so a city × category cross product there produces mostly 404s. Enumerate Navidiku from its sitemap.
 
 Listing shape — every company is a `div.general` block:
 
@@ -113,7 +135,7 @@ Eight sources were rejected outright. Each is in the JSON with its full reasonin
 
 | Source                                                                                      | Reason                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **APR** (Agencija za privredne registre)                                                    | `robots.txt` is exactly `User-agent: *` / `Disallow: /`. No exceptions. This is the most painful rejection in the registry — the register is the only route to complete national coverage of every preduzetnik with a facade-related activity code. **Flagging to the project owner:** the compliant route is official bulk-data or API licensing from the agency, which is a commercial conversation rather than an engineering task.                                                     |
+| **APR** (Agencija za privredne registre) — the `pretraga2.apr.gov.rs` search UI             | `robots.txt` is exactly `User-agent: *` / `Disallow: /`. No exceptions. Still rejected as a crawl target. **Partly superseded by FUZZ-8:** the claim that APR data therefore requires a commercial licensing conversation is wrong — the company register is published as free open data. See _Corrected by FUZZ-8: APR_ below.                                                                                                                                                            |
 | **Facebook**                                                                                | `robots.txt` opens with _"Collection of data on Facebook through automated means is prohibited unless you have express written permission from Facebook."_ Only named authorized agents are permitted.                                                                                                                                                                                                                                                                                     |
 | **Instagram**                                                                               | Identical Meta notice.                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | **Manufacturer installer lists** (Baumit, Bekament, JUB, Röfix, Austrotherm, Knauf, Maxima) | The issue's hypothesis was sound — vendor installer rosters are usually high-quality and rarely scraped — but **for Serbia these lists are not on the public web.** `baumit.rs` exposes no partner link and `/prodajna-mesta` returns 404; Bekament runs a training centre for fasaderi but publishes no alumni roster; JUB has no public Master-klub list; Austrotherm's "200+ partnera" are distributors, unlisted. Not dead as an idea, just not a scrape: it is a partnership request. |
@@ -123,6 +145,32 @@ Eight sources were rejected outright. Each is in the JSON with its full reasonin
 | **Stovarista.rs**                                                                           | Zero contractor content — exclusively stovarišta. Out of scope here, forwarded to the store registry (unrestricted `robots.txt` is a point in its favour there).                                                                                                                                                                                                                                                                                                                           |
 
 `Halo Oglasi` is **not** in that table but is worth calling out: it returned HTTP 403 to every request, so no page was ever rendered. Its `robots.txt` actually permits a project crawler (`Allow: /`) — it is the Cloudflare edge that blocks. Rather than estimate fields I could not observe, it is recorded as Low with `estimated_records: null` and every unknown field marked unknown. It is the one Low entry that could move up, after a timeboxed Playwright spike to check whether phones sit in the ad body or behind a KupujemProdajem-style click-gate.
+
+### Corrected by FUZZ-8: APR is open data, not a commercial conversation
+
+FUZZ-4 rejected APR on `robots.txt` and flagged licensed bulk data as _"a commercial conversation rather than an engineering task."_ For **privredna društva** that conversation is unnecessary. APR already publishes the register as open data, and FUZZ-8 called it: **HTTP 200, 57.7 MB of JSON, 133,634 active companies, cut date 2026-07-31, refreshed monthly, licence `sodl`** (Serbian Open Data Licence), at `https://openapi.apr.gov.rs/api/opendata/companies` — listed on `data.gov.rs` as dataset `api-za-registar-privrednikh-drushtava`. That host publishes no `robots.txt` and the endpoint is the documented open-data delivery channel, so the `apr.gov.rs` crawl prohibition does not reach it. It is now its own registry entry, `apr-opendata`; the `apr-registry` entry remains rejected, because the JS-driven search UI it describes is still `Disallow: /`.
+
+Each record carries matični broj, business name, municipality code and name, status, founding date, legal form and **registered activity code**. By the codes that matter:
+
+| Code | Activity                                          | Companies |
+| ---- | ------------------------------------------------- | --------: |
+| 4331 | Malterisanje                                      |       100 |
+| 4334 | Bojenje i zastakljivanje                          |       155 |
+| 4339 | Ostali završni radovi                             |       564 |
+| 4329 | Ostali instalacioni radovi u građevinarstvu       |       266 |
+| 4673 | Veleprodaja drveta, građ. materijala i sanitarije |     1,119 |
+| 4752 | Maloprodaja metalne robe, boja i stakla           |       609 |
+|      | **core six**                                      | **2,813** |
+| 4120 | Izgradnja stambenih i nestambenih zgrada          |     6,609 |
+| 4399 | Ostali specifični građevinski radovi              |     1,399 |
+|      | contractor-side, all codes                        |    10,806 |
+|      | store-side, all codes                             |     1,786 |
+
+The core six span **168 municipalities**.
+
+**It carries no phone numbers and no street addresses**, so under this registry's phone-first rule it is not a lead source and is ranked `Low` — that ranking is the rule applied honestly, not a judgement on its value. What it is, is the only complete national frame available: a coverage denominator (_"we hold a phone for N of the 2,813 core-code companies in municipality X"_ is a statistic nothing else here can produce), classification ground truth (the activity code is the state's own `FACADE_CONTRACTOR` vs `CONSTRUCTION_MATERIAL_STORE` call, so name + city matching beats guessing from description text), and a ranked enrichment worklist.
+
+**The limitation, and it is a big one.** The dataset covers privredna društva only — DOO and AD. It does **not** cover **preduzetnici**, the sole traders the project brief names as a large share of Serbian fasaderi. `/api/opendata/entrepreneurs` and `/api/opendata/preduzetnici` were both probed and both 404, and `data.gov.rs` has no preduzetnici dataset. The sole-trader register is this project's largest structural coverage gap and it is not open data. FUZZ-8 also swept `data.gov.rs` generally: 3,516 datasets across 216 organisations, and apart from this register none is a business directory with contact data.
 
 ### Two findings that belong to the next issue
 
@@ -135,7 +183,7 @@ Portal Srbija's `/stovarista-beograd` (137 unique phones on one page) and Navidi
 
 ### Recommended build order
 
-1. **Portal Srbija** — ~10 requests, ~642 companies with inline phones. Highest yield per unit of engineering effort by a wide margin; ship this adapter first.
+1. **Portal Srbija** — ~642 companies with inline phones, and that is a floor. Highest yield per unit of engineering effort by a wide margin; ship this adapter first. Budget the FUZZ-8 sweep shape, not the original one: ~1,458 requests (9 categories × ~162 units) at 1 req/s, skipping the 14 slugs that 500 and routing Belgrade through its city municipalities.
 2. **Navidiku.rs** — cleanest structured data (phone as JSON in a DOM attribute), ~100% phone coverage. Best source to calibrate the phone normalizer and the dedup keys against, because its data is near-lossless.
 3. **Gradjevinarstvo.rs** — the volume play, ~11,291 records at ~90% phone coverage. Do it third: it needs the classifier to be working before the crawl is worth running, and steps 1–2 will have surfaced most of the normalization edge cases.
 
