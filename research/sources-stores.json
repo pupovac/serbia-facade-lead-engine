@@ -16,7 +16,10 @@
       "estimate_method": "measured — parsed the single fetched page (265,570 bytes): 318 entries carry a 'T +38x ...' phone line; 289 are +381 (Serbia) and 29 are +382 (Montenegro). 270 distinct Serbian phone numbers across 224 distinct company names (a company with several branches repeats).",
       "fields_available": ["name", "address", "city", "postal_code", "phone"],
       "phone_coverage_estimate": 1.0,
-      "pagination": { "exists": false, "how": "Entire alphabetical A-Z list is inlined in one static HTML document. One GET returns everything." },
+      "pagination": {
+        "exists": false,
+        "how": "Entire alphabetical A-Z list is inlined in one static HTML document. One GET returns everything."
+      },
       "requires_js": false,
       "robots_allows": true,
       "robots_rule": "User-agent: * — Disallow: /*?id=* ; /*&id=* ; /*?L=0* ; /*&L=0* ; /*?type=98* ; /*/Private/* ; /fileadmin/templates/html/* ; /*/Configuration/* ; /typo3temp/*. No rule matches /distributeri, so it is allowed.",
@@ -37,7 +40,10 @@
       "estimate_method": "measured — enumerated 112 'stovarista-<grad>' URLs from sitemap1..8.xml (65,931 total URLs), fetched all 112, and extracted phone lines: 425 per-page unique numbers, 361 globally unique (317 landline, 44 mobile). Only 3 of the 112 city pages were empty.",
       "fields_available": ["name", "city", "address", "phone", "website", "description"],
       "phone_coverage_estimate": 0.95,
-      "pagination": { "exists": false, "how": "Sharded by city instead of paged. One page per city, all listings inline. 112 city pages = full national coverage." },
+      "pagination": {
+        "exists": false,
+        "how": "Sharded by city instead of paged. One page per city, all listings inline. 112 city pages = full national coverage."
+      },
       "requires_js": false,
       "robots_allows": true,
       "robots_rule": "User-Agent: * / Allow: / / Disallow: /admin*/ / Disallow: /pretraga/ — /stovarista-* is not matched by any Disallow.",
@@ -60,9 +66,20 @@
       "has_stores": true,
       "estimated_records": 294,
       "estimate_method": "measured — the Beograd page links 161 'stovarista/<grad>' city pages; fetched all 161 and collected detail-page slugs: 608 city→listing links resolving to 294 distinct store detail pages. Phone strings on the category pages: 554 across all cities (Beograd alone: 45 listings / 59 numbers), i.e. more than one number per listing.",
-      "fields_available": ["name", "city", "address", "phone", "website", "price_list", "description"],
+      "fields_available": [
+        "name",
+        "city",
+        "address",
+        "phone",
+        "website",
+        "price_list",
+        "description"
+      ],
       "phone_coverage_estimate": 1.0,
-      "pagination": { "exists": false, "how": "One page per city, no paging. 161 city pages cover the country." },
+      "pagination": {
+        "exists": false,
+        "how": "One page per city, no paging. 161 city pages cover the country."
+      },
       "requires_js": false,
       "robots_allows": true,
       "robots_rule": "User-Agent: * / Allow: / / Disallow: /admin*/ / Disallow: /pretraga/ / Disallow: /korisnici/ — /stovarista/* and the detail slugs are allowed.",
@@ -87,7 +104,10 @@
       "estimate_method": "measured — 24 'stovarista-<grad>' category URLs found in sitemap-categories-001.xml.gz / sitemap-subcategories-001.xml.gz; fetched all 24 and read the page's own 'Prikazano 1-N od M rezultata' counter: 132 listings total, 111 distinct tel: numbers (84%). A further 34 'gradjevinski-materijal-<grad>' and 4 'boje-fasade-i-lakovi-<grad>' subcategories exist and are not counted in the 132.",
       "fields_available": ["name", "address", "city", "phone", "rating", "description"],
       "phone_coverage_estimate": 0.84,
-      "pagination": { "exists": true, "how": "'Prikazano 1-N od M rezultata' counter with /N page suffixes; at current volumes every stovarišta category fits on one page." },
+      "pagination": {
+        "exists": true,
+        "how": "'Prikazano 1-N od M rezultata' counter with /N page suffixes; at current volumes every stovarišta category fits on one page."
+      },
       "requires_js": false,
       "robots_allows": true,
       "robots_rule": "User-agent: * / Disallow: /crm, /video/admin, /tv-uzivo/assets, /firme/assets, /gmap.php, /maintenance.php, /2k19, /2k20, /2k21, /mn, /fcache, /firme/ajax, /firme/noviajax — the rendered /firme/<category>-<city> pages are allowed; only the AJAX endpoints are off-limits.",
@@ -110,7 +130,18 @@
       "has_stores": true,
       "estimated_records": 608,
       "estimate_method": "measured — ran the Overpass query below on 2026-08-19 (osm_base timestamp 2026-08-19T20:53:16Z). 608 elements returned (523 nodes, 81 ways, 1 relation on the count query). Field coverage computed locally from the full tag dump.",
-      "fields_available": ["name", "phone", "contact:phone", "website", "email", "addr:street", "addr:city", "lat", "lon", "opening_hours"],
+      "fields_available": [
+        "name",
+        "phone",
+        "contact:phone",
+        "website",
+        "email",
+        "addr:street",
+        "addr:city",
+        "lat",
+        "lon",
+        "opening_hours"
+      ],
       "phone_coverage_estimate": 0.39,
       "pagination": { "exists": false, "how": "Single POST returns the whole result set." },
       "requires_js": false,
@@ -120,21 +151,74 @@
       "duplicate_risk": "Medium-Low — OSM names are informal ('Stovariste gradjevinskog materijala') and often lack a legal form, so name-based matching is unreliable. Dedup on phone first, then on lat/lon proximity + street.",
       "priority": "Medium",
       "osm_tag_breakdown": {
-        "shop=hardware": { "total": 297, "with_name": 264, "with_phone": 149, "with_website": 124, "with_email": 99, "with_addr_street": 122 },
-        "shop=paint": { "total": 113, "with_name": 92, "with_phone": 30, "with_website": 17, "with_email": 7, "with_addr_street": 47 },
-        "shop=doityourself": { "total": 112, "with_name": 94, "with_phone": 23, "with_website": 27, "with_email": 9, "with_addr_street": 31 },
-        "shop=trade": { "total": 60, "with_name": 51, "with_phone": 17, "with_website": 17, "with_email": 10, "with_addr_street": 23 },
-        "shop=building_materials": { "total": 23, "with_name": 23, "with_phone": 18, "with_website": 13, "with_email": 12, "with_addr_street": 5 },
-        "shop=building_material": { "total": 3, "with_name": 3, "with_phone": 3, "with_website": 2, "with_email": 3, "with_addr_street": 3 },
-        "trade=building_supplies": { "total": 0, "with_name": 0, "with_phone": 0, "with_website": 0, "with_email": 0, "with_addr_street": 0 },
-        "ALL": { "total": 608, "with_name": 527, "with_phone": 240, "with_website": 200, "with_email": 140, "with_addr_street": 231 }
+        "shop=hardware": {
+          "total": 297,
+          "with_name": 264,
+          "with_phone": 149,
+          "with_website": 124,
+          "with_email": 99,
+          "with_addr_street": 122
+        },
+        "shop=paint": {
+          "total": 113,
+          "with_name": 92,
+          "with_phone": 30,
+          "with_website": 17,
+          "with_email": 7,
+          "with_addr_street": 47
+        },
+        "shop=doityourself": {
+          "total": 112,
+          "with_name": 94,
+          "with_phone": 23,
+          "with_website": 27,
+          "with_email": 9,
+          "with_addr_street": 31
+        },
+        "shop=trade": {
+          "total": 60,
+          "with_name": 51,
+          "with_phone": 17,
+          "with_website": 17,
+          "with_email": 10,
+          "with_addr_street": 23
+        },
+        "shop=building_materials": {
+          "total": 23,
+          "with_name": 23,
+          "with_phone": 18,
+          "with_website": 13,
+          "with_email": 12,
+          "with_addr_street": 5
+        },
+        "shop=building_material": {
+          "total": 3,
+          "with_name": 3,
+          "with_phone": 3,
+          "with_website": 2,
+          "with_email": 3,
+          "with_addr_street": 3
+        },
+        "trade=building_supplies": {
+          "total": 0,
+          "with_name": 0,
+          "with_phone": 0,
+          "with_website": 0,
+          "with_email": 0,
+          "with_addr_street": 0
+        },
+        "ALL": {
+          "total": 608,
+          "with_name": 527,
+          "with_phone": 240,
+          "with_website": 200,
+          "with_email": 140,
+          "with_addr_street": 231
+        }
       },
       "overpass_query": "[out:json][timeout:180];area[\"ISO3166-1\"=\"RS\"][admin_level=2]->.rs;(nwr[\"shop\"=\"doityourself\"](area.rs);nwr[\"shop\"=\"hardware\"](area.rs);nwr[\"shop\"=\"trade\"](area.rs);nwr[\"shop\"=\"paint\"](area.rs);nwr[\"shop\"=\"building_materials\"](area.rs);nwr[\"shop\"=\"building_material\"](area.rs);nwr[\"trade\"=\"building_supplies\"](area.rs););out tags center;",
       "overpass_endpoint": "POST https://overpass-api.de/api/interpreter, body form-field 'data'",
-      "sample_urls": [
-        "https://overpass-api.de/api/interpreter",
-        "https://overpass-turbo.eu/"
-      ],
+      "sample_urls": ["https://overpass-api.de/api/interpreter", "https://overpass-turbo.eu/"],
       "notes": "Honest assessment of Serbian OSM coverage: usable but not good. Only 39% of the 608 elements carry any phone tag, and 81 have no name at all. 'trade=building_supplies' returned zero elements in Serbia, and 'shop=building_material' (singular) is a 3-element typo variant of the 23-element 'shop=building_materials' — neither is the mapping convention here. The bulk sits under shop=hardware (297 elements, 149 with phone), which mixes real gvožđare with locksmiths and tool shops, so classification noise is high. Its real value is not volume: it is the only source giving lat/lon, which makes it the best cross-check for deduping the directory sources geographically, and the shop=hardware slice is where multi-branch chains surface — every chain in the chains section below was discovered from repeated name/brand/operator tags in this dump."
     },
     {
@@ -146,9 +230,18 @@
       "has_stores": true,
       "estimated_records": 40,
       "estimate_method": "estimated — /stovarista paginates to exactly 2 pages (/stovarista/2 = HTTP 200, /stovarista/3 = HTTP 404) at ~10 listings/page ≈ 20; /gradjevinski-materijal likewise reaches at least page 2 ≈ 20+. Combined ≈ 40 Belgrade-area store records. The whole-site company base is far larger — 23 firme_N.xml sitemaps × 6,000 URLs ≈ 138,000 company pages — but that spans every industry, not stores.",
-      "fields_available": ["name", "address", "district", "description", "phone (detail page only)"],
+      "fields_available": [
+        "name",
+        "address",
+        "district",
+        "description",
+        "phone (detail page only)"
+      ],
       "phone_coverage_estimate": 0.5,
-      "pagination": { "exists": true, "how": "/<category>/<n>, 1-indexed, 404 past the last page — walk until 404." },
+      "pagination": {
+        "exists": true,
+        "how": "/<category>/<n>, 1-indexed, 404 past the last page — walk until 404."
+      },
       "requires_js": false,
       "robots_allows": true,
       "robots_rule": "User-agent: * / Allow: / / Sitemap: https://www.011info.com/sitemap.xml — no Disallow at all.",
@@ -173,7 +266,10 @@
       "estimate_method": "not estimated — the category/search endpoints that would let a crawler count are the exact paths robots.txt forbids (see rule), and /sitemap.xml returns an ASP.NET 'resource cannot be found' page. Detail pages are reachable by numeric id (2165 = Austrotherm, 1275 = Knauf Insulation), so the id space is walkable but its size was not measured.",
       "fields_available": ["name", "address", "phone", "website", "description"],
       "phone_coverage_estimate": 0.7,
-      "pagination": { "exists": true, "how": "Via /Pretraga/ and /Kategorije/GetFirme/ — both Disallowed. Only id-walking on /firme/<id>/<slug> is permitted." },
+      "pagination": {
+        "exists": true,
+        "how": "Via /Pretraga/ and /Kategorije/GetFirme/ — both Disallowed. Only id-walking on /firme/<id>/<slug> is permitted."
+      },
       "requires_js": false,
       "robots_allows": true,
       "robots_rule": "User-agent: * / Disallow: /admin/, /Kategorije/GetFirme/, /FirmaDetaljiURL/, /TekstDetaljiURL/, /Pretraga/, /Komentari/, /VestDetaljiURL/, /malioglasi/, /PrintTekst.aspx*, /firmadetalji.aspx* — /firme/<id>/<slug> is allowed; the listing and search endpoints are not.",
@@ -197,7 +293,10 @@
       "estimate_method": "not estimated — every category path tried returned HTTP 403 to a non-browser client, including /sitemaps/sitemap.xml, so no listing could be counted.",
       "fields_available": ["unverified"],
       "phone_coverage_estimate": null,
-      "pagination": { "exists": true, "how": "unverified — blocked before a listing page could be read." },
+      "pagination": {
+        "exists": true,
+        "how": "unverified — blocked before a listing page could be read."
+      },
       "requires_js": true,
       "robots_allows": true,
       "robots_rule": "User-agent: * / Content-Signal: search=yes,ai-train=no,use=reference / Allow: / — then a second 'User-agent: *' block with Disallow: /profil, /postavite-oglas, /upload, *?print, /prijava, /registracija. Named AI crawlers (GPTBot, ClaudeBot, CCBot, Bytespider, Amazonbot, meta-externalagent, Google-Extended, Applebot-Extended) are each Disallow: /. An honestly-named lead crawler falls under the permissive 'User-agent: *' rule, and 'ai-train=no' is compatible with lead extraction, which is not model training.",
@@ -300,7 +399,13 @@
       "has_stores": true,
       "estimated_records": null,
       "estimate_method": "not estimated — the search host returns HTTP 403 to a non-browser client (and only a 1,401-byte shell on the unified search path), so no result set could be read.",
-      "fields_available": ["legal_name", "registration_number", "PIB", "registered_address", "activity_code"],
+      "fields_available": [
+        "legal_name",
+        "registration_number",
+        "PIB",
+        "registered_address",
+        "activity_code"
+      ],
       "phone_coverage_estimate": 0.0,
       "pagination": { "exists": true, "how": "SPA-driven, unverified." },
       "requires_js": true,
@@ -372,7 +477,9 @@
       "recommended_approach": "Skip unless a later spot-check shows phones on detail pages; the category page alone gives nothing.",
       "duplicate_risk": "High",
       "priority": "Low",
-      "sample_urls": ["https://srbija.aladin.info/gradjevinarstvo/gradjevinski-materijal-i-stovarista/"],
+      "sample_urls": [
+        "https://srbija.aladin.info/gradjevinarstvo/gradjevinski-materijal-i-stovarista/"
+      ],
       "notes": "Ranks well for the exact Serbian query terms, delivers no contact data on the listing page."
     },
     {

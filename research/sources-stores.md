@@ -9,13 +9,13 @@ unless the entry says otherwise.
 
 ## Headline numbers
 
-| | |
-|---|---|
-| Sources evaluated | **20** |
-| High / Medium / Low | **4 / 3 / 13** |
-| Chains with 3+ Serbian locations | **11** |
-| Raw phone-bearing store records across sources | **1,424** |
-| Realistic distinct store records after dedup | **800–950** (projection, see below) |
+|                                                |                                     |
+| ---------------------------------------------- | ----------------------------------- |
+| Sources evaluated                              | **20**                              |
+| High / Medium / Low                            | **4 / 3 / 13**                      |
+| Chains with 3+ Serbian locations               | **11**                              |
+| Raw phone-bearing store records across sources | **1,424**                           |
+| Realistic distinct store records after dedup   | **800–950** (projection, see below) |
 
 ## The ranking rule that produced this order
 
@@ -110,7 +110,7 @@ Smallest of the four, but the easiest adapter to write and the least likely to b
 - **24 `stovarista-<grad>` categories**, all fetched. **132 listings** (read off the site's
   own `Prikazano 1-N od M rezultata` counter), **111 distinct `tel:` numbers** — 84%.
 - A further **34 `gradjevinski-materijal-<grad>`** and 4 `boje-fasade-i-lakovi-<grad>`
-  subcategories exist and are *not* counted in the 132 (spot-check: `gradjevinski-materijal-nis`
+  subcategories exist and are _not_ counted in the 132 (spot-check: `gradjevinski-materijal-nis`
   has 3 firms, Kragujevac 28, Subotica 32).
 - Whole-site company base is 13,408 detail pages across all industries.
 
@@ -147,16 +147,16 @@ POST it to `https://overpass-api.de/api/interpreter` as form field `data`.
 
 **Result: 608 elements** (523 nodes, 81 ways, 1 relation).
 
-| tag | total | name | **phone** | website | email | addr:street |
-|---|---:|---:|---:|---:|---:|---:|
-| `shop=hardware` | 297 | 264 | **149** | 124 | 99 | 122 |
-| `shop=paint` | 113 | 92 | **30** | 17 | 7 | 47 |
-| `shop=doityourself` | 112 | 94 | **23** | 27 | 9 | 31 |
-| `shop=trade` | 60 | 51 | **17** | 17 | 10 | 23 |
-| `shop=building_materials` | 23 | 23 | **18** | 13 | 12 | 5 |
-| `shop=building_material` | 3 | 3 | **3** | 2 | 3 | 3 |
-| `trade=building_supplies` | 0 | 0 | 0 | 0 | 0 | 0 |
-| **ALL** | **608** | **527** | **240** | **200** | **140** | **231** |
+| tag                       |   total |    name | **phone** | website |   email | addr:street |
+| ------------------------- | ------: | ------: | --------: | ------: | ------: | ----------: |
+| `shop=hardware`           |     297 |     264 |   **149** |     124 |      99 |         122 |
+| `shop=paint`              |     113 |      92 |    **30** |      17 |       7 |          47 |
+| `shop=doityourself`       |     112 |      94 |    **23** |      27 |       9 |          31 |
+| `shop=trade`              |      60 |      51 |    **17** |      17 |      10 |          23 |
+| `shop=building_materials` |      23 |      23 |    **18** |      13 |      12 |           5 |
+| `shop=building_material`  |       3 |       3 |     **3** |       2 |       3 |           3 |
+| `trade=building_supplies` |       0 |       0 |         0 |       0 |       0 |           0 |
+| **ALL**                   | **608** | **527** |   **240** | **200** | **140** |     **231** |
 
 The honest verdict is **Medium, and only 39% phone coverage**. 81 elements have no name at
 all. `trade=building_supplies` returns nothing in Serbia, and `shop=building_material`
@@ -167,7 +167,7 @@ shops, so classification noise is high.
 
 Its real value is not volume. It is the **only source that gives lat/lon**, which makes it
 the best geographic cross-check when deduping the directory sources — and, as it turned
-out, the only reliable way to *discover* chains (see below). Rate-limit it: five sequential
+out, the only reliable way to _discover_ chains (see below). Rate-limit it: five sequential
 queries got HTTP-throttled during this research. Use one combined query and split locally.
 ODbL attribution applies to anything derived from it.
 
@@ -188,26 +188,26 @@ numbers found anywhere was a **third-party article** — `krov.rs`, which carrie
 Haus addresses with numbers such as `BEOGRAD, Batajnica — Majora Zorana Radosavljevića 319,
 011/787-05-05`.
 
-| Chain | OSM locations | Published | Locator | Phones on locator | Segment fit |
-|---|---:|---:|---|---|---|
-| Woby Haus | 48 | 36 | wobyhaus.co.rs | no (use krov.rs) | Partial — tools/DIY |
-| Doming / Domino | 14 | — | doming.rs | no (dominosrbija.com/kontakt: 3) | **Direct** |
-| Uradi Sam / Уради сам | 14 | — | uradi-sam.rs | no | Partial — DIY |
-| Würth Srbija | 6 | — | wurth.rs | no | Partial — B2B supply |
-| Dim Trade | 5 | — | dimtrade.rs | yes | **Direct** |
-| Vanas | 4 | — | vanas.rs | yes | **Direct** — paints/facade |
-| SRMA Group | — | 4 | srmagroup.com | yes | **Direct** |
-| Bojadex | 3 | — | boje-lakovi.com/prodajni-objekti/ | host did not resolve | Partial — paints |
-| Darex | 3 | — | darex.rs | yes | Partial |
-| Luxel Plus | 3 | — | luxel.rs | yes | Partial |
-| Metalac Market | — | 81 | market.metalac.com | no | **None — out of scope** |
+| Chain                 | OSM locations | Published | Locator                           | Phones on locator                | Segment fit                |
+| --------------------- | ------------: | --------: | --------------------------------- | -------------------------------- | -------------------------- |
+| Woby Haus             |            48 |        36 | wobyhaus.co.rs                    | no (use krov.rs)                 | Partial — tools/DIY        |
+| Doming / Domino       |            14 |         — | doming.rs                         | no (dominosrbija.com/kontakt: 3) | **Direct**                 |
+| Uradi Sam / Уради сам |            14 |         — | uradi-sam.rs                      | no                               | Partial — DIY              |
+| Würth Srbija          |             6 |         — | wurth.rs                          | no                               | Partial — B2B supply       |
+| Dim Trade             |             5 |         — | dimtrade.rs                       | yes                              | **Direct**                 |
+| Vanas                 |             4 |         — | vanas.rs                          | yes                              | **Direct** — paints/facade |
+| SRMA Group            |             — |         4 | srmagroup.com                     | yes                              | **Direct**                 |
+| Bojadex               |             3 |         — | boje-lakovi.com/prodajni-objekti/ | host did not resolve             | Partial — paints           |
+| Darex                 |             3 |         — | darex.rs                          | yes                              | Partial                    |
+| Luxel Plus            |             3 |         — | luxel.rs                          | yes                              | Partial                    |
+| Metalac Market        |             — |        81 | market.metalac.com                | no                               | **None — out of scope**    |
 
 Two findings from this table matter beyond the chain list itself:
 
 - **Cyrillic/Latin transliteration is a real dedup problem, not a hypothetical one.** Uradi
   Sam appears 13× as `Уради сам` and 1× as `Uradi Sam`; Würth appears 3× as `Würth` and 3×
   as `Wurth`; `Farbara` / `Фарбара` splits 4/3. Name-based dedup must fold Cyrillic→Latin
-  *and* strip diacritics, or these chains fragment into separate leads.
+  _and_ strip diacritics, or these chains fragment into separate leads.
 - **SRMA Group is the pipeline's best end-to-end test case.** It appears on the Austrotherm
   distributor list, as a listing on portal-srbija, and on its own site — three sources, one
   business. If dedup on normalized phone collapses those three into one lead with three
@@ -241,7 +241,7 @@ returns HTTP 403 to non-browser clients and is a JS SPA; and, more fundamentally
 public register does not publish a business telephone number at all** — it carries legal
 name, matični broj, PIB, registered address and šifra delatnosti. Its genuine use is later,
 offline, as an authority file for canonicalising company names and attaching a PIB to a
-lead found elsewhere. The APR-derived *commercial* directories (portal-srbija, navidiku,
+lead found elsewhere. The APR-derived _commercial_ directories (portal-srbija, navidiku,
 011info) are where that same registry data becomes reachable **with** a phone attached.
 
 **Bekament mix-centri — reject for now, and this one stings.** Serbia's largest domestic
@@ -280,7 +280,7 @@ so per project cost policy it was not called. The free sources reach ~800–950 
 records; measure that first, then decide with numbers.
 
 **Facebook / Instagram — out of bounds.** Login-gated. Social URLs found as a contact field
-*on* another source are fine to store; going to Meta to discover leads is not.
+_on_ another source are fine to store; going to Meta to discover leads is not.
 
 ## Search terminology actually used
 
@@ -294,16 +294,16 @@ folding requirement extends past diacritics to full script transliteration.
 
 ## Volume arithmetic and the dedup caveat
 
-| Source | Phone-bearing records |
-|---|---:|
-| Austrotherm distributeri | 289 |
-| portal-srbija stovarišta | 361 |
-| mirandre stovarišta | 294 |
-| navidiku stovarišta | 132 |
-| OSM (with phone tag) | 240 |
-| 011info (Belgrade) | ~40 |
-| Chain locations | ~68 |
-| **Raw total** | **1,424** |
+| Source                   | Phone-bearing records |
+| ------------------------ | --------------------: |
+| Austrotherm distributeri |                   289 |
+| portal-srbija stovarišta |                   361 |
+| mirandre stovarišta      |                   294 |
+| navidiku stovarišta      |                   132 |
+| OSM (with phone tag)     |                   240 |
+| 011info (Belgrade)       |                   ~40 |
+| Chain locations          |                   ~68 |
+| **Raw total**            |             **1,424** |
 
 That 1,424 is a **sum, not a population.** portal-srbija and mirandre are the same operator
 family; Austrotherm's distributors are largely the same businesses those directories list;
@@ -320,7 +320,7 @@ and that number is the input the Google Places decision should be made on.
 2. **portal-srbija `/stovarista-<grad>`** — build second, for national reach. 112 towns,
    361 distinct numbers, everything on the category page, sitemap-driven discovery.
 3. **mirandre `/stovarista/<grad>`** — build third, for the long tail. 161 city slugs and
-   294 stores at ~100% phone coverage. Ship it *after* portal-srbija specifically so the
+   294 stores at ~100% phone coverage. Ship it _after_ portal-srbija specifically so the
    dedup logic is exercised against a source it heavily overlaps, rather than having both
    land at once.
 
