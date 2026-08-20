@@ -40,6 +40,7 @@ import {
   check,
   index,
   integer,
+  primaryKey,
   real,
   sqliteTable,
   text,
@@ -116,6 +117,48 @@ export const MERGE_SIGNALS = [
   'manual',
 ] as const;
 export type MergeSignal = (typeof MERGE_SIGNALS)[number];
+
+/**
+ * The identifier kinds strong enough to decide a merge on their own — and
+ * therefore the only ones worth quarantining when they turn out to be shared.
+ * A name is not here: a name never decides a merge alone.
+ */
+export const IDENTIFIER_KINDS = ['phone', 'website_domain', 'email'] as const;
+export type IdentifierKind = (typeof IDENTIFIER_KINDS)[number];
+
+/** Why a decisive identifier stopped being trusted as one. */
+export const QUARANTINE_REASONS = [
+  /** Attached to more distinct businesses than a real shared line ever is. */
+  'shared_across_businesses',
+  /** A listing portal's own domain or contact address, republished on every entry. */
+  'directory_owned',
+  /** A social network, CDN or platform host — never a business's own identity. */
+  'infrastructure',
+  /** A human said so. */
+  'manual',
+] as const;
+export type QuarantineReason = (typeof QUARANTINE_REASONS)[number];
+
+/**
+ * `MERGE_SIGNALS` plus the one corroborating signal that never decides a merge
+ * on its own and therefore has no slot in `merge_log`. A review-band pair can
+ * still be topped by it, so `merge_candidates` needs the wider vocabulary.
+ */
+export const MATCH_SIGNALS = [
+  'phone',
+  'website_domain',
+  'email',
+  'registration_number',
+  'name_city',
+  'address',
+  'manual',
+  'social_profile',
+] as const;
+export type MatchSignalName = (typeof MATCH_SIGNALS)[number];
+
+/** Where a `review`-band pair is in the human loop. */
+export const MERGE_CANDIDATE_STATUSES = ['pending', 'merged', 'rejected'] as const;
+export type MergeCandidateStatus = (typeof MERGE_CANDIDATE_STATUSES)[number];
 
 export const RUN_STATUSES = ['running', 'completed', 'failed', 'cancelled'] as const;
 export type RunStatus = (typeof RUN_STATUSES)[number];
@@ -354,6 +397,9 @@ export const leads = sqliteTable(
     // The review UI's default listing: relevant leads, best first.
     index('leads_classification_status_idx').on(t.classification, t.status, t.leadScore),
     index('leads_merged_into_idx').on(t.mergedIntoId),
+    // The merge engine's fuzzy pass blocks on the city: a near-duplicate name
+    // is only ever compared against the other leads in the same place.
+    index('leads_city_idx').on(t.cityId),
     index('leads_last_scraped_idx').on(t.lastScrapedAt),
     oneOf('leads_classification_check', 'classification', LEAD_CLASSIFICATIONS),
     oneOf('leads_status_check', 'status', LEAD_STATUSES),
@@ -613,6 +659,13 @@ export const mergeLog = sqliteTable(
     signalValue: text('signal_value').notNull(),
     /** The dedup engine's score for this match, 0–1. */
     score: real('score'),
+    /**
+     * JSON: every signal `scoreMatch` weighed, not just the deciding one.
+     * A merge that can only name its winning signal cannot be argued with; the
+     * evidence is stored with the verdict for the same reason the classifier
+     * stores `classification_evidence` with its label.
+     */
+    signals: text('signals'),
     /** `pipeline` or `reviewer:<id>` — who decided. */
     actor: text('actor').notNull().default('pipeline'),
     runId: integer('run_id').references(() => crawlRuns.id),
@@ -677,6 +730,111 @@ export const erasureBlocklist = sqliteTable(
 );
 
 /* -------------------------------------------------------------------------- */
+/* shared_identifiers — the quarantine that stops a chain merge               */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * One call-centre number, one marketplace domain, one directory's contact
+ * address — each of them is published next to dozens of unrelated businesses,
+ * and each of them is a decisive dedup signal. Left alone, one such value
+ * collapses a hundred leads into a single row and the whole export becomes
+ * untrustworthy.
+ *
+ * So a value that turns out to be attached to an implausible number of
+ * *distinct businesses* is written here with `quarantined = true`, and every
+ * matcher — `upsertLead`'s exact lookups and the merge engine's candidate
+ * search alike — skips it. The row is kept whether or not it is quarantined:
+ * knowing that a number spans three businesses and was allowed is worth as much
+ * as knowing that one spanning forty was stopped.
+ *
+ * `src/lib/dedup` computes and refreshes these rows; nothing else writes them.
+ */
+export const sharedIdentifiers = sqliteTable(
+  'shared_identifiers',
+  {
+    kind: text('kind', { enum: IDENTIFIER_KINDS }).notNull(),
+    /** Canonical form: the `+381…` e164, the registrable domain, the lower-cased address. */
+    value: text('value').notNull(),
+    /** How many un-merged leads carry this value right now. */
+    distinctLeads: integer('distinct_leads').notNull().default(0),
+    /**
+     * How many of those are *different businesses* — near-identical spellings of
+     * one name count once. This, not `distinct_leads`, is what trips the guard:
+     * one fasader listed by six directories is normal, six businesses on one
+     * number is not.
+     */
+    distinctBusinesses: integer('distinct_businesses').notNull().default(0),
+    quarantined: boolean('quarantined').notNull().default(false),
+    reason: text('reason', { enum: QUARANTINE_REASONS }),
+    /** JSON: a few of the distinct names seen, so a human can judge the verdict. */
+    sampleNames: text('sample_names'),
+    firstSeenAt: timestamp('first_seen_at').notNull(),
+    lastSeenAt: timestamp('last_seen_at').notNull(),
+    note: text('note'),
+  },
+  (t) => [
+    primaryKey({ columns: [t.kind, t.value] }),
+    // Every exact-signal lookup probes this before trusting its hit.
+    index('shared_identifiers_quarantined_idx').on(t.quarantined, t.kind),
+    oneOf('shared_identifiers_kind_check', 'kind', IDENTIFIER_KINDS),
+    oneOf('shared_identifiers_reason_check', 'reason', QUARANTINE_REASONS),
+  ],
+);
+
+/* -------------------------------------------------------------------------- */
+/* merge_candidates — the review band, and the reviewer's answer              */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * A pair the merge engine believes is probably one business but will not merge
+ * on its own — a strong name match in the same city with nothing corroborating
+ * it, or a decisive signal that landed on a quarantined value.
+ *
+ * The row exists for two reasons. It is what the Stage 5 review UI lists, and
+ * it is what makes a rejection stick: without it the next sweep would re-propose
+ * every pair a human has already looked at and said no to.
+ *
+ * `lead_a_id < lead_b_id` always, so a pair has exactly one row no matter which
+ * way round the sweep happened to find it.
+ */
+export const mergeCandidates = sqliteTable(
+  'merge_candidates',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    /** The lower of the two lead ids — the pair is unordered. */
+    leadAId: integer('lead_a_id')
+      .notNull()
+      .references(() => leads.id, { onDelete: 'cascade' }),
+    leadBId: integer('lead_b_id')
+      .notNull()
+      .references(() => leads.id, { onDelete: 'cascade' }),
+    /** 0–1, from `scoreMatch`. Orders the review queue. */
+    score: real('score').notNull(),
+    /** The strongest signal found — `merge_log`'s vocabulary plus `social_profile`. */
+    topSignal: text('top_signal', { enum: MATCH_SIGNALS }).notNull(),
+    signalValue: text('signal_value').notNull(),
+    /** JSON: every signal `scoreMatch` weighed, including the ones that argued against. */
+    signals: text('signals').notNull(),
+    status: text('status', { enum: MERGE_CANDIDATE_STATUSES }).notNull().default('pending'),
+    /** `pipeline` or `reviewer:<id>`. */
+    resolvedBy: text('resolved_by'),
+    resolvedAt: timestamp('resolved_at'),
+    /** Set when the reviewer said yes — the merge this pair became. */
+    mergeLogId: integer('merge_log_id').references(() => mergeLog.id),
+    firstSeenAt: timestamp('first_seen_at').notNull(),
+    lastSeenAt: timestamp('last_seen_at').notNull(),
+  },
+  (t) => [
+    uniqueIndex('merge_candidates_pair_idx').on(t.leadAId, t.leadBId),
+    // The review UI's queue: everything still pending, best evidence first.
+    index('merge_candidates_status_idx').on(t.status, t.score),
+    index('merge_candidates_lead_b_idx').on(t.leadBId),
+    oneOf('merge_candidates_status_check', 'status', MERGE_CANDIDATE_STATUSES),
+    oneOf('merge_candidates_signal_check', 'top_signal', MATCH_SIGNALS),
+  ],
+);
+
+/* -------------------------------------------------------------------------- */
 /* Inferred row types                                                         */
 /* -------------------------------------------------------------------------- */
 
@@ -694,3 +852,5 @@ export type LeadSource = typeof leadSources.$inferSelect;
 export type RawRecord = typeof rawRecords.$inferSelect;
 export type MergeLogEntry = typeof mergeLog.$inferSelect;
 export type ErasureLogEntry = typeof erasureLog.$inferSelect;
+export type SharedIdentifier = typeof sharedIdentifiers.$inferSelect;
+export type MergeCandidate = typeof mergeCandidates.$inferSelect;

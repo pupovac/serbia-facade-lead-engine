@@ -25,6 +25,8 @@ Four properties follow:
 | Phones are the identifier     | `lead_phones` holds canonical + raw, one row per claiming source, indexed on `e164` |
 | Provenance is per field       | `lead_field_values`, one row per (field, value, source); conflicts are rows         |
 | A parser bug destroys nothing | `raw_records` keeps the untouched payload, so re-normalizing needs no re-crawl      |
+| One bad value cannot cascade  | `shared_identifiers` quarantines a value spread across too many businesses          |
+| A decision can be deferred    | `merge_candidates` holds the pairs a human decides, and remembers a rejection       |
 
 ## The tables
 
@@ -149,6 +151,39 @@ The merge engine will sometimes be wrong — two branches of one company, two
 businesses sharing an accountant's phone number. Reversibility is what makes an
 aggressive dedup rule safe to try.
 
+### `shared_identifiers` — the quarantine that stops a chain merge
+
+One call-centre number, one marketplace domain, one directory's contact address:
+each is published next to dozens of unrelated businesses, and each is a decisive
+dedup signal. Left alone, one such value collapses a hundred leads into a single
+row.
+
+So every decisive value is counted against the number of **distinct businesses**
+carrying it — businesses, not rows, because one fasader listed by eight
+directories is eight rows and one perfectly good phone number. A value over its
+limit is written here with `quarantined = true` and stops deciding anything:
+`upsertLead` will not match on it, and `scoreMatch` downgrades it from decisive
+to blocked. Nothing is deleted — a quarantined number is still the deliverable,
+it just stops being an identity.
+
+A `reason` of `manual` is a human's verdict and the automatic pass never
+overwrites it, in either direction.
+
+### `merge_candidates` — the review band, and the reviewer's answer
+
+A pair the engine believes is probably one business but will not merge on its
+own: a strong name match in one city with nothing corroborating it, or a
+decisive signal that landed on a quarantined value.
+
+The row exists for two reasons. It is what the review UI lists, and it is what
+makes a rejection stick — without it, the next sweep would re-propose every pair
+a human has already said no to. `lead_a_id < lead_b_id` always, so a pair has
+one row however the sweep reached it.
+
+The pipeline also _withdraws_ pairs: a question the quarantine has since
+answered is resolved `rejected` with `resolved_by = 'pipeline'`, which is what
+distinguishes it from a human's no.
+
 ### `erasure_log` and `erasure_blocklist` — ZZPL deletion on request
 
 Many fasaderi are sole traders, so a business phone is personal data and an
@@ -187,9 +222,13 @@ Each has an index; each is hit on every insert. `matchedBy` in the result says
 which one fired.
 
 Fuzzy matching — near-duplicate names, address similarity, two locations of one
-business — is the merge engine's job (FUZZ-14). It runs afterwards, over stored
-leads, and calls `recordMerge()`. Keeping the two apart is what stops an adapter
-from silently collapsing two businesses on a weak signal.
+business — is the merge engine's job. It runs afterwards, over stored leads, and
+calls `recordMerge()`. Keeping the two apart is what stops an adapter from
+silently collapsing two businesses on a weak signal.
+
+An adapter should not call `upsertLead` directly: `dedup.ingestLead()` is the
+entry point, and it applies the full rule set plus the guards below. Pass
+`matching: 'caller'` if you call `upsertLead` yourself after matching.
 
 Name + city requires a city on purpose: "Fasada Plus" in Novi Sad and "Fasada
 Plus" in Niš are two businesses until something stronger says otherwise. A
@@ -218,6 +257,29 @@ overwrites: they are exactly the conflicts a reviewer needs to see.
 
 `resolveLead()` follows `merged_into_id`, so a lookup on a merged-away lead's
 phone returns the survivor.
+
+### Attaching and merging are different acts
+
+An **attach** folds an incoming record into an existing lead and leaves no
+`merge_log` row — there is nothing to undo. A **merge** leaves a snapshot and is
+one `revertMerge()` away from being corrected.
+
+So `ingestLead` only ever attaches a record to a lead whose name says it is the
+same business. Everything else the rules would merge — a shared phone under two
+unrelated names, which is either a real duplicate or the first sign of a
+switchboard — is written as its own lead and left to the sweep, which runs the
+quarantine first and merges reversibly. The database is briefly one row longer;
+it is never irreversibly one row shorter.
+
+### The three decisions
+
+`merge`, `review`, `distinct`. The rules pick the band and the score is clamped
+into it; inside a band the score orders the review queue. A shared phone merges
+however different the names are, and a perfect name match with nothing behind it
+only ever reaches `review` — so a single number doing both jobs would do
+neither.
+
+Full rule table, weights and thresholds: `src/lib/dedup/`.
 
 ## Keeping the Postgres door open
 
