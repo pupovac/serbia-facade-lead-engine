@@ -1,0 +1,5 @@
+User-Agent: *
+Allow: /
+Disallow: /admin*/
+Disallow: /pretraga/
+Sitemap: https://www.portal-srbija.com/sitemap.xml
