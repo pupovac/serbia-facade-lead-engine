@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getMunicipalityById, municipalities } from '../geo.js';
+import { isPhoneError, normalizePhone } from '../phone/index.js';
 import { foldForComparison } from '../text/fold.js';
 import {
   resolveCity,
@@ -191,12 +192,20 @@ describe('resolveCity — the landline fallback', () => {
     expectCity('', 'cacak', 'landline', { phone: '032 344 555' });
   });
 
-  it('accepts the object shape the phone module returns', () => {
-    const match = resolveCity('', {
-      phone: { e164: '+38118512345', nationalFormat: '018 512 345' },
-    });
+  it('accepts a NormalizedPhone straight from the phone module', () => {
+    const phone = normalizePhone('018/512-345');
+    expect(isPhoneError(phone)).toBe(false);
+    if (isPhoneError(phone)) return;
+    const match = resolveCity('', { phone });
     expect(match?.cityId).toBe('nis');
     expect(match?.matchedVia).toBe('landline');
+  });
+
+  it('reads a four-digit area code as its own network group', () => {
+    // Kikinda is 0230 and Zrenjanin is 023: a shortest-match read of the same
+    // number would file every Kikinda lead under Zrenjanin.
+    expectCity('', 'kikinda', 'landline', { phone: '0230/421-555' });
+    expectCity('', 'zrenjanin', 'landline', { phone: '023/561-234' });
   });
 
   it('marks the fallback lower-confidence than every real match', () => {

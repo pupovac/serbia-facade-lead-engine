@@ -18,11 +18,10 @@ import settlementData from '../../../data/serbia-settlements.json' with { type: 
 import {
   findMunicipalitiesByName,
   getMunicipalityById,
-  landlineGroupCenter,
   municipalities,
-  municipalitiesByLandlinePrefix,
   type Municipality,
 } from '../geo.js';
+import { areaCodeFor, inferCityFromAreaCode, type NormalizedPhone } from '../phone/index.js';
 import { hasCyrillic, toLatin } from '../text/cyrillic.js';
 import { foldForComparison, normalizeWhitespace } from '../text/fold.js';
 
@@ -77,18 +76,14 @@ export type CityResolution =
 /** A phone the lead already carries, used only as a fallback location signal. */
 export interface CityHint {
   /**
-   * `+38121123456`, `021/123-456` or the object `src/lib/phone` produces. Only
-   * the landline area code is read; a mobile number says nothing about a city.
+   * A `NormalizedPhone` from `src/lib/phone`, or the raw string it was built
+   * from (`+38121123456`, `021/123-456`). Only the landline area code is read;
+   * a mobile number says nothing about a city.
    */
   readonly phone?: PhoneLike | undefined;
 }
 
-export type PhoneLike =
-  | string
-  | {
-      readonly e164?: string | null | undefined;
-      readonly nationalFormat?: string | null | undefined;
-    };
+export type PhoneLike = string | NormalizedPhone;
 
 export interface Settlement {
   readonly name: string;
@@ -486,27 +481,23 @@ function uniqueByPostalCode(codes: readonly string[]): Municipality | undefined 
  *
  * A Serbian area code covers a whole RATEL network group, so this is the
  * group's centre and not necessarily the lead's own town — hence
- * `confidence: 0.35`. Mobile numbers (06x) carry no geography at all and are
- * ignored.
+ * `confidence: 0.35`. The plan tables live in `src/lib/phone`, which already
+ * knows that Kikinda is `0230` rather than a Zrenjanin `023` number, and that a
+ * mobile prefix names an operator and not a town.
  */
 function resolveFromPhone(phone: PhoneLike | undefined): Municipality | undefined {
-  const prefix = landlinePrefixOf(phone);
-  if (prefix === undefined) return undefined;
-  const centre = landlineGroupCenter(prefix);
-  if (centre !== undefined) return centre;
-  const group = municipalitiesByLandlinePrefix(prefix);
-  return group.length === 1 ? group[0] : undefined;
+  if (phone === undefined) return undefined;
+  const cityId =
+    typeof phone === 'string'
+      ? inferCityFromAreaCode(areaCodeFor(nationalDigits(phone)))
+      : (phone.inferredCityId ?? inferCityFromAreaCode(phone.areaCode));
+  return cityId === undefined ? undefined : getMunicipalityById(cityId);
 }
 
-function landlinePrefixOf(phone: PhoneLike | undefined): string | undefined {
-  if (phone === undefined) return undefined;
-  const raw = typeof phone === 'string' ? phone : (phone.e164 ?? phone.nationalFormat ?? '');
-  if (raw === null || raw === '') return undefined;
-  const national = raw
+/** A raw phone string reduced to its national significant number. */
+function nationalDigits(phone: string): string {
+  return phone
     .replace(/\D/gu, '')
     .replace(/^(00)?381/u, '')
     .replace(/^0/u, '');
-  // 06x is mobile: it tells us the operator, never the town.
-  if (national.length < 3 || national.startsWith('6')) return undefined;
-  return `0${national.slice(0, 2)}`;
 }
