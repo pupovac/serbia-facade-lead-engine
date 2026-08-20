@@ -1,0 +1,23 @@
+﻿User-agent: *
+
+Disallow: /admin/
+Disallow: /Kategorije/GetFirme/
+Disallow: /FirmaDetaljiURL/
+Disallow: /TekstDetaljiURL/
+Disallow: /Pretraga/
+Disallow: /Komentari/
+Disallow: /VestDetaljiURL/
+Disallow: /malioglasi/
+Disallow: /PrintTekst.aspx*
+Disallow: /firmadetalji.aspx*
+Disallow: /Pretraga/PretragaVesti*
+Disallow: /Pretraga/GetTekstoviZaPretragu/*
+Disallow: /Pretraga/PretragaKategorijaPoTekstovima/*
+Disallow: /Pretraga/GetFirme*
+Disallow: /pretraga/GetVesti*
+Disallow: /malioglasi/PrintOglas.aspx*
+Disallow: /malioglasi/DetaljiOglasa/UnosOglasa.aspx*
+Disallow: /news.aspx*
+
+
+Sitemap: https://www.gradjevinarstvo.rs/sitemap_index.xml
