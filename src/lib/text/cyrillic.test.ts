@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { hasCyrillic, toCyrillic } from './cyrillic.js';
+import { hasCyrillic, toCyrillic, toLatin } from './cyrillic.js';
 
 describe('toCyrillic', () => {
   it('transliterates the query terms this project actually uses', () => {
@@ -51,5 +51,32 @@ describe('hasCyrillic', () => {
     expect(hasCyrillic('fasader')).toBe(false);
     expect(hasCyrillic('Čačak')).toBe(false);
     expect(hasCyrillic('011 123 456')).toBe(false);
+  });
+});
+
+describe('toLatin', () => {
+  const cases: ReadonlyArray<readonly [string, string]> = [
+    ['фасадер', 'fasader'],
+    ['грађевински материјал', 'građevinski materijal'],
+    ['Фасада д.о.о. Београд', 'Fasada d.o.o. Beograd'],
+    ['ЗАНАТСКА РАДЊА', 'ZANATSKA RADNJA'],
+    ['Љубић', 'Ljubić'],
+    ['ЉУБИЋ', 'LJUBIĆ'],
+    ['Њива', 'Njiva'],
+    ['Џеп', 'Džep'],
+    ['Нови Сад 21000', 'Novi Sad 21000'],
+    ['Fasada doo', 'Fasada doo'],
+  ];
+
+  for (const [input, expected] of cases) {
+    it(`transliterates ${input} to ${expected}`, () => {
+      expect(toLatin(input)).toBe(expected);
+    });
+  }
+
+  it('round-trips every Serbian Latin term back to itself', () => {
+    for (const term of ['fasader', 'građevinski materijal', 'stovarište', 'izolacija kuće']) {
+      expect(toLatin(toCyrillic(term))).toBe(term);
+    }
   });
 });

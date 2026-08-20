@@ -36,12 +36,12 @@ route handler or an adapter, it belongs in `src/lib` instead.
 
 All of it in `src/lib`, none of it in an adapter and none of it in a component.
 
-| Concern                        | Home                | Note                                                                                                                                                                                                     |
-| ------------------------------ | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Whitespace + diacritic folding | `src/lib/text`      | `građevinski` / `gradjevinski`, `Čačak` / `Cacak`. Every query exists in both forms.                                                                                                                     |
-| Phone parsing                  | `src/lib/phone`     | `libphonenumber-js`, region `RS`. Canonical `+381641234567`. Landlines (011, 021, 018, 034, …) and mobiles (060–069) alike. **The raw original string is always preserved alongside the canonical one.** |
-| Names, addresses, cities       | `src/lib/normalize` | Company names are preserved in Serbian, never translated or "cleaned" into a different name.                                                                                                             |
-| Emails, website URLs           | `src/lib/normalize` | Domain extraction feeds dedup.                                                                                                                                                                           |
+| Concern                        | Home                | Note                                                                                                                                                                                                                                                              |
+| ------------------------------ | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Whitespace + diacritic folding | `src/lib/text`      | `građevinski` / `gradjevinski`, `Čačak` / `Cacak`. Every query exists in both forms.                                                                                                                                                                              |
+| Phone parsing                  | `src/lib/phone`     | `libphonenumber-js`, region `RS`. Canonical `+381641234567`. Landlines (011, 021, 018, 034, …) and mobiles (060–069) alike. **The raw original string is always preserved alongside the canonical one.**                                                          |
+| Names, addresses, cities       | `src/lib/normalize` | Company names are preserved in Serbian, never translated or "cleaned" into a different name. `normalizeCompanyName(name).ascii` is the value written to `leads.name_normalized`; `resolveCity` returns the `data/serbia-geo.json` slugs, or `null` with a reason. |
+| Emails, website URLs           | `src/lib/normalize` | Domain extraction feeds dedup.                                                                                                                                                                                                                                    |
 
 A source adapter that needs a new rule adds it here, with tests, and calls it.
 
@@ -72,8 +72,12 @@ Signal strength, strongest first:
 4. company name + city
 5. address
 
-**Never merge on a vaguely similar name alone.** Two locations of the same
-business are a real case and are represented as such, not collapsed.
+**Never merge on a vaguely similar name alone.** `nameSimilarity` scores a pair
+0–1 and `RECOMMENDED_NAME_MATCH_THRESHOLD` says where the measured separation
+between same-business and different-business pairs sits — but the score is one
+signal among five, and the module that produces it never merges anything. Two
+locations of the same business are a real case and are represented as such, not
+collapsed.
 
 **Merge, never delete.** A merged lead keeps every phone, every source URL and
 every field either side had. Where two sides disagree on a single-valued field,

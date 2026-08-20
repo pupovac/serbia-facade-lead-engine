@@ -111,3 +111,47 @@ export function toCyrillic(value: string): string {
 export function hasCyrillic(value: string): boolean {
   return /\p{Script=Cyrillic}/u.test(value);
 }
+
+/**
+ * Serbian Cyrillic → Latin, the direction scraped text actually needs.
+ *
+ * Unlike Latin → Cyrillic this mapping is unambiguous: `љ` is always `lj`, so
+ * there is no digraph guess to get wrong. `Фасада` → `Fasada`,
+ * `грађевински материјал` → `građevinski materijal`.
+ *
+ * A capital digraph takes the all-caps form only when the next letter is also
+ * uppercase — `ЉУБИЋ` → `LJUBIĆ`, `Љубић` → `Ljubić`.
+ */
+export function toLatin(value: string): string {
+  let out = '';
+  for (let i = 0; i < value.length; i += 1) {
+    const char = value[i] as string;
+    const mapped = CYRILLIC_TO_LATIN[char];
+    if (mapped === undefined) {
+      out += char;
+      continue;
+    }
+    if (mapped.length === 2 && mapped[0] === mapped[0]?.toUpperCase()) {
+      const next = value[i + 1];
+      out += next !== undefined && UPPERCASE_CYRILLIC.test(next) ? mapped.toUpperCase() : mapped;
+      continue;
+    }
+    out += mapped;
+  }
+  return out;
+}
+
+const UPPERCASE_CYRILLIC = /\p{Lu}/u;
+
+const CYRILLIC_TO_LATIN: Readonly<Record<string, string>> = {
+  ...Object.fromEntries(Object.entries(LETTERS).map(([latin, cyrillic]) => [cyrillic, latin])),
+  ...Object.fromEntries(DIGRAPHS.map(([latin, cyrillic]) => [cyrillic, latin])),
+  // The digraph table above maps three Latin spellings onto each Cyrillic
+  // letter; the last one written wins, so pin the two cased forms explicitly.
+  Љ: 'Lj',
+  љ: 'lj',
+  Њ: 'Nj',
+  њ: 'nj',
+  Џ: 'Dž',
+  џ: 'dž',
+};

@@ -295,7 +295,7 @@ export const leads = sqliteTable(
     id: integer('id').primaryKey({ autoIncrement: true }),
     /** Serbian, exactly as published. Never translated, never "cleaned". */
     name: text('name').notNull(),
-    /** `foldForComparison(name)` — the dedup lookup key, never shown to a user. */
+    /** `normalizeCompanyName(name).ascii` — the dedup lookup key, never shown to a user. */
     nameNormalized: text('name_normalized').notNull(),
     /** `d.o.o.`, `pr`, `szr`, … when the source states it. */
     legalForm: text('legal_form'),

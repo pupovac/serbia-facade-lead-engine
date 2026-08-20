@@ -1,0 +1,1532 @@
+{
+  "_meta": {
+    "description": "Settlement, suburb and city-district aliases that resolve to a municipality id in data/serbia-geo.json. Used by resolveCity() in src/lib/normalize/city.ts when a source publishes a village or a neighbourhood instead of the municipality.",
+    "settlement_count": 300,
+    "municipalities_covered": 94,
+    "kinds": {
+      "settlement": "A naselje in its own right — the source may legitimately print it as the town.",
+      "neighbourhood": "A part of a town, not a separate naselje. Present because directories print it as if it were one.",
+      "city_district": "A gradska opština of a city other than Belgrade (Niš, Požarevac). Those are not local self-government units, so they are not in serbia-geo.json."
+    },
+    "rules": [
+      "municipality_id must exist in data/serbia-geo.json; the test suite fails the build if it does not.",
+      "A name that is already a municipality or city-municipality name in serbia-geo.json is never listed here — the geo dataset wins.",
+      "Names ambiguous across municipalities (Prnjavor, Popovac, Markovac, Crna Bara, Medveđa as a village) are deliberately omitted: resolveCity returns null with a reason rather than guessing, because a wrong city is worse than an empty one.",
+      "This is a curated seed list of the settlements Serbian business directories actually print, not the full ~4,700-settlement register. Adding an entry is a data change, reviewed like code."
+    ],
+    "sources": [
+      {
+        "name": "Statistical Office of the Republic of Serbia — settlement register (naselja) by municipality",
+        "url": "https://www.stat.gov.rs/",
+        "used_for": "settlement-to-municipality assignment"
+      },
+      {
+        "name": "Wikipedia (sr) — municipality articles, section Насеља",
+        "url": "https://sr.wikipedia.org/wiki/Градови_и_општине_Србије",
+        "used_for": "cross-check of the settlement lists per municipality"
+      }
+    ]
+  },
+  "settlements": [
+    {
+      "name": "Kaluđerica",
+      "municipality_id": "beograd-grocka",
+      "kind": "settlement"
+    },
+    {
+      "name": "Vinča",
+      "municipality_id": "beograd-grocka",
+      "kind": "settlement"
+    },
+    {
+      "name": "Boleč",
+      "municipality_id": "beograd-grocka",
+      "kind": "settlement"
+    },
+    {
+      "name": "Ritopek",
+      "municipality_id": "beograd-grocka",
+      "kind": "settlement"
+    },
+    {
+      "name": "Leštane",
+      "municipality_id": "beograd-grocka",
+      "kind": "settlement"
+    },
+    {
+      "name": "Vrčin",
+      "municipality_id": "beograd-grocka",
+      "kind": "settlement"
+    },
+    {
+      "name": "Borča",
+      "municipality_id": "beograd-palilula",
+      "kind": "settlement"
+    },
+    {
+      "name": "Krnjača",
+      "municipality_id": "beograd-palilula",
+      "kind": "settlement"
+    },
+    {
+      "name": "Ovča",
+      "municipality_id": "beograd-palilula",
+      "kind": "settlement"
+    },
+    {
+      "name": "Padinska Skela",
+      "municipality_id": "beograd-palilula",
+      "kind": "settlement"
+    },
+    {
+      "name": "Višnjica",
+      "municipality_id": "beograd-palilula",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Karaburma",
+      "municipality_id": "beograd-palilula",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Kotež",
+      "municipality_id": "beograd-palilula",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Batajnica",
+      "municipality_id": "beograd-zemun",
+      "kind": "settlement"
+    },
+    {
+      "name": "Ugrinovci",
+      "municipality_id": "beograd-zemun",
+      "kind": "settlement"
+    },
+    {
+      "name": "Zemun Polje",
+      "municipality_id": "beograd-zemun",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Altina",
+      "municipality_id": "beograd-zemun",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Železnik",
+      "municipality_id": "beograd-cukarica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Umka",
+      "municipality_id": "beograd-cukarica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Sremčica",
+      "municipality_id": "beograd-cukarica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Ostružnica",
+      "municipality_id": "beograd-cukarica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Rušanj",
+      "municipality_id": "beograd-cukarica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Velika Moštanica",
+      "municipality_id": "beograd-cukarica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Banovo Brdo",
+      "municipality_id": "beograd-cukarica",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Resnik",
+      "municipality_id": "beograd-rakovica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Kijevo",
+      "municipality_id": "beograd-rakovica",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Kneževac",
+      "municipality_id": "beograd-rakovica",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Miljakovac",
+      "municipality_id": "beograd-rakovica",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Jajinci",
+      "municipality_id": "beograd-vozdovac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Kumodraž",
+      "municipality_id": "beograd-vozdovac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Ripanj",
+      "municipality_id": "beograd-vozdovac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Beli Potok",
+      "municipality_id": "beograd-vozdovac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Zuce",
+      "municipality_id": "beograd-vozdovac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Banjica",
+      "municipality_id": "beograd-vozdovac",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Mirijevo",
+      "municipality_id": "beograd-zvezdara",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Mali Mokri Lug",
+      "municipality_id": "beograd-zvezdara",
+      "kind": "settlement"
+    },
+    {
+      "name": "Veliki Mokri Lug",
+      "municipality_id": "beograd-zvezdara",
+      "kind": "settlement"
+    },
+    {
+      "name": "Bežanija",
+      "municipality_id": "beograd-novi-beograd",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Bežanijska Kosa",
+      "municipality_id": "beograd-novi-beograd",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Ledine",
+      "municipality_id": "beograd-novi-beograd",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Dorćol",
+      "municipality_id": "beograd-stari-grad",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Senjak",
+      "municipality_id": "beograd-savski-venac",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Dedinje",
+      "municipality_id": "beograd-savski-venac",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Dobanovci",
+      "municipality_id": "beograd-surcin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Boljevci",
+      "municipality_id": "beograd-surcin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Jakovo",
+      "municipality_id": "beograd-surcin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Petrovčić",
+      "municipality_id": "beograd-surcin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Bečmen",
+      "municipality_id": "beograd-surcin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Progar",
+      "municipality_id": "beograd-surcin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Meljak",
+      "municipality_id": "beograd-barajevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Baćevac",
+      "municipality_id": "beograd-barajevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Vranić",
+      "municipality_id": "beograd-barajevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Lisović",
+      "municipality_id": "beograd-barajevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Zabrežje",
+      "municipality_id": "beograd-obrenovac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Barič",
+      "municipality_id": "beograd-obrenovac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Skela",
+      "municipality_id": "beograd-obrenovac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Veliko Polje",
+      "municipality_id": "beograd-obrenovac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Vreoci",
+      "municipality_id": "beograd-lazarevac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Veliki Crljeni",
+      "municipality_id": "beograd-lazarevac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Rudovci",
+      "municipality_id": "beograd-lazarevac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Stepojevac",
+      "municipality_id": "beograd-lazarevac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Vlaška",
+      "municipality_id": "beograd-mladenovac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Ralja",
+      "municipality_id": "beograd-sopot",
+      "kind": "settlement"
+    },
+    {
+      "name": "Mali Požarevac",
+      "municipality_id": "beograd-sopot",
+      "kind": "settlement"
+    },
+    {
+      "name": "Nemenikuće",
+      "municipality_id": "beograd-sopot",
+      "kind": "settlement"
+    },
+    {
+      "name": "Petrovaradin",
+      "municipality_id": "novi-sad",
+      "kind": "settlement"
+    },
+    {
+      "name": "Sremska Kamenica",
+      "municipality_id": "novi-sad",
+      "kind": "settlement"
+    },
+    {
+      "name": "Futog",
+      "municipality_id": "novi-sad",
+      "kind": "settlement"
+    },
+    {
+      "name": "Veternik",
+      "municipality_id": "novi-sad",
+      "kind": "settlement"
+    },
+    {
+      "name": "Rumenka",
+      "municipality_id": "novi-sad",
+      "kind": "settlement"
+    },
+    {
+      "name": "Kać",
+      "municipality_id": "novi-sad",
+      "kind": "settlement"
+    },
+    {
+      "name": "Kisač",
+      "municipality_id": "novi-sad",
+      "kind": "settlement"
+    },
+    {
+      "name": "Budisava",
+      "municipality_id": "novi-sad",
+      "kind": "settlement"
+    },
+    {
+      "name": "Kovilj",
+      "municipality_id": "novi-sad",
+      "kind": "settlement"
+    },
+    {
+      "name": "Begeč",
+      "municipality_id": "novi-sad",
+      "kind": "settlement"
+    },
+    {
+      "name": "Čenej",
+      "municipality_id": "novi-sad",
+      "kind": "settlement"
+    },
+    {
+      "name": "Ledinci",
+      "municipality_id": "novi-sad",
+      "kind": "settlement"
+    },
+    {
+      "name": "Stepanovićevo",
+      "municipality_id": "novi-sad",
+      "kind": "settlement"
+    },
+    {
+      "name": "Bukovac",
+      "municipality_id": "novi-sad",
+      "kind": "settlement"
+    },
+    {
+      "name": "Telep",
+      "municipality_id": "novi-sad",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Detelinara",
+      "municipality_id": "novi-sad",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Adice",
+      "municipality_id": "novi-sad",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Klisa",
+      "municipality_id": "novi-sad",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Niška Banja",
+      "municipality_id": "nis",
+      "kind": "settlement"
+    },
+    {
+      "name": "Medijana",
+      "municipality_id": "nis",
+      "kind": "city_district"
+    },
+    {
+      "name": "Pantelej",
+      "municipality_id": "nis",
+      "kind": "city_district"
+    },
+    {
+      "name": "Crveni Krst",
+      "municipality_id": "nis",
+      "kind": "city_district"
+    },
+    {
+      "name": "Malča",
+      "municipality_id": "nis",
+      "kind": "settlement"
+    },
+    {
+      "name": "Grošnica",
+      "municipality_id": "kragujevac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Stragari",
+      "municipality_id": "kragujevac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Stanovo",
+      "municipality_id": "kragujevac",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Sevojno",
+      "municipality_id": "uzice",
+      "kind": "settlement"
+    },
+    {
+      "name": "Zlakusa",
+      "municipality_id": "uzice",
+      "kind": "settlement"
+    },
+    {
+      "name": "Karan",
+      "municipality_id": "uzice",
+      "kind": "settlement"
+    },
+    {
+      "name": "Kostolac",
+      "municipality_id": "pozarevac",
+      "kind": "city_district"
+    },
+    {
+      "name": "Palić",
+      "municipality_id": "subotica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Bajmok",
+      "municipality_id": "subotica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Čantavir",
+      "municipality_id": "subotica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Tavankut",
+      "municipality_id": "subotica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Hajdukovo",
+      "municipality_id": "subotica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Bački Vinogradi",
+      "municipality_id": "subotica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Bezdan",
+      "municipality_id": "sombor",
+      "kind": "settlement"
+    },
+    {
+      "name": "Kljajićevo",
+      "municipality_id": "sombor",
+      "kind": "settlement"
+    },
+    {
+      "name": "Stapar",
+      "municipality_id": "sombor",
+      "kind": "settlement"
+    },
+    {
+      "name": "Čonoplja",
+      "municipality_id": "sombor",
+      "kind": "settlement"
+    },
+    {
+      "name": "Riđica",
+      "municipality_id": "sombor",
+      "kind": "settlement"
+    },
+    {
+      "name": "Prigrevica",
+      "municipality_id": "apatin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Sonta",
+      "municipality_id": "apatin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Svilojevo",
+      "municipality_id": "apatin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Crvenka",
+      "municipality_id": "kula",
+      "kind": "settlement"
+    },
+    {
+      "name": "Sivac",
+      "municipality_id": "kula",
+      "kind": "settlement"
+    },
+    {
+      "name": "Ruski Krstur",
+      "municipality_id": "kula",
+      "kind": "settlement"
+    },
+    {
+      "name": "Kucura",
+      "municipality_id": "vrbas",
+      "kind": "settlement"
+    },
+    {
+      "name": "Zmajevo",
+      "municipality_id": "vrbas",
+      "kind": "settlement"
+    },
+    {
+      "name": "Savino Selo",
+      "municipality_id": "vrbas",
+      "kind": "settlement"
+    },
+    {
+      "name": "Čelarevo",
+      "municipality_id": "backa-palanka",
+      "kind": "settlement"
+    },
+    {
+      "name": "Gajdobra",
+      "municipality_id": "backa-palanka",
+      "kind": "settlement"
+    },
+    {
+      "name": "Obrovac",
+      "municipality_id": "backa-palanka",
+      "kind": "settlement"
+    },
+    {
+      "name": "Silbaš",
+      "municipality_id": "backa-palanka",
+      "kind": "settlement"
+    },
+    {
+      "name": "Deronje",
+      "municipality_id": "odzaci",
+      "kind": "settlement"
+    },
+    {
+      "name": "Ratkovo",
+      "municipality_id": "odzaci",
+      "kind": "settlement"
+    },
+    {
+      "name": "Vajska",
+      "municipality_id": "bac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Selenča",
+      "municipality_id": "bac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Bođani",
+      "municipality_id": "bac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Čerević",
+      "municipality_id": "beocin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Rakovac",
+      "municipality_id": "beocin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Banoštor",
+      "municipality_id": "beocin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Susek",
+      "municipality_id": "beocin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Bački Jarak",
+      "municipality_id": "temerin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Sirig",
+      "municipality_id": "temerin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Čurug",
+      "municipality_id": "zabalj",
+      "kind": "settlement"
+    },
+    {
+      "name": "Đurđevo",
+      "municipality_id": "zabalj",
+      "kind": "settlement"
+    },
+    {
+      "name": "Gospođinci",
+      "municipality_id": "zabalj",
+      "kind": "settlement"
+    },
+    {
+      "name": "Šajkaš",
+      "municipality_id": "titel",
+      "kind": "settlement"
+    },
+    {
+      "name": "Mošorin",
+      "municipality_id": "titel",
+      "kind": "settlement"
+    },
+    {
+      "name": "Lok",
+      "municipality_id": "titel",
+      "kind": "settlement"
+    },
+    {
+      "name": "Gardinovci",
+      "municipality_id": "titel",
+      "kind": "settlement"
+    },
+    {
+      "name": "Turija",
+      "municipality_id": "srbobran",
+      "kind": "settlement"
+    },
+    {
+      "name": "Nadalj",
+      "municipality_id": "srbobran",
+      "kind": "settlement"
+    },
+    {
+      "name": "Bačko Petrovo Selo",
+      "municipality_id": "becej",
+      "kind": "settlement"
+    },
+    {
+      "name": "Bačko Gradište",
+      "municipality_id": "becej",
+      "kind": "settlement"
+    },
+    {
+      "name": "Radičević",
+      "municipality_id": "becej",
+      "kind": "settlement"
+    },
+    {
+      "name": "Mol",
+      "municipality_id": "ada",
+      "kind": "settlement"
+    },
+    {
+      "name": "Utrine",
+      "municipality_id": "ada",
+      "kind": "settlement"
+    },
+    {
+      "name": "Horgoš",
+      "municipality_id": "kanjiza",
+      "kind": "settlement"
+    },
+    {
+      "name": "Martonoš",
+      "municipality_id": "kanjiza",
+      "kind": "settlement"
+    },
+    {
+      "name": "Bajša",
+      "municipality_id": "backa-topola",
+      "kind": "settlement"
+    },
+    {
+      "name": "Stara Moravica",
+      "municipality_id": "backa-topola",
+      "kind": "settlement"
+    },
+    {
+      "name": "Pačir",
+      "municipality_id": "backa-topola",
+      "kind": "settlement"
+    },
+    {
+      "name": "Elemir",
+      "municipality_id": "zrenjanin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Melenci",
+      "municipality_id": "zrenjanin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Ečka",
+      "municipality_id": "zrenjanin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Aradac",
+      "municipality_id": "zrenjanin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Mužlja",
+      "municipality_id": "zrenjanin",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Perlez",
+      "municipality_id": "zrenjanin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Lazarevo",
+      "municipality_id": "zrenjanin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Starčevo",
+      "municipality_id": "pancevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Kačarevo",
+      "municipality_id": "pancevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Jabuka",
+      "municipality_id": "pancevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Omoljica",
+      "municipality_id": "pancevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Banatski Brestovac",
+      "municipality_id": "pancevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Dolovo",
+      "municipality_id": "pancevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Ivanovo",
+      "municipality_id": "pancevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Glogonj",
+      "municipality_id": "pancevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Vojlovica",
+      "municipality_id": "pancevo",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Bavanište",
+      "municipality_id": "kovin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Deliblato",
+      "municipality_id": "kovin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Gaj",
+      "municipality_id": "kovin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Skorenovac",
+      "municipality_id": "kovin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Debeljača",
+      "municipality_id": "kovacica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Padina",
+      "municipality_id": "kovacica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Crepaja",
+      "municipality_id": "kovacica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Idvor",
+      "municipality_id": "kovacica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Uzdin",
+      "municipality_id": "kovacica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Samoš",
+      "municipality_id": "kovacica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Banatski Karlovac",
+      "municipality_id": "alibunar",
+      "kind": "settlement"
+    },
+    {
+      "name": "Vladimirovac",
+      "municipality_id": "alibunar",
+      "kind": "settlement"
+    },
+    {
+      "name": "Vlajkovac",
+      "municipality_id": "vrsac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Pavliš",
+      "municipality_id": "vrsac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Gudurica",
+      "municipality_id": "vrsac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Vatin",
+      "municipality_id": "vrsac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Vrdnik",
+      "municipality_id": "irig",
+      "kind": "settlement"
+    },
+    {
+      "name": "Beška",
+      "municipality_id": "indjija",
+      "kind": "settlement"
+    },
+    {
+      "name": "Novi Slankamen",
+      "municipality_id": "indjija",
+      "kind": "settlement"
+    },
+    {
+      "name": "Krčedin",
+      "municipality_id": "indjija",
+      "kind": "settlement"
+    },
+    {
+      "name": "Nova Pazova",
+      "municipality_id": "stara-pazova",
+      "kind": "settlement"
+    },
+    {
+      "name": "Novi Banovci",
+      "municipality_id": "stara-pazova",
+      "kind": "settlement"
+    },
+    {
+      "name": "Stari Banovci",
+      "municipality_id": "stara-pazova",
+      "kind": "settlement"
+    },
+    {
+      "name": "Belegiš",
+      "municipality_id": "stara-pazova",
+      "kind": "settlement"
+    },
+    {
+      "name": "Surduk",
+      "municipality_id": "stara-pazova",
+      "kind": "settlement"
+    },
+    {
+      "name": "Golubinci",
+      "municipality_id": "stara-pazova",
+      "kind": "settlement"
+    },
+    {
+      "name": "Šimanovci",
+      "municipality_id": "pecinci",
+      "kind": "settlement"
+    },
+    {
+      "name": "Popinci",
+      "municipality_id": "pecinci",
+      "kind": "settlement"
+    },
+    {
+      "name": "Ašanja",
+      "municipality_id": "pecinci",
+      "kind": "settlement"
+    },
+    {
+      "name": "Karlovčić",
+      "municipality_id": "pecinci",
+      "kind": "settlement"
+    },
+    {
+      "name": "Laćarak",
+      "municipality_id": "sremska-mitrovica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Mačvanska Mitrovica",
+      "municipality_id": "sremska-mitrovica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Martinci",
+      "municipality_id": "sremska-mitrovica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Kuzmin",
+      "municipality_id": "sremska-mitrovica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Adaševci",
+      "municipality_id": "sid",
+      "kind": "settlement"
+    },
+    {
+      "name": "Erdevik",
+      "municipality_id": "sid",
+      "kind": "settlement"
+    },
+    {
+      "name": "Kukujevci",
+      "municipality_id": "sid",
+      "kind": "settlement"
+    },
+    {
+      "name": "Morović",
+      "municipality_id": "sid",
+      "kind": "settlement"
+    },
+    {
+      "name": "Putinci",
+      "municipality_id": "ruma",
+      "kind": "settlement"
+    },
+    {
+      "name": "Kraljevci",
+      "municipality_id": "ruma",
+      "kind": "settlement"
+    },
+    {
+      "name": "Hrtkovci",
+      "municipality_id": "ruma",
+      "kind": "settlement"
+    },
+    {
+      "name": "Nikinci",
+      "municipality_id": "ruma",
+      "kind": "settlement"
+    },
+    {
+      "name": "Voganj",
+      "municipality_id": "ruma",
+      "kind": "settlement"
+    },
+    {
+      "name": "Pocerski Pričinović",
+      "municipality_id": "sabac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Mačvanski Pričinović",
+      "municipality_id": "sabac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Jevremovac",
+      "municipality_id": "sabac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Petlovača",
+      "municipality_id": "sabac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Badovinci",
+      "municipality_id": "bogatic",
+      "kind": "settlement"
+    },
+    {
+      "name": "Klenje",
+      "municipality_id": "bogatic",
+      "kind": "settlement"
+    },
+    {
+      "name": "Banja Koviljača",
+      "municipality_id": "loznica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Tršić",
+      "municipality_id": "loznica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Lipnički Šor",
+      "municipality_id": "loznica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Perućac",
+      "municipality_id": "bajina-basta",
+      "kind": "settlement"
+    },
+    {
+      "name": "Tara",
+      "municipality_id": "bajina-basta",
+      "kind": "settlement"
+    },
+    {
+      "name": "Divčibare",
+      "municipality_id": "valjevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Brankovina",
+      "municipality_id": "valjevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Petnica",
+      "municipality_id": "valjevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Pambukovica",
+      "municipality_id": "ub",
+      "kind": "settlement"
+    },
+    {
+      "name": "Bogovađa",
+      "municipality_id": "lajkovac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Banja Vrujci",
+      "municipality_id": "mionica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Rudnik",
+      "municipality_id": "gornji-milanovac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Pranjani",
+      "municipality_id": "gornji-milanovac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Takovo",
+      "municipality_id": "gornji-milanovac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Mrčajevci",
+      "municipality_id": "cacak",
+      "kind": "settlement"
+    },
+    {
+      "name": "Ovčar Banja",
+      "municipality_id": "cacak",
+      "kind": "settlement"
+    },
+    {
+      "name": "Preljina",
+      "municipality_id": "cacak",
+      "kind": "settlement"
+    },
+    {
+      "name": "Zablaće",
+      "municipality_id": "cacak",
+      "kind": "settlement"
+    },
+    {
+      "name": "Trbušani",
+      "municipality_id": "cacak",
+      "kind": "settlement"
+    },
+    {
+      "name": "Atenica",
+      "municipality_id": "cacak",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Guča",
+      "municipality_id": "lucani",
+      "kind": "settlement"
+    },
+    {
+      "name": "Kotraža",
+      "municipality_id": "lucani",
+      "kind": "settlement"
+    },
+    {
+      "name": "Zlatibor",
+      "municipality_id": "cajetina",
+      "kind": "settlement"
+    },
+    {
+      "name": "Sirogojno",
+      "municipality_id": "cajetina",
+      "kind": "settlement"
+    },
+    {
+      "name": "Brodarevo",
+      "municipality_id": "prijepolje",
+      "kind": "settlement"
+    },
+    {
+      "name": "Zlatar",
+      "municipality_id": "nova-varos",
+      "kind": "settlement"
+    },
+    {
+      "name": "Duga Poljana",
+      "municipality_id": "sjenica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Kopaonik",
+      "municipality_id": "raska",
+      "kind": "settlement"
+    },
+    {
+      "name": "Jošanička Banja",
+      "municipality_id": "raska",
+      "kind": "settlement"
+    },
+    {
+      "name": "Mataruška Banja",
+      "municipality_id": "kraljevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Vitanovac",
+      "municipality_id": "kraljevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Ratina",
+      "municipality_id": "kraljevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Sirča",
+      "municipality_id": "kraljevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Ušće",
+      "municipality_id": "kraljevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Velika Drenova",
+      "municipality_id": "trstenik",
+      "kind": "settlement"
+    },
+    {
+      "name": "Jasika",
+      "municipality_id": "krusevac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Veliki Šiljegovac",
+      "municipality_id": "krusevac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Brzeće",
+      "municipality_id": "brus",
+      "kind": "settlement"
+    },
+    {
+      "name": "Bukovik",
+      "municipality_id": "arandjelovac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Oplenac",
+      "municipality_id": "topola",
+      "kind": "neighbourhood"
+    },
+    {
+      "name": "Natalinci",
+      "municipality_id": "topola",
+      "kind": "settlement"
+    },
+    {
+      "name": "Bagrdan",
+      "municipality_id": "jagodina",
+      "kind": "settlement"
+    },
+    {
+      "name": "Končarevo",
+      "municipality_id": "jagodina",
+      "kind": "settlement"
+    },
+    {
+      "name": "Supska",
+      "municipality_id": "cuprija",
+      "kind": "settlement"
+    },
+    {
+      "name": "Stalać",
+      "municipality_id": "cicevac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Radinac",
+      "municipality_id": "smederevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Vranovo",
+      "municipality_id": "smederevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Kolari",
+      "municipality_id": "smederevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Lipe",
+      "municipality_id": "smederevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Osipaonica",
+      "municipality_id": "smederevo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Azanja",
+      "municipality_id": "smederevska-palanka",
+      "kind": "settlement"
+    },
+    {
+      "name": "Golobok",
+      "municipality_id": "smederevska-palanka",
+      "kind": "settlement"
+    },
+    {
+      "name": "Selevac",
+      "municipality_id": "smederevska-palanka",
+      "kind": "settlement"
+    },
+    {
+      "name": "Krnjevo",
+      "municipality_id": "velika-plana",
+      "kind": "settlement"
+    },
+    {
+      "name": "Lozovik",
+      "municipality_id": "velika-plana",
+      "kind": "settlement"
+    },
+    {
+      "name": "Srebrno Jezero",
+      "municipality_id": "veliko-gradiste",
+      "kind": "settlement"
+    },
+    {
+      "name": "Ram",
+      "municipality_id": "veliko-gradiste",
+      "kind": "settlement"
+    },
+    {
+      "name": "Donji Milanovac",
+      "municipality_id": "majdanpek",
+      "kind": "settlement"
+    },
+    {
+      "name": "Rudna Glava",
+      "municipality_id": "majdanpek",
+      "kind": "settlement"
+    },
+    {
+      "name": "Brestovačka Banja",
+      "municipality_id": "bor",
+      "kind": "settlement"
+    },
+    {
+      "name": "Zlot",
+      "municipality_id": "bor",
+      "kind": "settlement"
+    },
+    {
+      "name": "Krivelj",
+      "municipality_id": "bor",
+      "kind": "settlement"
+    },
+    {
+      "name": "Prahovo",
+      "municipality_id": "negotin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Rajac",
+      "municipality_id": "negotin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Kobišnica",
+      "municipality_id": "negotin",
+      "kind": "settlement"
+    },
+    {
+      "name": "Brza Palanka",
+      "municipality_id": "kladovo",
+      "kind": "settlement"
+    },
+    {
+      "name": "Gamzigrad",
+      "municipality_id": "zajecar",
+      "kind": "settlement"
+    },
+    {
+      "name": "Grljan",
+      "municipality_id": "zajecar",
+      "kind": "settlement"
+    },
+    {
+      "name": "Vratarnica",
+      "municipality_id": "zajecar",
+      "kind": "settlement"
+    },
+    {
+      "name": "Minićevo",
+      "municipality_id": "knjazevac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Kalna",
+      "municipality_id": "knjazevac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Bogovina",
+      "municipality_id": "boljevac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Rtanj",
+      "municipality_id": "boljevac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Žitkovac",
+      "municipality_id": "aleksinac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Prćilovica",
+      "municipality_id": "aleksinac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Vučje",
+      "municipality_id": "leskovac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Grdelica",
+      "municipality_id": "leskovac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Pečenjevce",
+      "municipality_id": "leskovac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Vranjska Banja",
+      "municipality_id": "vranje",
+      "kind": "settlement"
+    },
+    {
+      "name": "Ristovac",
+      "municipality_id": "vranje",
+      "kind": "settlement"
+    },
+    {
+      "name": "Vlasina Rid",
+      "municipality_id": "surdulica",
+      "kind": "settlement"
+    },
+    {
+      "name": "Bujanovačka Banja",
+      "municipality_id": "bujanovac",
+      "kind": "settlement"
+    },
+    {
+      "name": "Sijarinska Banja",
+      "municipality_id": "medvedja",
+      "kind": "settlement"
+    },
+    {
+      "name": "Prolom Banja",
+      "municipality_id": "kursumlija",
+      "kind": "settlement"
+    },
+    {
+      "name": "Lukovska Banja",
+      "municipality_id": "kursumlija",
+      "kind": "settlement"
+    },
+    {
+      "name": "Đavolja Varoš",
+      "municipality_id": "kursumlija",
+      "kind": "settlement"
+    }
+  ]
+}

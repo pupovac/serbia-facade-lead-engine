@@ -8,6 +8,11 @@ differently by git.
 - Geo data: Serbian cities and `opštine`, with both spellings (`Čačak` /
   `Cacak`), used to drive location-scoped queries and to normalize the `city`
   and `municipality` fields.
+- Settlement aliases (`serbia-settlements.json`): the villages, suburbs and city
+  districts directories print instead of the municipality — `Kaluđerica`,
+  `Petrovaradin`, `Zlatibor` — each pointing at a municipality id in the geo
+  dataset. A curated seed list, not the full settlement register: a name it does
+  not know resolves to nothing rather than to a guess.
 - Query datasets: the contractor and store search terms, each in its diacritic
   and ASCII-folded form.
 
