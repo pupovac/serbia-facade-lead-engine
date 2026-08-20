@@ -25,7 +25,7 @@
  * Drizzle renders identically for Postgres.
  */
 import { createHash } from 'node:crypto';
-import { and, eq, inArray, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNull, or, sql } from 'drizzle-orm';
 import type { Db } from './client.js';
 import {
   type ContactKind,
@@ -45,14 +45,23 @@ import {
   leadPhones,
   leadSources,
   leads,
+  type IdentifierKind,
+  type MergeCandidate,
+  type MergeCandidateStatus,
+  type MatchSignalName,
+  type MergeLogEntry,
   type MergeSignal,
   type NewSource,
+  type QuarantineReason,
+  type SharedIdentifier,
   type PhoneType,
   type ProvenanceField,
   type RawRecord,
   type RawRecordStatus,
   type RunStatus,
+  mergeCandidates,
   mergeLog,
+  sharedIdentifiers,
   rawRecords,
   sources,
 } from './schema.js';
@@ -155,6 +164,24 @@ export interface UpsertLeadResult {
 
 /** The exact-match lookups `upsertLead` runs, strongest first. */
 export type MatchSignal = 'lead_id' | 'phone' | 'website_domain' | 'email' | 'name_city';
+
+export interface UpsertLeadOptions {
+  /**
+   * Who decided which lead this record belongs to.
+   *
+   * - `'exact'` (default) runs the built-in exact matcher: phone, website
+   *   domain, email, then name + city.
+   * - `'caller'` runs nothing and trusts `input.leadId` alone. The caller has
+   *   already matched with the full rule set, and letting the exact matcher
+   *   second-guess it would undo the decision — a shared phone across two
+   *   *differently registered* companies is a `review` verdict the merge engine
+   *   reached on purpose, and the exact matcher would attach them anyway.
+   *
+   * `src/lib/dedup`'s `ingestLead` is the caller this exists for, and it is the
+   * entry point an adapter should be writing through.
+   */
+  readonly matching?: 'exact' | 'caller' | undefined;
+}
 
 /* -------------------------------------------------------------------------- */
 /* Sources                                                                    */
@@ -459,11 +486,25 @@ function fieldClaimsFrom(input: LeadInput): FieldClaim[] {
  * An existing lead is **updated by filling blanks**. A value that disagrees
  * with one already promoted is stored as a claim and reported in
  * `conflictsRecorded`, never written over the stored one.
+ *
+ * A quarantined identifier is skipped rather than matched on. Attaching is
+ * **irreversible** — unlike a merge, it leaves no `merge_log` row to undo — so
+ * a call-centre number that ten unrelated companies publish must not attach
+ * every one of them to whichever lead happened to be inserted first. See
+ * `shared_identifiers` and `src/lib/dedup/quarantine.ts`.
+ *
+ * `options.matching = 'caller'` hands the whole decision to the caller;
+ * `src/lib/dedup/ingest.ts` is what that is for.
  */
-export function upsertLead(db: Db, input: LeadInput, provenance: Provenance): UpsertLeadResult {
+export function upsertLead(
+  db: Db,
+  input: LeadInput,
+  provenance: Provenance,
+  options: UpsertLeadOptions = {},
+): UpsertLeadResult {
   return db.transaction((tx) => {
     const at = provenance.seenAt ?? new Date();
-    const matched = matchLead(tx, input);
+    const matched = matchLead(tx, input, options);
     const existing = matched?.lead;
 
     const leadId = existing ? existing.id : insertLead(tx, input, at);
@@ -509,22 +550,27 @@ export function upsertLead(db: Db, input: LeadInput, provenance: Provenance): Up
 function matchLead(
   tx: Executor,
   input: LeadInput,
+  options: UpsertLeadOptions,
 ): { lead: Lead; signal: MatchSignal } | undefined {
   if (input.leadId != null) {
     const lead = resolveLead(tx, input.leadId);
     if (lead) return { lead, signal: 'lead_id' };
   }
+  if (options.matching === 'caller') return undefined;
   for (const phone of input.phones ?? []) {
+    if (isQuarantined(tx, 'phone', phone.e164)) continue;
     const lead = findByPhone(tx, phone.e164);
     if (lead) return { lead, signal: 'phone' };
   }
   for (const contact of input.contacts ?? []) {
     if (contact.kind !== 'website' || !contact.domain) continue;
+    if (isQuarantined(tx, 'website_domain', contact.domain)) continue;
     const lead = findByDomain(tx, contact.domain);
     if (lead) return { lead, signal: 'website_domain' };
   }
   for (const contact of input.contacts ?? []) {
     if (contact.kind !== 'email') continue;
+    if (isQuarantined(tx, 'email', contact.value)) continue;
     const lead = findByEmail(tx, contact.value);
     if (lead) return { lead, signal: 'email' };
   }
@@ -1120,6 +1166,8 @@ export interface MergeInput {
   readonly signal: MergeSignal;
   readonly signalValue: string;
   readonly score?: number | null | undefined;
+  /** `JSON.stringify` of every signal `scoreMatch` weighed, not just the winner. */
+  readonly signals?: string | null | undefined;
   readonly actor?: string | undefined;
   readonly runId?: number | null | undefined;
   readonly mergedAt?: Date | undefined;
@@ -1368,6 +1416,7 @@ export function recordMerge(db: Db, input: MergeInput): MergeResult {
         signal: input.signal,
         signalValue: input.signalValue,
         score: input.score ?? null,
+        signals: input.signals ?? null,
         actor: input.actor ?? 'pipeline',
         runId: input.runId ?? null,
         snapshot: JSON.stringify(snapshot),
@@ -1409,6 +1458,20 @@ const INHERITABLE_COLUMNS = [
   'openingHours',
 ] as const satisfies readonly (keyof Lead)[];
 
+export function getMergeLogEntry(db: Executor, mergeLogId: number): MergeLogEntry | undefined {
+  return db.select().from(mergeLog).where(eq(mergeLog.id, mergeLogId)).get();
+}
+
+/** Every merge recorded for a lead, whichever side of it the lead was on. */
+export function mergeHistoryFor(db: Executor, leadId: number): MergeLogEntry[] {
+  return db
+    .select()
+    .from(mergeLog)
+    .where(or(eq(mergeLog.survivingLeadId, leadId), eq(mergeLog.mergedLeadId, leadId)))
+    .orderBy(asc(mergeLog.id))
+    .all();
+}
+
 /**
  * Undo a merge, using the snapshot taken when it happened.
  *
@@ -1421,6 +1484,24 @@ export function revertMerge(db: Db, mergeLogId: number, note?: string): void {
     const entry = tx.select().from(mergeLog).where(eq(mergeLog.id, mergeLogId)).get();
     if (!entry) throw new Error(`merge log entry ${mergeLogId} not found`);
     if (entry.revertedAt != null) throw new Error(`merge ${mergeLogId} was already reverted`);
+
+    // The snapshot describes two specific rows. If either has moved since --
+    // the survivor merged onward into a third lead, or the merged-away lead
+    // re-pointed somewhere else -- putting it back would restore stale columns
+    // onto a tombstone. Later merges are undone first, newest to oldest.
+    const survivorNow = getLead(tx, entry.survivingLeadId);
+    if (survivorNow?.mergedIntoId != null) {
+      throw new Error(
+        `lead ${entry.survivingLeadId} has since been merged into ${survivorNow.mergedIntoId}: ` +
+          'revert that merge first',
+      );
+    }
+    const mergedNow = getLead(tx, entry.mergedLeadId);
+    if (mergedNow != null && mergedNow.mergedIntoId !== entry.survivingLeadId) {
+      throw new Error(
+        `lead ${entry.mergedLeadId} is no longer merged into ${entry.survivingLeadId}`,
+      );
+    }
 
     const snapshot = JSON.parse(entry.snapshot) as MergeSnapshot;
     const mergedId = entry.mergedLeadId;
@@ -1532,6 +1613,540 @@ function laterOrNull(a: Date | null, b: Date | null): Date | null {
   if (a == null) return b;
   if (b == null) return a;
   return later(a, b);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Candidate lookups — the merge engine's reads                               */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The singular `findBy…` helpers above answer "is this business already here?",
+ * which is all an insert needs. The merge engine asks a different question —
+ * "which stored leads share this value?" — and a phone published by three
+ * separate rows is exactly the case it exists to fix, so these return every
+ * match, resolved through `merged_into_id` and de-duplicated by id.
+ */
+function resolveAll(db: Executor, leadIds: readonly number[]): Lead[] {
+  const seen = new Map<number, Lead>();
+  for (const id of leadIds) {
+    const lead = resolveLead(db, id);
+    if (lead && !seen.has(lead.id)) seen.set(lead.id, lead);
+  }
+  return [...seen.values()];
+}
+
+export function findAllByPhone(db: Executor, e164: string): Lead[] {
+  const rows = db
+    .selectDistinct({ leadId: leadPhones.leadId })
+    .from(leadPhones)
+    .where(eq(leadPhones.e164, e164))
+    .all();
+  return resolveAll(
+    db,
+    rows.map((r) => r.leadId),
+  );
+}
+
+export function findAllByDomain(db: Executor, domain: string): Lead[] {
+  const rows = db
+    .selectDistinct({ leadId: leadContacts.leadId })
+    .from(leadContacts)
+    .where(and(eq(leadContacts.kind, 'website'), eq(leadContacts.domain, domain)))
+    .all();
+  return resolveAll(
+    db,
+    rows.map((r) => r.leadId),
+  );
+}
+
+export function findAllByEmail(db: Executor, email: string): Lead[] {
+  const rows = db
+    .selectDistinct({ leadId: leadContacts.leadId })
+    .from(leadContacts)
+    .where(and(eq(leadContacts.kind, 'email'), eq(leadContacts.value, email)))
+    .all();
+  return resolveAll(
+    db,
+    rows.map((r) => r.leadId),
+  );
+}
+
+/** Social profiles are corroboration, never a decisive signal — hence `kind` as an argument. */
+export function findAllByContact(db: Executor, kind: ContactKind, value: string): Lead[] {
+  const rows = db
+    .selectDistinct({ leadId: leadContacts.leadId })
+    .from(leadContacts)
+    .where(and(eq(leadContacts.kind, kind), eq(leadContacts.value, value)))
+    .all();
+  return resolveAll(
+    db,
+    rows.map((r) => r.leadId),
+  );
+}
+
+/** Maticni broj — an exact identifier the state issued, so it never needs a guard. */
+export function findAllByRegistrationNumber(db: Executor, registrationNumber: string): Lead[] {
+  const rows = db
+    .select({ id: leads.id })
+    .from(leads)
+    .where(eq(leads.registrationNumber, registrationNumber))
+    .all();
+  return resolveAll(
+    db,
+    rows.map((r) => r.id),
+  );
+}
+
+/** Every live lead carrying this `name_normalized`, in any city. */
+export function findAllByNameKey(db: Executor, nameNormalized: string): Lead[] {
+  const rows = db
+    .select({ id: leads.id })
+    .from(leads)
+    .where(and(eq(leads.nameNormalized, nameNormalized), isNull(leads.mergedIntoId)))
+    .all();
+  return resolveAll(
+    db,
+    rows.map((r) => r.id),
+  );
+}
+
+/**
+ * The blocking query behind fuzzy name matching: every live lead in one city.
+ *
+ * Index-backed on `leads_city_idx`. A near-duplicate name is only ever compared
+ * against the leads in the same place, which is both the correct rule — two
+ * `Fasade Petrovic` in different cities are two businesses — and what keeps the
+ * comparison from being quadratic over the whole table.
+ */
+export function findLeadsInCity(db: Executor, cityId: string): Lead[] {
+  return db
+    .select()
+    .from(leads)
+    .where(and(eq(leads.cityId, cityId), isNull(leads.mergedIntoId)))
+    .orderBy(asc(leads.id))
+    .all();
+}
+
+/**
+ * Every live lead already attached to this exact page.
+ *
+ * The strongest identity there is for an incremental re-crawl: the same source
+ * saying the same thing at the same URL is the same sighting, not a new
+ * business. Without it a re-run re-inserts every record whose only other
+ * signals the merge engine declines to decide on — a quarantined phone, a name
+ * match with no corroboration — and the database grows by a full crawl each
+ * time.
+ *
+ * A listing page that carries several businesses returns several leads, so the
+ * caller still has to pick by name.
+ */
+export function findLeadsBySourceUrl(db: Executor, sourceId: string, sourceUrl: string): Lead[] {
+  const rows = db
+    .selectDistinct({ leadId: leadSources.leadId })
+    .from(leadSources)
+    .where(and(eq(leadSources.sourceId, sourceId), eq(leadSources.sourceUrl, sourceUrl)))
+    .all();
+  return resolveAll(
+    db,
+    rows.map((r) => r.leadId),
+  );
+}
+
+/** Every lead that has not been merged away. The sweep iterates this. */
+export function activeLeads(db: Executor): Lead[] {
+  return db.select().from(leads).where(isNull(leads.mergedIntoId)).orderBy(asc(leads.id)).all();
+}
+
+export function activeLeadCount(db: Executor): number {
+  const row = db
+    .select({ n: sql<number>`count(*)` })
+    .from(leads)
+    .where(isNull(leads.mergedIntoId))
+    .get();
+  return row?.n ?? 0;
+}
+
+/* -------------------------------------------------------------------------- */
+/* shared_identifiers — the quarantine                                        */
+/* -------------------------------------------------------------------------- */
+
+/** One (identifier, lead) sighting, with the name that lead carries. */
+export interface IdentifierOccurrence {
+  readonly kind: IdentifierKind;
+  readonly value: string;
+  readonly leadId: number;
+  readonly name: string;
+  readonly nameNormalized: string;
+}
+
+/**
+ * Every live (identifier, lead) pair of one kind, with the lead's name.
+ *
+ * This is the raw material the quarantine is computed from: the guard has to
+ * count *businesses*, not rows, and only the name can say whether two rows are
+ * two businesses. Invalid phones are excluded — a number that did not parse is
+ * kept for auditing and must never anchor a merge.
+ */
+export function identifierOccurrences(db: Executor, kind: IdentifierKind): IdentifierOccurrence[] {
+  if (kind === 'phone') {
+    return db
+      .selectDistinct({
+        value: leadPhones.e164,
+        leadId: leads.id,
+        name: leads.name,
+        nameNormalized: leads.nameNormalized,
+      })
+      .from(leadPhones)
+      .innerJoin(leads, eq(leads.id, leadPhones.leadId))
+      .where(and(eq(leadPhones.valid, true), isNull(leads.mergedIntoId)))
+      .all()
+      .map((row) => ({ kind, ...row }));
+  }
+
+  const column = kind === 'website_domain' ? leadContacts.domain : leadContacts.value;
+  const contactKind: ContactKind = kind === 'website_domain' ? 'website' : 'email';
+  return db
+    .selectDistinct({
+      value: column,
+      leadId: leads.id,
+      name: leads.name,
+      nameNormalized: leads.nameNormalized,
+    })
+    .from(leadContacts)
+    .innerJoin(leads, eq(leads.id, leadContacts.leadId))
+    .where(and(eq(leadContacts.kind, contactKind), isNull(leads.mergedIntoId)))
+    .all()
+    .filter((row): row is typeof row & { value: string } => row.value != null && row.value !== '')
+    .map((row) => ({ kind, ...row }));
+}
+
+export interface SharedIdentifierInput {
+  readonly kind: IdentifierKind;
+  readonly value: string;
+  readonly distinctLeads: number;
+  readonly distinctBusinesses: number;
+  readonly quarantined: boolean;
+  readonly reason?: QuarantineReason | null | undefined;
+  /** A few of the distinct names seen, so a human can judge the verdict. */
+  readonly sampleNames?: readonly string[] | undefined;
+  readonly note?: string | null | undefined;
+  readonly seenAt?: Date | undefined;
+}
+
+/**
+ * Record what a decisive identifier is attached to, and whether it is still
+ * trusted. Re-running the quarantine pass refreshes the counts and the verdict;
+ * `first_seen_at` survives, so how long a number has been shared is readable.
+ *
+ * A `manual` verdict is never overwritten by the pass — a human who unblocked a
+ * number, or blocked one the counts do not catch, outranks the arithmetic.
+ */
+export function upsertSharedIdentifier(db: Db, input: SharedIdentifierInput): void {
+  const at = input.seenAt ?? new Date();
+  const existing = getSharedIdentifier(db, input.kind, input.value);
+  if (existing?.reason === 'manual') {
+    db.update(sharedIdentifiers)
+      .set({
+        distinctLeads: input.distinctLeads,
+        distinctBusinesses: input.distinctBusinesses,
+        sampleNames: input.sampleNames ? JSON.stringify(input.sampleNames) : null,
+        lastSeenAt: at,
+      })
+      .where(and(eq(sharedIdentifiers.kind, input.kind), eq(sharedIdentifiers.value, input.value)))
+      .run();
+    return;
+  }
+
+  db.insert(sharedIdentifiers)
+    .values({
+      kind: input.kind,
+      value: input.value,
+      distinctLeads: input.distinctLeads,
+      distinctBusinesses: input.distinctBusinesses,
+      quarantined: input.quarantined,
+      reason: input.reason ?? null,
+      sampleNames: input.sampleNames ? JSON.stringify(input.sampleNames) : null,
+      note: input.note ?? null,
+      firstSeenAt: at,
+      lastSeenAt: at,
+    })
+    .onConflictDoUpdate({
+      target: [sharedIdentifiers.kind, sharedIdentifiers.value],
+      set: {
+        distinctLeads: input.distinctLeads,
+        distinctBusinesses: input.distinctBusinesses,
+        quarantined: input.quarantined,
+        reason: input.reason ?? null,
+        sampleNames: input.sampleNames ? JSON.stringify(input.sampleNames) : null,
+        note: input.note ?? null,
+        lastSeenAt: at,
+      },
+    })
+    .run();
+}
+
+export function getSharedIdentifier(
+  db: Executor,
+  kind: IdentifierKind,
+  value: string,
+): SharedIdentifier | undefined {
+  return db
+    .select()
+    .from(sharedIdentifiers)
+    .where(and(eq(sharedIdentifiers.kind, kind), eq(sharedIdentifiers.value, value)))
+    .get();
+}
+
+/**
+ * Is this value barred from deciding a merge?
+ *
+ * Called on the insert path for every phone, domain and email, so it is a
+ * primary-key lookup and nothing more.
+ */
+export function isQuarantined(db: Executor, kind: IdentifierKind, value: string): boolean {
+  const row = db
+    .select({ quarantined: sharedIdentifiers.quarantined })
+    .from(sharedIdentifiers)
+    .where(and(eq(sharedIdentifiers.kind, kind), eq(sharedIdentifiers.value, value)))
+    .get();
+  return row?.quarantined === true;
+}
+
+export function quarantinedIdentifiers(db: Executor, kind?: IdentifierKind): SharedIdentifier[] {
+  const where =
+    kind == null
+      ? eq(sharedIdentifiers.quarantined, true)
+      : and(eq(sharedIdentifiers.quarantined, true), eq(sharedIdentifiers.kind, kind));
+  return db
+    .select()
+    .from(sharedIdentifiers)
+    .where(where)
+    .orderBy(desc(sharedIdentifiers.distinctBusinesses))
+    .all();
+}
+
+/**
+ * A human's verdict on one identifier, which the automatic pass will not undo.
+ *
+ * Both directions matter: releasing a number the counts caught but a reviewer
+ * knows is one business with six brands, and blocking one the counts have not
+ * caught yet.
+ */
+export function setManualQuarantine(
+  db: Db,
+  kind: IdentifierKind,
+  value: string,
+  quarantined: boolean,
+  note?: string,
+  at = new Date(),
+): void {
+  db.insert(sharedIdentifiers)
+    .values({
+      kind,
+      value,
+      distinctLeads: 0,
+      distinctBusinesses: 0,
+      quarantined,
+      reason: 'manual',
+      note: note ?? null,
+      firstSeenAt: at,
+      lastSeenAt: at,
+    })
+    .onConflictDoUpdate({
+      target: [sharedIdentifiers.kind, sharedIdentifiers.value],
+      set: { quarantined, reason: 'manual', note: note ?? null, lastSeenAt: at },
+    })
+    .run();
+}
+
+/* -------------------------------------------------------------------------- */
+/* merge_candidates — the review band                                         */
+/* -------------------------------------------------------------------------- */
+
+export interface MergeCandidateInput {
+  readonly leadAId: number;
+  readonly leadBId: number;
+  readonly score: number;
+  /** The strongest signal found. `merge_log`'s vocabulary plus `social_profile`. */
+  readonly topSignal: MatchSignalName;
+  readonly signalValue: string;
+  /** `JSON.stringify` of the full signal list from `scoreMatch`. */
+  readonly signals: string;
+  readonly seenAt?: Date | undefined;
+}
+
+export interface MergeCandidateResult {
+  readonly id: number;
+  readonly created: boolean;
+  readonly status: MergeCandidateStatus;
+}
+
+/**
+ * Park a pair for a human to decide, or refresh the evidence on one already
+ * parked.
+ *
+ * The pair is stored unordered (`lead_a_id < lead_b_id`), so the same two leads
+ * produce one row however the sweep reached them. A pair a reviewer has already
+ * **rejected** keeps its status: re-proposing it every run is how a review
+ * queue becomes noise a human stops reading, and it is also what would stop the
+ * sweep from being idempotent.
+ */
+export function upsertMergeCandidate(db: Db, input: MergeCandidateInput): MergeCandidateResult {
+  const at = input.seenAt ?? new Date();
+  const [leadAId, leadBId] =
+    input.leadAId < input.leadBId ? [input.leadAId, input.leadBId] : [input.leadBId, input.leadAId];
+  if (leadAId === leadBId) throw new Error('a merge candidate needs two different leads');
+
+  const existing = db
+    .select()
+    .from(mergeCandidates)
+    .where(and(eq(mergeCandidates.leadAId, leadAId), eq(mergeCandidates.leadBId, leadBId)))
+    .get();
+
+  if (existing) {
+    if (existing.status === 'pending') {
+      db.update(mergeCandidates)
+        .set({
+          score: input.score,
+          topSignal: input.topSignal,
+          signalValue: input.signalValue,
+          signals: input.signals,
+          lastSeenAt: at,
+        })
+        .where(eq(mergeCandidates.id, existing.id))
+        .run();
+    } else {
+      db.update(mergeCandidates)
+        .set({ lastSeenAt: at })
+        .where(eq(mergeCandidates.id, existing.id))
+        .run();
+    }
+    return { id: existing.id, created: false, status: existing.status };
+  }
+
+  const row = db
+    .insert(mergeCandidates)
+    .values({
+      leadAId,
+      leadBId,
+      score: input.score,
+      topSignal: input.topSignal,
+      signalValue: input.signalValue,
+      signals: input.signals,
+      status: 'pending',
+      firstSeenAt: at,
+      lastSeenAt: at,
+    })
+    .returning({ id: mergeCandidates.id })
+    .get();
+  return { id: row.id, created: true, status: 'pending' };
+}
+
+export function getMergeCandidate(
+  db: Executor,
+  leadAId: number,
+  leadBId: number,
+): MergeCandidate | undefined {
+  const [a, b] = leadAId < leadBId ? [leadAId, leadBId] : [leadBId, leadAId];
+  return db
+    .select()
+    .from(mergeCandidates)
+    .where(and(eq(mergeCandidates.leadAId, a), eq(mergeCandidates.leadBId, b)))
+    .get();
+}
+
+/** The review UI's queue: still undecided, strongest evidence first. */
+export function pendingMergeCandidates(db: Executor, limit?: number): MergeCandidate[] {
+  const query = db
+    .select()
+    .from(mergeCandidates)
+    .where(eq(mergeCandidates.status, 'pending'))
+    .orderBy(desc(mergeCandidates.score), asc(mergeCandidates.id));
+  return limit == null ? query.all() : query.limit(limit).all();
+}
+
+export interface ResolveCandidateOptions {
+  readonly resolvedBy?: string | undefined;
+  readonly mergeLogId?: number | null | undefined;
+  readonly at?: Date | undefined;
+}
+
+export function resolveMergeCandidate(
+  db: Db,
+  candidateId: number,
+  status: Exclude<MergeCandidateStatus, 'pending'>,
+  options: ResolveCandidateOptions = {},
+): void {
+  const at = options.at ?? new Date();
+  db.update(mergeCandidates)
+    .set({
+      status,
+      resolvedBy: options.resolvedBy ?? 'pipeline',
+      resolvedAt: at,
+      mergeLogId: options.mergeLogId ?? null,
+      lastSeenAt: at,
+    })
+    .where(eq(mergeCandidates.id, candidateId))
+    .run();
+}
+
+/**
+ * Close out the pending pairs that pointed at a lead which has just been merged
+ * away. The pair no longer describes two live rows; the next sweep re-proposes
+ * it against the survivor, with the fuller record a reviewer should be judging.
+ */
+export function releaseCandidatesFor(db: Db, leadId: number, at = new Date()): number {
+  const rows = db
+    .select({ id: mergeCandidates.id })
+    .from(mergeCandidates)
+    .where(
+      and(
+        eq(mergeCandidates.status, 'pending'),
+        or(eq(mergeCandidates.leadAId, leadId), eq(mergeCandidates.leadBId, leadId)),
+      ),
+    )
+    .all();
+  if (rows.length === 0) return 0;
+  db.update(mergeCandidates)
+    .set({ status: 'merged', resolvedBy: 'pipeline', resolvedAt: at, lastSeenAt: at })
+    .where(
+      inArray(
+        mergeCandidates.id,
+        rows.map((r) => r.id),
+      ),
+    )
+    .run();
+  return rows.length;
+}
+
+/**
+ * Merges whose deciding value has since been quarantined.
+ *
+ * The guard runs before the merges, so this is normally empty. It stops being
+ * empty when a later crawl adds the leads that turn a plausible shared number
+ * into an obvious one — and then these are exactly the merges to walk back with
+ * `revertMerge()`.
+ */
+export function mergesOnQuarantinedIdentifiers(db: Executor): MergeLogEntry[] {
+  const quarantined = db
+    .select({ kind: sharedIdentifiers.kind, value: sharedIdentifiers.value })
+    .from(sharedIdentifiers)
+    .where(eq(sharedIdentifiers.quarantined, true))
+    .all();
+  if (quarantined.length === 0) return [];
+
+  const signalFor: Record<IdentifierKind, MergeSignal> = {
+    phone: 'phone',
+    website_domain: 'website_domain',
+    email: 'email',
+  };
+  const suspect = new Set(quarantined.map((q) => `${signalFor[q.kind]} ${q.value}`));
+  return db
+    .select()
+    .from(mergeLog)
+    .where(isNull(mergeLog.revertedAt))
+    .all()
+    .filter((entry) => suspect.has(`${entry.signal} ${entry.signalValue}`));
 }
 
 /* -------------------------------------------------------------------------- */
