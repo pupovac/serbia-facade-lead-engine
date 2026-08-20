@@ -16,3 +16,5 @@ drizzle/meta/
 # one would change what the test is testing.
 src/lib/phone/__fixtures__/*.html
 src/scraper/sources/*/__fixtures__/*.html
+src/scraper/enrich/__fixtures__/*.html
+src/scraper/enrich/__fixtures__/*/*.html
