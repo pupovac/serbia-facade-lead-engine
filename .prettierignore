@@ -15,3 +15,4 @@ drizzle/meta/
 # Serbian directory actually publishes, malformed markup included — reformatting
 # one would change what the test is testing.
 src/lib/phone/__fixtures__/*.html
+src/scraper/sources/*/__fixtures__/*.html
