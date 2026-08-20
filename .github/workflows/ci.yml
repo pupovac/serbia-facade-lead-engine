@@ -47,5 +47,10 @@ jobs:
       - name: Test
         run: npm run test
 
+      # The phone module is held at 100% branch coverage; the threshold lives in
+      # vitest.config.ts and this step is what enforces it.
+      - name: Coverage thresholds
+        run: npm run test:coverage
+
       - name: Build
         run: npm run build
