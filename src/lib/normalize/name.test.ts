@@ -161,6 +161,28 @@ describe('normalizeCompanyName', () => {
     );
   });
 
+  // A digraph is one letter written as two, and the two scripts disagree about
+  // how many that is. Whatever the source shouted, the match key is the same.
+  it('gives the digraph names one key across script and case', () => {
+    const keys = [
+      'Njegoš fasade d.o.o.',
+      'NJEGOŠ FASADE DOO',
+      'ЊЕГОШ ФАСАДЕ ДОО',
+      'Његош фасаде доо',
+    ].map((raw) => normalizeCompanyName(raw).ascii);
+    expect(new Set(keys).size).toBe(1);
+    expect(keys[0]).toBe('njegos fasade');
+  });
+
+  it('reads the precomposed digraph code point as its two-letter form', () => {
+    // U+01C7. Before this the token was `ǉubinko`, which matched nothing and
+    // scored 0.61 against `ljubinko` — below the merge threshold.
+    expect(normalizeCompanyName('Ǉubinko gradnja').ascii).toBe(
+      normalizeCompanyName('Ljubinko gradnja').ascii,
+    );
+    expect(nameSimilarity('Ǉubinko gradnja', 'Ljubinko gradnja')).toBe(1);
+  });
+
   it('keeps the diacritic spelling in normalized and folds only ascii', () => {
     const result = normalizeCompanyName('Fasade Marković');
     expect(result.normalized).toBe('fasade marković');

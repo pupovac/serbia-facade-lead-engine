@@ -9,8 +9,10 @@
  * before relaxing anything.
  */
 import { describe, expect, it } from 'vitest';
+import { toCyrillic } from '../text/cyrillic.js';
 import { classifyLead } from './classify.js';
 import { LABELLED_BUSINESSES, evaluateClassifier } from './fixtures.js';
+import type { ClassificationInput } from './types.js';
 
 const report = evaluateClassifier();
 
@@ -75,6 +77,35 @@ describe('classification precision on the labelled fixture set', () => {
     for (const label of ['FACADE_CONTRACTOR', 'CONSTRUCTION_MATERIAL_STORE'] as const) {
       expect(report.perLabel[label]?.recall).toBeGreaterThanOrEqual(0.8);
     }
+  });
+
+  // A source picks a script and a case and never asks us. Measured on this set
+  // before the fix: 48 of the 50 records the classifier labels at all lost
+  // their label when the same text was written in Cyrillic. ALL-CAPS Latin
+  // already survived — the folding order was right — and this pins both.
+  describe('the same business written a different way', () => {
+    const rewrite = (
+      input: ClassificationInput,
+      f: (s: string) => string,
+    ): ClassificationInput => ({
+      ...input,
+      ...(input.name === undefined ? {} : { name: f(input.name) }),
+      ...(input.categories === undefined ? {} : { categories: input.categories.map(f) }),
+      ...(input.description === undefined ? {} : { description: f(input.description) }),
+    });
+
+    it.each([
+      ['ALL-CAPS', (s: string) => s.toUpperCase()],
+      ['Cyrillic', toCyrillic],
+      ['Cyrillic ALL-CAPS', (s: string) => toCyrillic(s).toUpperCase()],
+    ])('classifies every fixture identically in %s', (_name, rewriteText) => {
+      const changed = LABELLED_BUSINESSES.filter(
+        (business) =>
+          classifyLead(rewrite(business.input, rewriteText as (s: string) => string)).label !==
+          classifyLead(business.input).label,
+      );
+      expect(changed.map((business) => business.name)).toStrictEqual([]);
+    });
   });
 
   it('gives every classified record auditable evidence', () => {

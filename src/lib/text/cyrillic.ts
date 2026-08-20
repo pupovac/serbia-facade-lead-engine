@@ -10,6 +10,7 @@
  * lossy, and `dj` → `đ` would be a guess. Transliterate the diacritic form and
  * fold separately.
  */
+import { digraphCase } from './case.js';
 
 /**
  * The three Serbian digraphs, longest match first. They must be replaced before
@@ -119,8 +120,9 @@ export function hasCyrillic(value: string): boolean {
  * there is no digraph guess to get wrong. `Фасада` → `Fasada`,
  * `грађевински материјал` → `građevinski materijal`.
  *
- * A capital digraph takes the all-caps form only when the next letter is also
- * uppercase — `ЉУБИЋ` → `LJUBIĆ`, `Љубић` → `Ljubić`.
+ * A capital digraph is one letter written as two, so its case comes from the
+ * letters around it — `ЉУБИЋ` → `LJUBIĆ`, `Љубић` → `Ljubić`, and word-final
+ * `КОВИЉ` → `KOVILJ` rather than `KOVILj` (see `digraphCase`).
  */
 export function toLatin(value: string): string {
   let out = '';
@@ -132,16 +134,13 @@ export function toLatin(value: string): string {
       continue;
     }
     if (mapped.length === 2 && mapped[0] === mapped[0]?.toUpperCase()) {
-      const next = value[i + 1];
-      out += next !== undefined && UPPERCASE_CYRILLIC.test(next) ? mapped.toUpperCase() : mapped;
+      out += digraphCase(value, i) === 'upper' ? mapped.toUpperCase() : mapped;
       continue;
     }
     out += mapped;
   }
   return out;
 }
-
-const UPPERCASE_CYRILLIC = /\p{Lu}/u;
 
 const CYRILLIC_TO_LATIN: Readonly<Record<string, string>> = {
   ...Object.fromEntries(Object.entries(LETTERS).map(([latin, cyrillic]) => [cyrillic, latin])),

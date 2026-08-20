@@ -202,9 +202,81 @@ describe('classifyLead — mechanics', () => {
   });
 
   it('reads Cyrillic through the same folding as everything else', () => {
-    expect(classifyLead({ name: 'Фасадерски радови Марковић' }).label).toBe('UNKNOWN');
-    // Cyrillic is transliterated by the name normalizer, not here; the raw
-    // Cyrillic string is deliberately not a match, so callers must normalize.
+    const latin = classifyLead({ name: 'Fasaderski radovi Marković' });
+    const cyrillic = classifyLead({ name: 'Фасадерски радови Марковић' });
+    expect(latin.label).toBe('FACADE_CONTRACTOR');
+    expect(cyrillic.label).toBe(latin.label);
+    expect(cyrillic.contractor.net).toBe(latin.contractor.net);
+  });
+
+  // Directories publish the same company in three shapes — `Njegoš fasade`,
+  // `NJEGOŠ FASADE`, `ЊЕГОШ ФАСАДЕ` — and a lead that reaches the salesperson
+  // must not depend on which one the source chose. The digraphs are the
+  // interesting part: `Nj`, `Lj` and `Dž` are one letter, and `Њ` upper-cased
+  // beside another capital is `NJ`, not `Nj`.
+  describe.each([
+    [
+      'nj digraph',
+      'Njegoš fasade doo',
+      'NJEGOŠ FASADE DOO',
+      'Његош фасаде доо',
+      'ЊЕГОШ ФАСАДЕ ДОО',
+    ],
+    [
+      'lj digraph',
+      'Ljubinko fasaderski radovi',
+      'LJUBINKO FASADERSKI RADOVI',
+      'Љубинко фасадерски радови',
+      'ЉУБИНКО ФАСАДЕРСКИ РАДОВИ',
+    ],
+    [
+      'dž digraph',
+      'Džordže građevinsko stovarište',
+      'DŽORDŽE GRAĐEVINSKO STOVARIŠTE',
+      'Џорџе грађевинско стовариште',
+      'ЏОРЏЕ ГРАЂЕВИНСКО СТОВАРИШТЕ',
+    ],
+    [
+      'đ, word-final and mid-word',
+      'Đorđ demit fasade',
+      'ĐORĐ DEMIT FASADE',
+      'Ђорђ демит фасаде',
+      'ЂОРЂ ДЕМИТ ФАСАДЕ',
+    ],
+  ])('%s — one business, four spellings', (_name, mixed, caps, cyrillic, capsCyrillic) => {
+    it('produces one label and one score', () => {
+      const baseline = classifyLead({ name: mixed });
+      for (const spelling of [caps, cyrillic, capsCyrillic]) {
+        const result = classifyLead({ name: spelling });
+        expect(result.label, spelling).toBe(baseline.label);
+        expect(result.contractor.net, spelling).toBe(baseline.contractor.net);
+        expect(result.store.net, spelling).toBe(baseline.store.net);
+      }
+    });
+  });
+
+  it('matches a term whichever case the source shouted it in', () => {
+    const shouted = classifyLead({
+      name: 'GRAĐEVINSKO STOVARIŠTE NJEGOŠ',
+      description: 'PRODAJA STIROPORA, LEPKA I MREŽICE. VELEPRODAJA I MALOPRODAJA.',
+    });
+    const spoken = classifyLead({
+      name: 'Građevinsko stovarište Njegoš',
+      description: 'Prodaja stiropora, lepka i mrežice. Veleprodaja i maloprodaja.',
+    });
+    expect(shouted.label).toBe('CONSTRUCTION_MATERIAL_STORE');
+    expect(shouted.label).toBe(spoken.label);
+    expect(shouted.store.net).toBe(spoken.store.net);
+  });
+
+  it('reads the precomposed digraph code points as their two-letter forms', () => {
+    // U+01C7..U+01CC. Rare, but a source that emits one would otherwise take
+    // the whole word out of every keyword the classifier knows.
+    const precomposed = classifyLead({ name: 'Ǉubinko fasaderski radovi' });
+    expect(precomposed.label).toBe('FACADE_CONTRACTOR');
+    expect(precomposed.contractor.net).toBe(
+      classifyLead({ name: 'Ljubinko fasaderski radovi' }).contractor.net,
+    );
   });
 
   it('returns UNKNOWN with high confidence for an empty record', () => {
