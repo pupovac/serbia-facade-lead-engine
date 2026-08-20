@@ -18,9 +18,12 @@ classifyLead({
 //     suppressed: [], reason: 'Facade evidence 3.6 from `fasaderski` (name)…' }
 ```
 
-Pure. No clock, no I/O, no database. Diacritics are folded by
-`src/lib/text/fold.ts` first, so `građevinski` and `gradjevinski` are the same
-word to the matcher.
+Pure. No clock, no I/O, no database. Every field goes through
+`foldForComparison` in `src/lib/text/fold.ts` first, so script, case and
+diacritics are all invisible to the matcher: `Građevinsko stovarište`,
+`GRAĐEVINSKO STOVARIŠTE`, `gradjevinsko stovariste` and
+`ГРАЂЕВИНСКО СТОВАРИШТЕ` are one string by the time the signal table sees them.
+Callers pass what the source published; they do not pre-transliterate.
 
 ## The two rules that do the work
 
@@ -92,6 +95,7 @@ Re-run and inspect:
 ```
 npx tsx scripts/report-classification-precision.ts            # the table above
 npx tsx scripts/report-classification-precision.ts --errors   # every mistake, with evidence
+npx tsx scripts/report-portal-srbija-classification.ts --unknown  # a real source, record by record
 npx vitest run src/lib/classify                               # the same numbers, as assertions
 ```
 

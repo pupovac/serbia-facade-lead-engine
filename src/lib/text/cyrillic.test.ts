@@ -74,6 +74,33 @@ describe('toLatin', () => {
     });
   }
 
+  // `Њ` is one letter written as two, so the case of the second one is a
+  // decision. Taking it from the following letter alone breaks every word that
+  // *ends* in a digraph, which is how `КОВИЉ` used to come out as `KOVILj`.
+  describe('digraph casing', () => {
+    const cases: ReadonlyArray<readonly [string, string]> = [
+      ['ЊЕГОШ ФАСАДЕ', 'NJEGOŠ FASADE'],
+      ['Његош фасаде', 'Njegoš fasade'],
+      ['КОВИЉ', 'KOVILJ'],
+      ['Ковиљ', 'Kovilj'],
+      ['ЛЕПЉЕЊЕ СТИРОПОРА', 'LEPLJENJE STIROPORA'],
+      ['ЏАК', 'DŽAK'],
+      ['ГРАДЊА ДОО', 'GRADNJA DOO'],
+      ['СЗР КОВИЉ ЊЕГОШ', 'SZR KOVILJ NJEGOŠ'],
+      // A lone digraph is a whole word with no neighbour to ask.
+      ['Љ', 'Lj'],
+      // The word ends but the sentence does not: punctuation is not a letter,
+      // so the letter before the digraph still decides.
+      ['КОВИЉ, НОВИ САД', 'KOVILJ, NOVI SAD'],
+      ['Ковиљ, Нови Сад', 'Kovilj, Novi Sad'],
+    ];
+    for (const [input, expected] of cases) {
+      it(`transliterates ${input} to ${expected}`, () => {
+        expect(toLatin(input)).toBe(expected);
+      });
+    }
+  });
+
   it('round-trips every Serbian Latin term back to itself', () => {
     for (const term of ['fasader', 'građevinski materijal', 'stovarište', 'izolacija kuće']) {
       expect(toLatin(toCyrillic(term))).toBe(term);
