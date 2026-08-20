@@ -193,23 +193,20 @@ function coordinate(value: string | undefined, limit: number): number | null {
  *
  * This source does not print a maps link; it prints `data-latitude` and
  * `data-longitude` on every real row, which is strictly better data. The store
- * sheet wants a link a salesperson can tap, and `maps.google.com/?q=lat,lon` is
- * that link with nothing added — the coordinates as published, in URL form. The
- * numbers themselves also travel on the record's `latitude` / `longitude`, so
- * nothing downstream has to take this URL's word for anything.
+ * sheet wants a link a salesperson can tap, and a URL carrying nothing but the
+ * coordinates as published is that link with nothing added. The numbers
+ * themselves also travel on the record's `latitude` / `longitude`, so nothing
+ * downstream has to take this URL's word for anything.
  *
- * The `?q=` form rather than the `?api=1&query=` one, deliberately.
- * `src/lib/contact` owns what a Google Maps link means, and it reads `q`,
- * `destination`, `daddr`, `ll` and `center` — not `query` — then canonicalizes
- * whatever it read to `https://www.google.com/maps/search/?api=1&query=…`. So
- * this hands it a URL it can actually parse and lets it produce the canonical
- * form, instead of an adapter deciding the canonical form for itself. (That the
- * extractor cannot re-read its own output is a round-trip gap in
- * `src/lib/contact`, raised with the Data Engineer rather than patched here.)
+ * `src/lib/contact` owns what a Google Maps link means and reads coordinates
+ * under `q` as readily as under `query`, so either form parses. The canonical
+ * `?api=1&query=` one is written here because that is what the extractor
+ * itself emits — this URL and the one a re-read produces are then the same
+ * string, and nothing downstream has to care which of the two wrote it.
  */
 export function mapsUrlFor(latitude: number | null, longitude: number | null): string | null {
   if (latitude === null || longitude === null) return null;
-  return `https://maps.google.com/?q=${latitude},${longitude}`;
+  return `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
 }
 
 interface DealerRow {

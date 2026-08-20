@@ -264,8 +264,13 @@ function googleMaps(url: URL, raw: string): Parsed {
     };
   }
 
-  // A directions link still pins the business when the destination is a coordinate pair.
-  for (const key of ['destination', 'daddr', 'q', 'll', 'center']) {
+  // A directions link still pins the business when the destination is a
+  // coordinate pair. `query` is in the list because it is also what this
+  // function *emits*: a canonical `/maps/search/?api=1&query=<lat>,<lon>` has
+  // to read back as the coordinates it was written from, or a stored link
+  // loses its place on the next pass. The place parameters come before the
+  // viewport ones (`ll`, `center`), which centre the map rather than name it.
+  for (const key of ['destination', 'daddr', 'q', 'query', 'll', 'center']) {
     const id = coordinateId(url.searchParams.get(key) ?? '');
     if (id !== null) {
       return {
