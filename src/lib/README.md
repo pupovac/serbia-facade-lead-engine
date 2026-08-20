@@ -8,7 +8,7 @@ Next.js app import from this directory; neither of them re-implements any of it.
 
 | Area         | What it owns                                                                                                                                       |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `db/`        | Drizzle schema, migrations, the better-sqlite3 connection, and the repository functions that read and write leads.                                 |
+| `db/`        | Drizzle schema, migrations, the better-sqlite3 connection, and the repository functions that read and write leads. See `docs/data-model.md`.       |
 | `text/`      | Whitespace and diacritic folding — the `građevinski` / `gradjevinski` pair every query and every name comparison needs.                            |
 | `phone/`     | Parsing and canonicalization to `+381641234567` via `libphonenumber-js` (region `RS`), landlines and mobiles alike, always keeping the raw string. |
 | `normalize/` | Turning a validated raw record into the canonical field shapes: names, addresses, cities, emails, website URLs.                                    |
