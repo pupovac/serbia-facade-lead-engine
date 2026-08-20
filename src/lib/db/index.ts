@@ -10,3 +10,13 @@ export * from './client.js';
 export * from './repo.js';
 export * from './schema.js';
 export { registrySourceRows, seedSources } from './seed-sources.js';
+export {
+  pendingSuggestions,
+  recordSuggestion,
+  rejectedValues,
+  resolveSuggestion,
+  suggestionsForLead,
+  type PendingSuggestionOptions,
+  type SuggestionInput,
+  type SuggestionResult,
+} from './suggestions.js';

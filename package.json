@@ -23,7 +23,8 @@
     "db:setup": "tsx scripts/db-setup.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "scrape": "tsx src/scraper/cli.ts"
+    "scrape": "tsx src/scraper/cli.ts",
+    "enrich": "tsx src/scraper/enrich/cli.ts"
   },
   "dependencies": {
     "@duckdb/node-api": "^1.5.5-r.4",

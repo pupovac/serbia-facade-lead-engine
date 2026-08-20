@@ -160,6 +160,36 @@ export type MatchSignalName = (typeof MATCH_SIGNALS)[number];
 export const MERGE_CANDIDATE_STATUSES = ['pending', 'merged', 'rejected'] as const;
 export type MergeCandidateStatus = (typeof MERGE_CANDIDATE_STATUSES)[number];
 
+/* -------------------------------------------------------------------------- */
+/* Enrichment                                                                 */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Where an enriched value was read.
+ *
+ * The distinction is the whole safety argument of the enrichment crawler.
+ * `own_site` is a page on a domain the lead already carries — the business
+ * publishes it, so anything on it is theirs by construction. `discovered` is a
+ * page some search turned up, which belongs to the business only if the
+ * evidence says so, and is where a wrong merge writes a competitor's phone
+ * number onto a lead.
+ */
+export const ENRICHMENT_ORIGINS = ['own_site', 'discovered'] as const;
+export type EnrichmentOrigin = (typeof ENRICHMENT_ORIGINS)[number];
+
+/**
+ * What an enrichment suggestion is proposing to add.
+ *
+ * `CONTACT_KINDS` plus the three facts that do not live in `lead_contacts`: a
+ * phone number, a street address and a city.
+ */
+export const SUGGESTION_KINDS = [...CONTACT_KINDS, 'phone', 'address', 'city'] as const;
+export type SuggestionKind = (typeof SUGGESTION_KINDS)[number];
+
+/** Where a suggestion is in the human loop. Mirrors `MERGE_CANDIDATE_STATUSES`. */
+export const SUGGESTION_STATUSES = ['pending', 'accepted', 'rejected'] as const;
+export type SuggestionStatus = (typeof SUGGESTION_STATUSES)[number];
+
 export const RUN_STATUSES = ['running', 'completed', 'failed', 'cancelled'] as const;
 export type RunStatus = (typeof RUN_STATUSES)[number];
 
@@ -835,6 +865,68 @@ export const mergeCandidates = sqliteTable(
 );
 
 /* -------------------------------------------------------------------------- */
+/* enrichment_suggestions — the medium-confidence findings a human decides     */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * A contact detail the enrichment crawler found and was **not** confident
+ * enough to merge.
+ *
+ * The table exists because enrichment has three outcomes, not two, for exactly
+ * the reason `merge_candidates` does. A page that is probably — but not
+ * certainly — the same business is the common case in a country with many
+ * `Fasade Petrović`, and both binary answers are wrong: merging it writes a
+ * competitor's phone onto a lead and nobody ever notices, and discarding it
+ * throws away most of what enrichment is for. So it is queued with its
+ * evidence, and a human decides.
+ *
+ * `(lead_id, kind, value)` is unique, so a re-run of the same page bumps
+ * `last_seen_at` instead of re-queueing a suggestion a reviewer already
+ * rejected.
+ */
+export const enrichmentSuggestions = sqliteTable(
+  'enrichment_suggestions',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    leadId: integer('lead_id')
+      .notNull()
+      .references(() => leads.id, { onDelete: 'cascade' }),
+    kind: text('kind', { enum: SUGGESTION_KINDS }).notNull(),
+    /** Canonical: `+381641234567`, a lower-cased address, `https://firma.rs`. */
+    value: text('value').notNull(),
+    /** Exactly as the page published it, for auditing. */
+    valueRaw: text('value_raw'),
+    /** The page the value was read at. Provenance is per suggestion, not per run. */
+    sourceUrl: text('source_url').notNull(),
+    origin: text('origin', { enum: ENRICHMENT_ORIGINS }).notNull(),
+    /** 0–1 from `assessCandidate`. Orders the review queue, best evidence first. */
+    confidence: real('confidence').notNull(),
+    /** The `ConfidenceRuleId` that produced the verdict — greppable in `confidence.ts`. */
+    rule: text('rule').notNull(),
+    /** One sentence a reviewer reads: why this is probably, not certainly, the same business. */
+    reason: text('reason').notNull(),
+    /** JSON: every signal `scoreMatch` weighed, including the ones that argued against. */
+    evidence: text('evidence').notNull(),
+    status: text('status', { enum: SUGGESTION_STATUSES }).notNull().default('pending'),
+    /** `enrichment` or `reviewer:<id>`. */
+    resolvedBy: text('resolved_by'),
+    resolvedAt: timestamp('resolved_at'),
+    runId: integer('run_id').references(() => crawlRuns.id),
+    firstSeenAt: timestamp('first_seen_at').notNull(),
+    lastSeenAt: timestamp('last_seen_at').notNull(),
+  },
+  (t) => [
+    uniqueIndex('enrichment_suggestions_value_idx').on(t.leadId, t.kind, t.value),
+    // The review UI's queue: everything still pending, best evidence first.
+    index('enrichment_suggestions_status_idx').on(t.status, t.confidence),
+    index('enrichment_suggestions_lead_idx').on(t.leadId),
+    oneOf('enrichment_suggestions_kind_check', 'kind', SUGGESTION_KINDS),
+    oneOf('enrichment_suggestions_origin_check', 'origin', ENRICHMENT_ORIGINS),
+    oneOf('enrichment_suggestions_status_check', 'status', SUGGESTION_STATUSES),
+  ],
+);
+
+/* -------------------------------------------------------------------------- */
 /* Inferred row types                                                         */
 /* -------------------------------------------------------------------------- */
 
@@ -854,3 +946,5 @@ export type MergeLogEntry = typeof mergeLog.$inferSelect;
 export type ErasureLogEntry = typeof erasureLog.$inferSelect;
 export type SharedIdentifier = typeof sharedIdentifiers.$inferSelect;
 export type MergeCandidate = typeof mergeCandidates.$inferSelect;
+export type EnrichmentSuggestion = typeof enrichmentSuggestions.$inferSelect;
+export type NewEnrichmentSuggestion = typeof enrichmentSuggestions.$inferInsert;

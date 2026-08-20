@@ -23,6 +23,7 @@ building one; `sources/example/` is the working template.
 | `http/`          | The polite fetcher: `robots.txt`, the per-host rate limiter, retries and the budget. |
 | `errors.ts`      | `StructureChangedError` and the rest of the failure vocabulary.                      |
 | `sources/`       | One directory per source adapter. See its README.                                    |
+| `enrich/`        | Contact enrichment: a lead we already have → the rest of its contact details.        |
 
 ## Running it
 
@@ -36,6 +37,21 @@ npm run scrape -- --help
 A run ends with the numbers worth reading: items discovered, extracted, skipped
 as fresh and failed; records emitted, rejected and carrying a phone; leads
 created and updated; requests spent against the budget; wall time.
+
+## Enriching what a crawl left thin
+
+```bash
+npm run enrich -- --path own-site --limit 50    # crawl the contact pages of leads that have a website
+npm run enrich -- --path search --limit 20      # look for a lead that has no website at all
+npm run enrich -- --help
+```
+
+Enrichment is not an adapter and is not registered as one: it does not discover
+businesses, it starts from businesses already in the database and goes looking
+for the phone, the email and the address they are missing. It shares this
+directory's `PoliteFetcher`, so `robots.txt`, the per-host rate limit and the
+request budget apply to a stranger's hosting account exactly as they do to a
+directory we crawl on purpose. `enrich/README.md` has the confidence rules.
 
 ## What does not belong here
 
