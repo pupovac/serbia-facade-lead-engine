@@ -26,6 +26,7 @@
     "scrape": "tsx src/scraper/cli.ts"
   },
   "dependencies": {
+    "@duckdb/node-api": "^1.5.5-r.4",
     "better-sqlite3": "^12.11.1",
     "cheerio": "^1.2.0",
     "drizzle-orm": "^0.45.2",
