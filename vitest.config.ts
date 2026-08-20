@@ -6,6 +6,23 @@ export default defineConfig({
     environment: 'node',
     include: ['src/**/*.test.ts', 'app/**/*.test.ts'],
     globals: false,
+    coverage: {
+      provider: 'v8',
+      include: ['src/lib/**/*.ts'],
+      // The phone module decides what a phone number is, and it is both the
+      // deliverable and the strongest dedup key. Every branch of it — every
+      // rejection reason, every confidence step, every place a page can hide a
+      // number — is reachable from the test tables, and this is what keeps it
+      // that way.
+      thresholds: {
+        'src/lib/phone/**/*.ts': {
+          statements: 100,
+          branches: 100,
+          functions: 100,
+          lines: 100,
+        },
+      },
+    },
   },
   resolve: {
     alias: {
