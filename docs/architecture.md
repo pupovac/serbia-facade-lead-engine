@@ -100,6 +100,9 @@ merge auditable, and what makes ZZPL deletion-on-request possible.
 
 ## Database
 
+Every table, the merge rules and the provenance rules in prose:
+**`docs/data-model.md`**.
+
 - Schema and migrations live in `src/lib/db`. **Every schema change goes through
   a Drizzle migration** — never a hand-edited database file.
 - **Keep the Postgres door open.** No SQLite-only SQL where a portable form

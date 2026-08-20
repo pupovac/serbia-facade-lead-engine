@@ -17,6 +17,9 @@
     "lint:fix": "eslint . --fix",
     "test": "vitest run",
     "test:watch": "vitest",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:setup": "tsx scripts/db-setup.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "scrape": "tsx src/scraper/cli.ts"
