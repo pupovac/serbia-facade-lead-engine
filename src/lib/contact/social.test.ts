@@ -121,6 +121,18 @@ describe('google maps', () => {
       'https://maps.google.com?daddr=43.148506,20.52075960000002',
       '43.148506,20.520760',
     ],
+    // The canonical form this module itself emits — a stored link has to read
+    // back as the coordinates it was written from.
+    [
+      'coordinates',
+      'https://www.google.com/maps/search/?api=1&query=43.305177,21.775493',
+      '43.305177,21.775493',
+    ],
+    [
+      'coordinates',
+      'https://www.google.com/maps/search/?api=1&query=44.8181%2C20.4573',
+      '44.818100,20.457300',
+    ],
   ];
   for (const [idKind, url, id] of cases) {
     it(`reads the ${idKind} out of ${url.slice(0, 60)}…`, () => {
@@ -129,6 +141,34 @@ describe('google maps', () => {
       expect(googleMaps?.id).toBe(id);
     });
   }
+
+  const roundTrips = [
+    'https://maps.google.com/?q=43.305177,21.775493',
+    'https://www.google.com/maps/dir/?api=1&destination=44.848134,20.394314',
+    'https://maps.google.com/?cid=8834321234567890123',
+    'https://www.google.com/maps?q=place_id:ChIJm2fasade123',
+    'https://www.google.com/maps/place/Kneza+Aleksandra+212,+Gornji+Milanovac+32300/@44.0378172,20.4781858,17z/data=!3m1!4b1!4m5!3m4!1s0x475741d73a50b41f:0xf0bc77c82a052c67!8m2!3d44.0378172!4d20.4803746',
+  ];
+  for (const url of roundTrips) {
+    it(`re-reads its own canonical form of ${url.slice(0, 48)}…`, () => {
+      const first = extractSocials([url]).googleMaps;
+      expect(first).toBeDefined();
+      const second = extractSocials([first?.url ?? '']).googleMaps;
+      expect(second?.id).toBe(first?.id);
+      expect(second?.idKind).toBe(first?.idKind);
+      expect(second?.url).toBe(first?.url);
+    });
+  }
+
+  it('drops a canonical search link whose query is a place name, not a pair', () => {
+    // `?query=` carries free text far more often than coordinates; only the
+    // coordinate form is a stable identifier.
+    const { socials, rejected } = extractSocialsWithRejections([
+      'https://www.google.com/maps/search/?api=1&query=Fasaderski%20radovi%20Beograd',
+    ]);
+    expect(socials.googleMaps).toBeUndefined();
+    expect(rejected[0]?.rule).toBe('social_no_stable_identifier');
+  });
 
   it('drops a directions link to a typed address, which pins nothing', () => {
     // majstorimajstori.com sends you to the city, not to the business.

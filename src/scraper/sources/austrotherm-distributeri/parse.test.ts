@@ -14,6 +14,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import * as cheerio from 'cheerio';
 import { describe, expect, it } from 'vitest';
+import { extractSocials } from '../../../lib/contact/index.js';
 import { StructureChangedError } from '../../errors.js';
 import { expectFound } from '../../types.js';
 import { rawLeadSchema } from '../../raw-lead.js';
@@ -74,7 +75,7 @@ describe('parseDealerList — the saved page', () => {
       postalCode: '18000',
       latitude: 43.305177,
       longitude: 21.775493,
-      socials: ['https://maps.google.com/?q=43.305177,21.775493'],
+      socials: ['https://www.google.com/maps/search/?api=1&query=43.305177,21.775493'],
       categories: ['Austrotherm distributer', 'EPS / stiropor', 'građevinski materijal'],
       text: '21 MAJ\nMramorsko brdo bb, 18000 Niš\nT +381 (0)18 469 40 13',
       links: [],
@@ -103,13 +104,13 @@ describe('parseDealerList — the saved page', () => {
     expect(located).toHaveLength(291);
     for (const lead of located) {
       expect(lead.socials).toEqual([
-        `https://maps.google.com/?q=${lead.latitude},${lead.longitude}`,
+        `https://www.google.com/maps/search/?api=1&query=${lead.latitude},${lead.longitude}`,
       ]);
     }
 
     // `src/lib/contact` is what turns that link into a `google_maps` contact,
-    // and it canonicalizes it back to `?api=1&query=lat,lon` — the shape the
-    // store sheet reads. This side only publishes the coordinates.
+    // and it reads this exact form back unchanged — the shape the store sheet
+    // reads. This side only publishes the coordinates.
 
     // One row was published at 0,0 — Null Island, not Zrenjanin. An unplaced
     // dealer gets no coordinates and no link rather than a link to the ocean.
@@ -308,11 +309,24 @@ describe('countryOf', () => {
 
 describe('mapsUrlFor', () => {
   it('builds a link from a coordinate pair', () => {
-    expect(mapsUrlFor(43.305177, 21.775493)).toBe('https://maps.google.com/?q=43.305177,21.775493');
+    expect(mapsUrlFor(43.305177, 21.775493)).toBe(
+      'https://www.google.com/maps/search/?api=1&query=43.305177,21.775493',
+    );
   });
 
   it('has nothing to build from without both coordinates', () => {
     expect(mapsUrlFor(null, 21.775493)).toBeNull();
     expect(mapsUrlFor(43.305177, null)).toBeNull();
+  });
+
+  it('builds a link `src/lib/contact` reads back as the same coordinates', () => {
+    // The reason this adapter is allowed to write the canonical form directly
+    // (FUZZ-29): the extractor recognises `query`, so the link survives a
+    // round trip instead of quietly losing its place.
+    const url = mapsUrlFor(43.305177, 21.775493);
+    const { googleMaps } = extractSocials([url ?? '']);
+    expect(googleMaps?.idKind).toBe('coordinates');
+    expect(googleMaps?.id).toBe('43.305177,21.775493');
+    expect(googleMaps?.url).toBe(url);
   });
 });
