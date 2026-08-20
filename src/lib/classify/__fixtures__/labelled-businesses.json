@@ -1,0 +1,1638 @@
+{
+  "_meta": {
+    "description": "Hand-labelled Serbian businesses, used to measure classification precision. Every record is a real listing, extracted verbatim from a public Serbian business directory; nothing here is invented.",
+    "issue": "FUZZ-15",
+    "collected_at": "2026-08-20",
+    "collection": "One polite HTTP GET per category page, honest user agent, robots.txt checked first (portal-srbija.com: `Allow: /` with only /admin*/ and /pretraga/ disallowed; poslovnikontakt.com: `Disallow:` — empty). Public business-contact listings published by the businesses themselves. No logins, no CAPTCHAs, no phone numbers stored here.",
+    "why_these_categories": "The category pages were chosen to be adversarial, not representative. `Termo izolacija` and `Čišćenje fasada` are the two categories where the words `termoizolacija` and `fasada` appear on companies that are not in our market at all, and `Završni radovi` is full of adjacent trades. 111 of 161 records are true negatives on purpose.",
+    "labelling_rubric": {
+      "FACADE_CONTRACTOR": "The record shows the business performing facade work: fasaderski radovi, demit/termo fasada, izrada/postavljanje/sanacija/restauracija/održavanje fasade, fasadne obloge. Washing or cleaning a facade does not count.",
+      "CONSTRUCTION_MATERIAL_STORE": "The record shows the business selling building materials: stovarište, građevinski materijal, farbara, veleprodaja/maloprodaja, or a materials assortment wide enough that it can only be a yard.",
+      "BOTH": "The record shows both, independently — a yard that also installs.",
+      "UNKNOWN": "Everything else, including every business whose only facade/insulation wording belongs to another trade. A manufacturer is UNKNOWN: it is a supplier, not a buyer."
+    },
+    "counts": {
+      "total": 161,
+      "BOTH": 2,
+      "CONSTRUCTION_MATERIAL_STORE": 37,
+      "FACADE_CONTRACTOR": 12,
+      "UNKNOWN": 110
+    }
+  },
+  "businesses": [
+    {
+      "name": "Sidek Inženjering",
+      "city": "Beograd",
+      "description": "SIDEK INŽENjERING: ARMACELL - ARMAFLEX GREJANjE KOTLOVI RASHLADNI SISTEMI / KLIMATIZACIJA i VENTILACIJA INSTALACIONI RADOVI GASNE INSTALACIJE KLIMATIZACIJA, VENTILACIJA GREJANjE, KOTLARNICE IZOLACIJA - TERMOIZOLACIJA IZOLACIJA Armacell je svetski lider u proizvodnji fleksibilnih izolacionih materijala od elastomera. Kompanija je poznata po razvoju Armaflex-a, u svetu najpoznatijeg brenda za fleksibilne izolacione materijale. Sa dinamičnim razvojem Armacell je postao glavni snabdevač proizvodima sa zatvorenom ćelijskom strukturom od ekspandirane gume. Sa svojom jedinstvenom mrežom od 19 fabrika u 12 zemalja širom sveta Armacell je čvrsto pozicioniran na svetskom tržištu izolacionih …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "UNKNOWN",
+      "note": "Armacell/Armaflex pipe and HVAC insulation — the `termoizolacija` false positive that is not a building trade."
+    },
+    {
+      "name": "Jugosistem Niš",
+      "city": "Niš",
+      "description": "VELEPRODAJA i MALOPRODAJA GRAĐEVINSKOG MATERIJALA CEMENT ARMATURA FERT TAVANICE SVE VRSTE OPEKARSKIH PROIZVODA - CIGLA, BLOK, CREP SIPOREKS TERMOIZOLACIONI i HIDROIZOLACIONI MATERIJALI - STIROPOR, MINERALNA VUNA, KONDOR DRVENA GRAĐA DIMNjACI ZASTUPAMO BRENDOVE HOLCIM YTONG TONDACH MLADOST SCHIEDEL Preduzeće Jugosistem d.o.o. osnovano je 1993. godine sa osnovnom delatnošću obrade betonskog gvožđa i izrade armature po specifikaciji. Prilikom osnivanja preduzeće nije imalo sopstveni poslovni prostor, pa je korišćen zakupljeni poslovni prostor preduzeća Kopaonik na Crvenom krstu. Kupovinom poslovnog prostora na Bulevaru Svetog Cara Konstantina, broj 80-82 (ispred Elektronske industrije), …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE"
+    },
+    {
+      "name": "Farbara Kolaž",
+      "city": "Beograd",
+      "description": "TERMO IZOLACIJA, ZVUČNA IZOLACIJA - FARBARA KOLAŽ Lepkovi za pločice i stiropor (stirodur), fleksibilni lepkovi (pločica na pločicu), vodopropusne mase za bazene, kao i boje koje, takođe, toniramo u nijansu po želji.",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "https://kolazfarbara.rs/"
+    },
+    {
+      "name": "Farbare Vumix Color",
+      "city": "Beograd",
+      "description": "TERMO IZOLACIJA, ZVUČNA IZOLACIJA - VUMIX COLOR Kod nas možete pronaći potreban materijal za termo i zvučnu izolaciju.",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE"
+    },
+    {
+      "name": "Partizan UC Gradjevinski Materijal",
+      "city": "Beograd",
+      "description": "KOMPLETAN GRAĐEVINSKI MATERIJAL GRAĐEVINSKA HEMIJA OPEKARIJA MAŠINE i ALATI VODOVOD, KANALIZACIJA i POVRŠINSKI ODVOD VODE GRAĐA i OSB PLOČE BOJE i LAKOVI PROFILI i LAJSNE ZA GRAĐEVINARSTVO PODNE i ZIDNE OBLOGE: PARKET, LAMINAT, VINIL PODOVI, BRODSKI POD... MERDEVINE i SKELE KROVNI POKRIVAČI PRAŠKASTI MATERIJAL KNAUF PROGRAM CRNA METALURGIJA IZOLACIJA PROIZVODNjA ARMATURNIH MREŽA Preduzeće UC \"Partizan\" osnovano je 1989. godine kao građevinsko stovarište tj. privatno preduzeće za trgovinu građevinskim materijalom na veliko i malo, usluge i transport. Sa razvojem preduzeća tokom godina proširena je delatnost na uvoz-izvoz i zastupanje inostranih firmi na tržištu Srbije. Cilj nam je da kupcu …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "http://www.ucpartizan.com"
+    },
+    {
+      "name": "Farbara Bimax",
+      "city": "Beograd",
+      "description": "BOJE i LAKOVI FASADNI MATEIJAL MOLERSKI PRIBOR I ALAT Postojimo od 2001. godine. Naše farbare se nalaze na dve lokacije u Zemunu. Naši proizvodi su iz asortimana poznatih brendova Maxima, Vitex, JUB, Helios, Henkel, Zorka Šabac, Isomat... Ulešajte vaš prostor bilo poslovni ili kućni pomoću naših saveta. Besplatan prevoz naše robe na teritoriji Beograda ali i šire. Mix sistem Helios, JUB, Maxima, Vitex Italijanske dekorativne tehnike Emajl lakovi za drvo i metal Sandolini, tankoslojni, sa lakom, sa voskom Termofasade, lepkovi, stiropor, mrežica, tiplovi, bavalit - akrilni, silikonski, silikatni, kulirplast Lepkovi za keramiku i fug mase Pribor za rad: četke, krep trake, valjci, gletarice, …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "http://www.bimax.rs"
+    },
+    {
+      "name": "Beogranit boje i lakovi",
+      "city": "Beograd",
+      "description": "BOJE i LAKOVI FASADNI MATERIJAL ELEKTROMATERIJAL VODOVODNI MATERIJAL KANALIZACIONI MATERIJAL ALATI ŠRAFOVSKA ROBA BOJLERI SANITARNA GALANTERIJA Naša adresa je Vojvođanska 375. Beogranit sadrži široku ponudu šrafovske robe, kao i asortiman iz građevinskog i zanatskog programa. Ukoliko se profesionalno ili za svoje lične potrebe bavite molerajem ili zidarskim poslovima, na pravom ste mestu. Možemo da Vam ponudimo kompletan program koji će Vam olakšati posao i dovesti do savršenstva izgled objekta na kom radite. BOJE i LAKOVI Fasadni premazi Disperzije i poludisperzije Emajl lakovi Boje za drvo i metal FASADNI MATERIJAL Pene Silikoni Lepkovi Gips ploče Hidroizolacija, termoizolacija Fug mase …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "http://www.keramickeplocicebeograd.com"
+    },
+    {
+      "name": "Ostrog Gradjevinski Materijali",
+      "city": "Beograd",
+      "description": "TERMO IZOLACIJA, ZVUČNA IZOLACIJA - OSTROG GRADJEVINSKI MATERIJALI Naša osnovna delatnost je veleprodaja i maloprodaja građevinskog materijala, često i sa izvođenjem građevinskih radova u kooperaciji sa velikim brojem izvođača koji su dugo već naši partneri u poslu.",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "https://www.ostrog.rs/"
+    },
+    {
+      "name": "Dem Kolor",
+      "city": "Beograd",
+      "description": "BOJE i LAKOVI FASADNI MATERIJAL IZOLACIONI MATERIJAL GRAĐEVINSKI LEPKOVI ELEKTROMATERIJAL MOLERSKI ALAT ŠRAFOVSKA ROBA AUTO PROGRAM Farbara Dem Kolor postoji i uspešno radi već dugi niz godina, a osnovna delatnost ogleda se u prodaji boja, lakova i građevinskog materijala. Sve što Vas zanima kada je reč o hidroizolaciji, materijalima za termo i zvučnu izolaciju, svim vrstama boja i lakova, kao i pratećem priboru za molersko-farbarske radove, Dem Kolor može da Vam ponudi. Zahvaljujući uspešnoj saradnji sa velikim brojem firmi, kod nas možete pronaći veliki izbor proizvoda vodećih proizvođača: Henkel, Sika, Chromos Svjetlost, Maksima, JUB, Tesarol... Farbara Dem Kolor konstantnim proširenjem …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE"
+    },
+    {
+      "name": "Penhem boje i lakovi",
+      "city": "Beograd",
+      "description": "BOJE i LAKOVI FASADNI MATERIJAL GRAĐEVINSKI LEPKOVI IZOLACIONI MATERIJAL MOLERSKI PRIBOR i ALAT Sa svojim radom započeli smo 2004. godine i do sada bili na usluzi velikom broju naših zadovoljnih sugrađana. Korektnim odnosom i ljubaznom uslugom, trudimo se da Vam uvek srdačno izađemo u susret. Osnovna delatnost naše farbare ogleda se u prodaji boja, lakova i građevinskog materijala. Saradnjom sa renomiranim proizvođačima iz naše zemlje i inostranstva nudimo Vam širok asortiman naših proizvoda za kompletno uređenje prostora po Vašem izboru. Miksujemo boje po vašoj želji i dostavljamo robu na željenu adresu. BOJE i LAKOVI Fasadne boje Disperzije i poludisperzije Boje za drvo i metal Premazi za …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "http://www.okreci.com"
+    },
+    {
+      "name": "Farbara Hemoluks",
+      "city": "Beograd",
+      "description": "BOJE i LAKOVI FASADNI MATERIJAL GRAĐEVINSKI LEPKOVI TERMOIZOLACIJA HIDROIZOLACIJA ALATI Farbara Hemoluks nalazi se u Rakovici u ulici Pilota Mihaila Petrovica 53g. Naši zaposleni daće vam bilo koji savet vezano za boje i lakove, fasadu, izolaciju ili na neku sličnu temu. Imamo veliki izbor nijansi boja i lakova, do njih dolazimo miksovanjem po vašoj želji. Sve proizvode nudimo vam po veoma povoljnim cenama. Naš asortiman obuhvata proizvode sledećih brendova: Helios Vitex Zvezda Zorka Henkel Tim Izolirka JUB Isomat Er-lak Prvi maj Duga BOJE i LAKOVI Fasadni premazi Disperzije i poludisperzije Emajl lakovi Boje za drvo i metal Lakovi raznih namena Boje u spreju Toneri FASADNI MATERIJAL i …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE"
+    },
+    {
+      "name": "Stog Farbara",
+      "city": "Beograd",
+      "description": "TERMO IZOLACIJA, ZVUČNA IZOLACIJA - STOG FARBARA Kod nas možete pronaći materijal za termoizolaciju.",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "http://www.stog.rs"
+    },
+    {
+      "name": "Boja doo",
+      "city": "Beograd",
+      "description": "TERMO IZOLACIJA, ZVUČNA IZOLACIJA - BOJA DOO Kod nas možete pronaći veliki izbor boja, lakova, izolacionog i fasadnog matetijala, građevinskih lepkova, molerske opreme i alata.",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "http://www.boja-doo.com"
+    },
+    {
+      "name": "Farbara Barbara",
+      "city": "Beograd",
+      "description": "TERMO IZOLACIJA, ZVUČNA IZOLACIJA - FARBARA BARBARA Kod nas možete pronaći potrebam izolacioni materijal.",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE"
+    },
+    {
+      "name": "Farbara Dekor D",
+      "city": "Beograd",
+      "description": "TERMO IZOLACIJA, ZVUČNA IZOLACIJA - FARBARA DEKOR D Kod nas možete naći potreban izolacioni materijal.",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE"
+    },
+    {
+      "name": "Domis enterijeri",
+      "city": "Sremska Mitrovica",
+      "description": "TERMO IZOLACIJA, ZVUČNA IZOLACIJA - DOMIS ENTERIJERI Stiropor, stirodur, staklena vuna, kondor.",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "http://www.domisenterijeri.com"
+    },
+    {
+      "name": "Gradište Komerc",
+      "city": "Veliko Gradište",
+      "description": "TERMO IZOLACIJA, ZVUČNA IZOLACIJA - GRADIŠTE KOMERC Sav potreban izolacioni materijal možete pronaći kod nas.",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "https://www.gradistekomerc.com/"
+    },
+    {
+      "name": "Tehnoguma beograd",
+      "city": "Beograd",
+      "description": "TEHNIČKA GUMA PENASTI MATERIJALI TRANSPORTNE TRAKE VALjCI ZA TRANSPORTERE PROFILI GUMENO TEHNIČKA ROBA FLEKSIBILNE CEVI ZAPTIVKE ZAPTIVNE PLOČE ZAPTIVNI IZOLACIJSKI MATERIJALI ZVUČNA IZOLACIJA TEFLONSKA PLATNA i FOLIJE TEHNIČKA PLASTIKA TEHNIČKI LAMINATI FLEKSIBILNA PVC VRATA PLOČA OD MEKANOG PVC-A POLIURETAN TEHNIČKI FILC FILTERI ZA INDUSTRIJSKO OPRAŠIVANjE POGONSKO REMENjE PODNA OBLOGA ZA PALUBE USLUGE REZANjA i OBRADE Od osnivanja, društvo je svoje poslovanje usmeravalo prema kvalitetu pružanja usluge, pouzdanosti i ozbiljnosti u poslu. Stalnim poboljšavanjem kvaliteta te stalnom usavršavanjem zaposlenih tokom proteklih godina uspeli smo postići i zadržati visok kvalitet naših usluga, …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "UNKNOWN",
+      "note": "Technical rubber and acoustic foam. `zvučna izolacija` without any construction context."
+    },
+    {
+      "name": "Farbara butterfly",
+      "city": "Beograd",
+      "description": "BOJE i LAKOVI GRAĐEVINSKI MATERIJALI GRAĐEVINSKI LEPKOVI FASADNI MATERIJALI RUČNI ALAT HIDROIZOLACIJA TERMOIZOLACIJA MERDEVINE LAJSNE Farbara Butterfly je farbara sa višedecenijskim iskustvom. U našu stručnost, profesionalnost i opremljenost možete se uveriti dolaskom u jednu od naše dve prodavnice, na Mirijevu i u opšini Stari Grad. Godinama u nazad se trudimo da budemo tu za naše mušterije i da im budemo verni u pružanju kvaliteta i pristupačnim cenama. Dugogodišnje uspešno poslovanje Vam govori da u tome i uspevamo. BOJE i LAKOVI Boje za zidove Fasadne boje Boje za drvo i metal Lakovi Emajli Zaštitni premazi Razerđivači Spejevi FASADNI MATERIJALI Termo i Hidroizolacioni materijali Cement …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE"
+    },
+    {
+      "name": "Farbara vesić",
+      "city": "Beograd",
+      "description": "BOJE i LAKOVI FASADNI PROGRAM GRAĐEVINSKI LEPKOVI IZOLACIONI MATERIJALI LAJSNE ALATI Farbara Vesić uspešno posluje već 17 godina. Sa zdravom i stabilnom politikom, uspeli smo da unapredimo naše kapacitete i znanje i da se proširimo na tri maloprodajna objekta, sa tendencijom otvaranja novih. Otvorenost za svaku sugestiju, savet, komentar i želju kupaca dovelo nas je do toga da se konstantno razvijamo, širimo i unapređujemo u svakom smislu. Farbara Vesić u svom voznom parku ima pick-up-ove , kombije i kamione, tako da u svakom trenutku može odgovoriti zahtevima kupaca u najkraćem mogućem roku. Slanački put 2 - Karaburma Valjevskog odreda 16 - Borča Jovana Isailovića 18b - Kotež BOJE i LAKOVI …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "http://www.farbaravesic.rs"
+    },
+    {
+      "name": "Boja temper",
+      "city": "Beograd",
+      "description": "FARBARA BOJE i LAKOVI PREMAZI ZA DRVO i METAL RUČNI ALAT REZNI ALAT FASADNI MATERIJAL ŠRAFOVSKA ROBA GRAĐEVINSKI LEPKOVI IZOLACIONI MATERIJALI AUTO BOJE ELKTROMATERIJAL Farbara Boja Temper se trudi da vam obezbedi najkvalitetnije i najsavremenije boje za unutrašnjost i spoljašnost. Takođe nudimo lakove i boje za drvo i metal vrhunskog kvaliteta. U ponudi imamo širok spektar boja što vam pruža mogućnost izbora i zagarntovanu nijansu po vašem ukusu. Zastupamo više domaćih i svetskih proizvođača: DUGA, ZORKA BOJE, ZVEZDA, MAX MEYER, ER-LAK, BODY, HELIOS, JUB, VITEX, SMIRDEX, SIA, HENKEL, CERESIT. BOJE i LAKOVI Boje za unutrašnje zidove Boje za spoljašnje zidove Boje za drvo Boje za metal Auto …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE"
+    },
+    {
+      "name": "Dem company boje i lakovi",
+      "city": "Beograd",
+      "description": "BOJE i LAKOVI PRAŠKASTI MATERIJALI FASADNI MATERIJALI LEPKOVI i FUG MASE ZAPTIVNI MATERIJALI TERMO i HIDROIZOLACIJA RUČNI ALAT ELEKTRIČNI ALAT ŠRAFOVSKA ROBA AKUMULATORI OKOV ZA NAMEŠTAJ TRAKE Prodaja boja i lakova, premaza za drvo, premaza za metal i beton, kao i razniih vatrostalnih premaza su samo deo našeg asortimana koji možete pronaći u našem maloprodajnom objektu u Beogradu, Mirijevski Bulevar 31. U našoj radnji se nalazi profesionalno obučeno osoblje koje će Vam rado pomoći oko izbora pravog materijala za krečenje, ili opreme i alata za molerske radove, ali i pravi savet oko izbora električnog alta i ručnog alata. Prodaja izolacije, ter papira (kondora) za izolaciju, prodaja lepka …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "http://www.farbare.com"
+    },
+    {
+      "name": "Lisa comerc",
+      "city": "Beograd",
+      "description": "GRAĐEVINSKI LEPKOVI HIDROIZOLACIJA TERMOIZOLACIJA OPREMA ZA MOLERSKE RADOVE BOJE i LAKOVI ŠRAFOSKA ROBA AUTO BOJE FASADNI MATERIJALI RUČNI ALAT MERDEVINE Farbara Lisa Comerc posluje od 1991. godine. Od samog početka pa do danas svakom poslu pristupamo puni entuzijazma i motiva kako bi smo opravdali ukazano poverenje, u tome uspevamo najviše zato što volimo ono što radimo. Dokaz da i drugi vole ono što radimo i da to radimo najbolje su naši klijenti kojih je svakim danom sve više. Našu budućnost ostvarujemo sopstvenom dobiti. Uspešni i zadovoljni kupci su za to preduslov. Naša filozofija zasnovana je na ideji vodilji porodičnog preduzetništva: svi naši zaposleni, naši kupci i potrošači …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "http://www.farbara.org"
+    },
+    {
+      "name": "Farbara zona n i s",
+      "city": "Beograd",
+      "description": "BOJE i LAKOVI GRAĐEVINSKI LEPKOVI TAPETE ZA ZIDOVE KUĆNA HEMIJA DIHTUNG TRAKE ZA PROZORE STIROPOL LAJSNE KOMPJUTERSKO MIKSOVANJE BOJA DO 10000 NIJANSI Farbara Zona N I S se nalazi na tri lokacije. Ukoliko imate bilo kakve nedoumice oko izbora ili adekvatne primene boje i lakova i ostalog potrebnog materijala, naše ljubazno i profesionalno osoblje je uvek tu da Vam pruži pomoć, bilo da ste iskusan majstor ili jednostavno volite da samostalno uređujete Vaš dom. Lomina 5 - Savski venac Maksima Gorkog 3 - Vračar Džordža Vašingtona 9 - Stari grad BOJE i LAKOVI Boje za fasadu Boje za unutrašnje zidove Boje za drvo Boje za metal Emajl lakovi Antikorizivni premazi GRAĐEVINSKI LEPKOVI Pur pene …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE"
+    },
+    {
+      "name": "Milanović inženjering",
+      "city": "Desimirovac",
+      "description": "PROJEKTOVANJE MAŠINSKA PROIZVODNjA ZAVARIVANjE WATER JET USLUGE SEČENjA TRETMAN VODA TERMOIZOLACIONI MATERIJALI INŽENjERING Kompanija Milanović inženjering je tehnički i kadrovski osposobljena za pružanje usluga inženjeringa i projektovanja iz raznih oblasti mašinske proizvodnje, tretmana voda, procesne tehnike. Projektovanje i izrada mašinskih sistema i fabričkih postrojenja Projektovanje i izrada mašina i alata Projektovanje i izrada proizvoda u mašinskoj industriji Projektovanje i izrada konstrukcija i delova konstrukcija Razvoj alatnih mašina i alata Projektovanje i izrada vodoprivrednih sistema (postrojenja za tretman voda, pumpnih stanica, cevovoda). Projektovanje i izrada posuda pod …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "UNKNOWN",
+      "website": "http://www.miing.rs",
+      "note": "Machining, welding and water treatment. `termoizolacioni materijali` is one line in an engineering catalogue."
+    },
+    {
+      "name": "Mkm - jugo group",
+      "city": "Beograd",
+      "description": "",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "UNKNOWN",
+      "website": "http://www.mkm-gr.com"
+    },
+    {
+      "name": "Interlemind",
+      "city": "Leskovac",
+      "description": "IZOLACIONI KROVNI, ZIDNI i FASADNI SISTEMI SENDVIČ PANELI PROFILISANE TABLE ELEMENTI",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "UNKNOWN",
+      "website": "http://www.interlemind.amf.rs",
+      "note": "Sandwich-panel manufacturer. `fasadni sistemi` here means the product it makes, not a business that buys panels."
+    },
+    {
+      "name": "Fima - fabrika izolacionih materijala i ambalaže",
+      "city": "Mionica",
+      "description": "FABRIKA IZOLACIONIH MATERIJALA i AMBALAŽE : PROIZVODNjA STIROPORA GRAĐEVINSKI PROGRAM AMBALAŽNI PROGRAM POLjOPRIVREDNI PROGRAM DEKORATIVNI PROGRAM",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "UNKNOWN",
+      "website": "http://www.fima.rs",
+      "note": "EPS factory — a competitor on the supply side, not a buyer."
+    },
+    {
+      "name": "Izomont group",
+      "city": "Beograd",
+      "description": "HIDROIZOLACIJA TERMOIZOLACIJA INDUSTRIJSKI PODOVI PODNE OBLOGE Već dugi niz godina firme iz ove grupacije uspešno izvode sledeće radove: - projektovanje i izvođenje svih vrsta termo i hidroizolaterskih radova - izvođenje svih vrsta obloga - izvođenje montažnih radova - inženjering - predstavljanje i zastupanje inostranih firmi - uvoz i izvoz - trgovina na veliko i malo Materijali: - različite vrste termo i akustičnih materijala - hidroizolacioni materijali: - Bentofix (protiv prodora podzemnih voda) - bitumenske trake na bazi SBS-a i APP-a - sve vrste folije (PVC, TPO, LDPE, HDPE) - premazi (poliuretanski, epoksidni, polimer-cementni) - penetrati Izolacije: - sve vrste termoizolacija - …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "UNKNOWN",
+      "website": "http://www.izomont-group.rs",
+      "note": "Insulation and waterproofing contractor with no facade evidence at all; industrial floors and coverings."
+    },
+    {
+      "name": "Kingspan srbija",
+      "city": "Beograd",
+      "description": "IZOLACIONI KROVNI i FASADNI SISTEMI IZOLACIJA KONSTRUKCIJA SOLARNA i OBNOVLjIVA ENERGIJA GOTOVE POLUKONSTRUKCIJE ILI KONSTRUKCIJE STRUKTURALNI PODOVI ZAŠTITA OKOLINE - SISTEM ZA PRIKUPLjANjE KIŠNICE KINGSPAN VRATA ZA RAHLADNE KOMORE",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "UNKNOWN",
+      "website": "http://www.kingspan.rs",
+      "note": "Manufacturer of roof and facade systems."
+    },
+    {
+      "name": "Omega impeks",
+      "city": "Beograd",
+      "description": "OD TEMELjA DO KROVA TERMOIZOLACIJA - STIROPOR SVIH VRSTA HIDROIZOLACIJA - BITUMEN, BITULIT, KONDOR, TER PAPIR KOMPLETAN GIPS KARTON PROGRAM GRAĐEVINSKI MATERIJAL - CEMENT, KREČ, BLOK MINERALNA VUNA KOMPLETAN MOLERSKO - FARBARSKI MATERIJAL LAMINATI SVIH VRSTA KOMPLET DEMIT FASADE PROIZVODNjA PRAŠKASTIH PROIZVODA KERAMIKA, SANITARIJE",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE"
+    },
+    {
+      "name": "Prvi maj čačak",
+      "city": "Čačak",
+      "description": "FABRIKA STIROPORA FABRIKA BOJA i FASADA FABRIKA PRAŠKASTIH MATERIJALA FABRIKA TEČNIH LEPILA FABRIKA PROIZVODA ZA TEHNOLOGIJU BETONA i PROIZVODNjA SPECIJALNIH BETONA",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "UNKNOWN",
+      "website": "http://www.prvimaj.co.rs",
+      "note": "EPS, paint and facade factory — manufacturer, not a yard."
+    },
+    {
+      "name": "Tecasi",
+      "city": "Beograd",
+      "description": "KROVNI POKRIVAČI KROVNI PROZORI TERMO IZOLACIJA HIDRO IZOLACIJA TEGOLA CANADESE TEMA FIM KANJIŽA ONDULINE KRONOSPAN HENKEL BAUMIT URSA KNAUF INSULATION HELIOS TECASI d.o.o. osnovan je 1994. godine u Kruševcu. Sa šest predstavništava-filijala i više od 80 zaposlenih TECASI d.o.o. je u samom vrhu preduzeća koja se bave rgovinom građevinskim materijalima. Tesne veze za vodećim evropskim kompanijama na području krovnih okrivača, hidro i termo izolacija i ostalih građevinskih materijala omogućile su da se preduzeće TECASI oblikuje u jednu savremenu i uspešnu kompaniju koja je još početkom devedesetih integrisana kao bitan regionalni faktor u evropsku privredu. Naša razvojna strategija, kvalitet …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "http://www.tecasi.rs"
+    },
+    {
+      "name": "Krov valjevo",
+      "city": "Valjevo",
+      "description": "PRODAJA : LAMINATNI PODOVI i PARKETI TERMOIZOLACIONI MATERIJALI BOJE ZA UNUTRAŠNjE i SPOLjAŠNjE RADOVE MATERIJAL ZA ZAVRŠNE RADOVE USLUGE : FASADERSKI RADOVI MOLERSKO - FARBARSKI RADOVI PODOPOLAGAČKI RADOVI KERAMIČKI RADOVI HIDROIZOLACIJA TERMOIZOLACIJA",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "BOTH",
+      "website": "http://www.krov-va.co.rs",
+      "note": "Sells insulation and finishing materials AND performs `fasaderski radovi` — a genuine BOTH."
+    },
+    {
+      "name": "Atma",
+      "city": "Beograd",
+      "description": "PROIZVODNjA i PRODAJA TERMOIZOLACIONIH MATERIJALA POLIURETANSKI SISTEMI PLUTO PARKETI PLUTO TAPETE PLUTE ROLO VRATA, GARAŽNA VRATA SVE ŠTO VAM JE POTREBNO ZA IZOLACIJU i OBLAGANjE PROSTORA VAŠEG DOMA",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "UNKNOWN",
+      "website": "http://www.atmadoo.rs",
+      "note": "Cork and polyurethane producer; `proizvodnja i prodaja` without any building-materials retail assortment."
+    },
+    {
+      "name": "Srma group",
+      "city": "Beograd",
+      "description": "BOJE I LAKOVI FASADNI MATERIJALI VODOVODNI MATERIJALI KANALIZACIONI MATERIJALI ALATI TERMOIZOLACIJA HIDROIZOLACIJA ELEKTRO MATERIJALI PROTIVPOŽARNA ZAŠTITA KROVOVI I OPREMA",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "http://www.srmagroup.com"
+    },
+    {
+      "name": "Descon",
+      "city": "Beograd",
+      "description": "GRAĐEVINSKE FOLIJE TEMELjNE FOLIJE KROVNE FOLIJE ZELENI KROVOVI FASADNE FOLIJE HIDROIZOLACIJA ZVUČNA IZOLACIJA CENTRALNI USISIVAČI",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "UNKNOWN",
+      "website": "http://www.descon.co.rs",
+      "note": "Construction membranes and central vacuums. No retail or wholesale evidence in the record."
+    },
+    {
+      "name": "Termo plus",
+      "city": "Beograd",
+      "description": "PROIZVODNjA i PRODAJA TERMOIZOLACIONIH MATERIJALA PROIZVODNJj PREDIZOLOVANIH CEVI i OPREME ZA TOPLOVODE Društvo \"TERMO PLUS\" u svom PROIZVODNOM PROGRAMU ima sledeće proizvode: PREDIZOLOVANE CEVI PREDIZOLOVANA KOLENA PREDIZOLOVANE RAČVE PREDIZOLOVANE ČVRSTE TAČKE PREDIZOLOVANE REDUKCIJE PREDIZOLOVANA ZAPORNA ARMATURA PU GREDICE Pored svojih proizvoda \"TERMO PLUS\" isporučuje: TERMOSKUPLJAJUĆE SPOJNICE KRAJNJE KAPE ZAVRŠNE KAPE PROLAZI KROZ ZID EKSPANZIONI ZASTUCI PU MASA DNEVNI KAPACITETI PROIZVODNJE IZNOSE 300 DO 500 M PREDIZOLOVANIH CEVI (zavisno od prečnika). KVALITET Od februara 2006. godine \"TERMO PLUS\" je uveo sistem menadžmenta kvalitetom prema standardu ISO 9001:2000 za proizvodnju i …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "UNKNOWN",
+      "website": "http://www.termo-plus.rs",
+      "note": "Pre-insulated district-heating pipes."
+    },
+    {
+      "name": "Saint gobain isover srbija",
+      "city": "Beograd",
+      "description": "IZOLACIONI MATERIJALI ISOVER SAINT GOBAIN Naš zadatak je da izolacionim materijalima Isover poboljšamo kvalitet života, osećaj ugodnosti i da radimo u korist novih naraštaja. Grupacija Saint Gobain, je najveći proizvođač izolacionih materijala od mineralne vune u svetu. Zato smo mi i naša međunarodna preduzeća odlučili da od 1. januara 2000. godine nastupamo pod zajedničkim imenom. Zbog velike biološke razgradivosti proizvodi od mineralne vune Isover nisu negativno klasifikovani. PROIZVODI - Toplotna i zvučna izolacija - Vetrene fasade - Potkrovlja - Plafoni - Folije - Udarna buka - Specijalne namene i tehničke izolacije Za optimalnu zvučnu izolaciju i veću tišinu. Za trajnu izolaciju …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "UNKNOWN",
+      "website": "http://www.isover.rs",
+      "note": "Isover — mineral-wool manufacturer."
+    },
+    {
+      "name": "Offer trade",
+      "city": "Beograd",
+      "description": "KAMENA MINERALNA VUNA STAKLENA MINERALNA VUNA KERAMIČKA VUNA TERMO FASADA STIROPOR i STIRODUR HERAKLIT - TAROLIT HIDROIZOLACIJA FOLIJE",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "http://www.offertrade.co.rs"
+    },
+    {
+      "name": "Masterplast",
+      "city": "Subotica",
+      "description": "SISTEM TERMOIZOLACIJE FASADE KROVNE FOLIJE i KROVNI ELEMENTI BITUMENSKI KROVNI POKRIVAČI HIDROIZOLACIJA TOPLOTNA, ZVUČNA i HIDROIZOLACIJA SUVA GRADNjA PROFILI ZA MALTERISANjE i DOPUNSKI PROIZVODI PROIZVODNjA STIROPORA - IZOLACIONIH PLOČA",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "UNKNOWN",
+      "website": "http://www.masterplast.hu",
+      "note": "Masterplast — EPS manufacturer."
+    },
+    {
+      "name": "Fim kanjiža",
+      "city": "Kanjiža",
+      "description": "FABRIKA IZOLACIONIH MATERIJALA BITUMENIZIRANI KROVNI KARTON HIDROIZOLACIONE TRAKE BITUMENSKE MASE EPS TERMOIZOLACIJA DRENAŽNE TRAKE POMOĆNI MATERIJAL I",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "UNKNOWN",
+      "website": "http://www.fim.co.rs",
+      "note": "Bitumen and EPS factory."
+    },
+    {
+      "name": "Fibran",
+      "city": "Beograd",
+      "description": "GEOLAN proizvodni program toplotne, zvučne izolacije i protivpožarne zaštite objedinjuje materijale izrađene od kamene vune. Kamena vuna je prirodan vlaknasti materijal. Minerali kao što su bazalt, krečnjak, dolomit i boksit se koriste za proizvodnju ovih vlakana koja u prečniku nisu veća od 4 ili 5 mikro metara. Kohezivnost vlakana se obezbedjuje uz dodatke smola otpornih na visoke temperature, a vodootpornost dodatkom silikonskih komponenti. Savremen način proizvodnje obezbedjuje materijal prijateljski orijentisan prema okolini. Svoju primenu ovaj materijal nalazi u raznim oblastima: građevinarstvu industriji brodogradnji poljoprivredi (sistem \"kap po kap\") železnici FIBRAN ECO …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "UNKNOWN",
+      "website": "http://www.fibran.rs",
+      "note": "Stone-wool manufacturer."
+    },
+    {
+      "name": "Tim izolirka",
+      "city": "Šid",
+      "description": "TERMOIZOLACIJE HIDROIZOLACIJE AMBALAŽA U KALUPIMA OD POLISTIRENA ELEMENTI ZA UGRADNjU PROIZVODNjA EPS STIROPORONIH PLOČA",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "UNKNOWN",
+      "website": "http://www.timizolirka.rs",
+      "note": "EPS plate factory."
+    },
+    {
+      "name": "Monument inženjering",
+      "city": "Niš",
+      "description": "PROJEKTOVANjE, ARHITEKTURA ENTERIJERA IZVOĐENjE PREGRADNIH ZIDOVA, SPUŠTENIH PLAFONA, POTKROVLjA i PODOVA LAMINATNE ZIDNE i PODNE OBLOGE MAŠINSKO MALTERISANjE GRAĐEVINSKI i GRAĐEVINSKO-ZANATSKI RADOVI ELEKTRO-INSTALACIONI RADOVI, MAŠINSKI i VIK RADOVI PRODAJA GRAĐEVINSKOG MATERIJALA SISTEM SUVE GRADNjE MALTERI i GLET MASE TERMOIZOLACIONI BLOKOVI SIROPOR SVIH DEBLjINA i GUSTINA ADITIVI ZA BETON i MALTER HIDROIZOLACIJA, ADITIVI, OSNOVNI PREMAZI INDUSTRIJSKI PODOVI GRAĐEVINSKE i PROPUSNE FOLIJE TERMOSILENT KROVNI SISTEMI, KROVNI POKRIVAČI POLIESTER U ROLNI GRAĐEVINSKI LEPKOVI MASE ZA FUGOVANjE PUR PENE i SILIKONI TERMOIZOLACIJA i ZVUČNA IZOLACIJA (MINERALNA VUNA) LAMINATNE PODNE i ZIDNE OBLOGE …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "http://www.monument-ing.com",
+      "note": "Sells building materials and does machine plastering, but the record names no facade work — so the rubric gives the store label only, not BOTH."
+    },
+    {
+      "name": "S.r.m.a. doo",
+      "city": "Beograd",
+      "description": "SUVA GRADNjA MALTERI, LEPKOVI i FASADE BOJE i LAKOVI TERMO i ZVUČNA IZOLACIJA HIDROIZOLACIJA KROVNI POKRIVAČI GRUBI GRAĐEVINSKI MATERIJALI RUČNI i ELEKTRO ALAT HTZ OPREMA DRVO, LAMINATI, LAJSNE VRATA i PROZORI GRAĐEVINSKA HEMIJA ŠRAFOVSKA ROBA VODOVOD, KANALIZACIJA, SANITARIJE GRAĐEVINSKE MAŠINE i OPREMA BAŠTENSKI ALAT i OPREMA",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "http://www.srmagroup.com"
+    },
+    {
+      "name": "Montel",
+      "city": "Mali Iđoš",
+      "description": "OBRADA BETONSKOG GVOŽĐA NADVOJNE GREDE FERT GREDE i ISPUNE DIMLjAČKI i VENTILACIONI ELEMENTI BLOKOVI ZA ZIDANjE BETONSKI STUBOVI i CEVI DIMLjAČKI SISTEMI KOMPLETAN GRAĐEVINSKI MATERIJAL OPEKARSKI PROIZVODI i SIPOREX BLOKOVI BETONSKI BLOKOVI MATERIJAL ZA BETONIRANjE, ZIDANjE, MALTERISANjE BETONSKA GALANTERIJA ŽICE, PLETENE ŽICE FERT GREDICE NADVOJNE GREDE REZANA GRAĐA, ŠTAFLE, LETVE EKSERI PROZORI i VRATA - KLASIČNI i PVC KROVNI POKRIVAČI PROFILI, CEVI, LIMARIJA TERMO i HIDROIZOLACIJA MATERIJAL ZA SUVU GRADNjU MATERIJAL ZA DEMIT FASADU KERAMIČKE PLOČICE, LEPAK, MASA ZA FUGOVANjE SANITARIJE i OPREMA ZA KUPATILA ELEKTROMATERIJAL i RASVETA VODOVOD i KANALIZACIJA PARKET, LAMINAT, BRODSKI POD, …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "http://www.montel-fert.com"
+    },
+    {
+      "name": "Farbara gvožđara lazić",
+      "city": "Beograd",
+      "description": "BOJE I LAKOVI TERMOIZOLACIJA HIDROIZOLACIJA FASADNI MATERIJAL GIPSANI ELEMENTI ELEKTROMATERIJAL TERAPEUTSKI MATERIJAL VODOVODNI MATERIJAL KANALIZACIONI MATERIJAL ŠRAFOVSKA ROBA BAŠTENSKA OPREMA RADNO VREME RADNIM DANIMA OD 07:30H DO 19:00H SUBOTOM OD 07:30H DO 16:00H NEDELJOM OD 07:30H DO 13:00H",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE"
+    },
+    {
+      "name": "Zlatići doo",
+      "city": "Užice",
+      "description": "TERMO IZOLACIJA HIDRO IZOLACIJA ZVUČNA IZOLACIJA PODOVI: PARKET i LAMINAT SISTEMI SUVE GRADNjE MAŠINSKI MALTERI GRAĐEVINSKE FOLIJE KROVNI PROZORI i KROVNI POKRIVAČI DEKORATIVNI STIROPORI",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "http://www.zlatici.rs"
+    },
+    {
+      "name": "Design vertikal",
+      "city": "Beograd",
+      "description": "PROJEKTOVANjE, INŽINjERING i OPREMANjE POSLOVNIH i STAMBENIH OBJEKATA, HOTELA, ŠKOLA, AERODROMA, BOLNICA i DRUGIH OBJEKATA SVE VRSTE ZAVESA: LAKE i TEŠKE ZAVESE (HOTELSKI PROGRAM), NABORANE ZAVESE, VENECIJANERI, TRAKASTE ZAVESE... ZAŠTITA OD SUNCA SPOLjNA i UNUTRAŠNjA: ALU ŽALUZINE, BRISOLEJI, SKRIN ROL KERAMIKA KADE, TUŠ KABINE, ĐAKUZI... KAMINI ZVUČNO IZOLACIONI MATERIJALI RASVETA PODNE OBLOGE : TEKSTILNE PODNE OBLOGE PVC PODOVI EPOKSIDNI PODOVI POLIURETANSKI PODOVI LINOLEUM PARKETI LAMINATI",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "UNKNOWN",
+      "website": "http://www.designvertikal.co.rs",
+      "note": "Curtains, blinds and sun protection."
+    },
+    {
+      "name": "Dacić prom",
+      "city": "Novi Pazar",
+      "description": "STOVARIŠTE GRAĐEVINSKOG MATERIJALA IZOLACIJE GRAĐEVINSKA HEMIJA KROVNI ELEMENTI SUVA GRADNjA DIMNjAČKI SISTEMI PODOVI, LAMINATI OPEKARIJA MATERIJAL ZA BETONSKE SMEŠE MAŠINSKI MATLERI SIROPEX IZGRADNjA i PRODAJA STAMBENO-POSLOVNOG PROSTORA U NOVOM PAZARU",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE"
+    },
+    {
+      "name": "Laminat prom",
+      "city": "Sremska Mitrovica",
+      "description": "PODOVI: LAMINAT i BAMBUS PARKET GIPSANE PLOČE FASADNI SISTEMI IZOLACIONI MATERIJALI ZA ZVUČNU i TOPLOTNU IZOLACIJU REZANA GRAĐA OSB PLOČE BOJE i LAKOVI",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "http://www.laminatprom.rs"
+    },
+    {
+      "name": "Canex & damm",
+      "city": "Sremski Karlovci",
+      "description": "ODVODNA TEHNIKA - LEONI SANITARNA OPREMA SANITARNI UREĐAJI POGONSKA OPREMA - KOHLHOFF INDUSTRIJSKE MAŠINE - KOHLHOFF PROPUSTNE MAŠINE - KOHLHOFF HIGIJENSKE STANICE STERILIZATORI - KOHLHOFF PRANjE i DEZINFIKACIJA POGONA i OPREME SISTEMOM NISKOG PRITISKA - LAGAFORS STOLOVI - KOHLHOFF PVC AMBALAŽA TRANSPORTNA VEŠALA TRANSPORTNA OPREMA i POSUĐE TRANSPORTNA i LOGISTIČKA OPREMA PRIBOR ZA ODRŽAVANjE HIGIJENE PROSTORIJA VIKAN LEDOMATI SLIVNICI IZOLACIJA ZA CEVI - PLAMAFLEX IZOLACIONE PLOČE - PLAMAFLEX IZOLACIJA ZA KLIME - PLAMAFLEX",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "UNKNOWN",
+      "note": "Sanitary and industrial washing equipment."
+    },
+    {
+      "name": "Dakar beograd",
+      "city": "Beograd",
+      "description": "HIDROIZOLACIJA ZERMOIZOLACIJA Hidroizolacija za kose krovove Parapropusne folije za podaščane i nepodaščane krovove Parne brane ispod gipsanih ploča, izdvajamo alu foliju koja štedi i do 30% grejne energije",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "UNKNOWN",
+      "website": "http://www.dakar.co.rs",
+      "note": "Roof waterproofing membranes and vapour barriers — the `hidroizolacija` false positive."
+    },
+    {
+      "name": "Szr ns vertical limits",
+      "city": "Novi Sad",
+      "description": "VISINSKI RADOVI HIDROIZOLACIJA TERMOIZOLACIJA ČIŠĆENjE i PRANjE PROZORA NA SVIM VISINAMA LIMARSKI RADOVI MOLERSKI RADOVI KERAMIČARSKI RADOVI POSTAVLjANjE KLIMA FASADE SANACIJE ZGRADA Firma Vertical Limit se bavi postavljanjem hidroizolacija kao i termoizolacija a imamo i visokokvalifikovani tim za visinske radove na industrijskoj užadi, alpinističkom metodom, tako da sa nama možete da zaboravite na nezgrapne i opasne skele i na skupe dizalice. Kao primer, montiranje skele zahteva čitav jedan radni dan, demontiranje još jedan, a za svo to vreme vi uglavnom plaćate najam iste na dan, dok postavljanje i uklanjanje naše opreme oduzima samo 2 sata a što je najvažnije Vas ne košta ništa! …",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "FACADE_CONTRACTOR"
+    },
+    {
+      "name": "Pinoles",
+      "city": "Nova Pazova",
+      "description": "PLOČASTI MATERIJALI OD DRVETA IVERICA UNIVER VISOKI SJAJ AGT RADNE POČE METAL AKRIL HDF MDF KANT TRAKE FURNIRANI MDF FURNIRANA IVERICA EKSTRUDIRANA IVERICA EUROLIGHT PLOČE EURO LIGHT RADNE PLOČE OKOV ZA EUROLIGHT DIHT LAJSNE LAMINATI LEPKOVI LAMINATNI PODOVI UNUTRAŠNjA VRATA KROVNI PROZORI SISTEMI SUVE GRAĐE TERMO IZOLACIONI MATERIJALI GRAĐEVINSKA HEMIJA PRAŠKASTI MATERIJALI OSB",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "UNKNOWN",
+      "website": "http://www.pinoles.com",
+      "note": "Wood-based panels; `termo izolacija` is one line of a furniture-board catalogue."
+    },
+    {
+      "name": "Privredno društvo mimihip",
+      "city": "Kruševac",
+      "description": "STOVARIŠTE GRADNjA PRODAJA STANOVA PRODAJA GRAĐEVINSKOG MATERIJALA : REZANA GRAĐA CMENT, KREČ... BETONSKO GVOŽĐE ARMATURNE MREŽE HIDRO i TERMO IZOLACIJA OSB PLOČE LAMPERIJA BRODSKI POD TERVOLI, STIROPOR, FASADA... BETONSKA GALANTERIJA KROVNI POKRIVAČI DRVENA SOBNA VRATA",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "http://www.mimihip.co.rs"
+    },
+    {
+      "name": "Arat",
+      "city": "Beograd",
+      "description": "KERAMIKA i SANITARIJE HIDRO i TERMO IZOLACIONI MATERIJALI PLOČASTI MATERIJALI RADNO VREME radnim danima 08 - 20h",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "http://www.arat.co.rs"
+    },
+    {
+      "name": "Pap - term",
+      "city": "Bečej",
+      "description": "KNjIGOVODSTVENA AGENCIJA SOLARNI SISTEMI ADAPTACIJA KUĆA i STANOVA ZAVRŠNI RADOVI U GRAĐEVINARSTVU : IZGRADNjA OBJEKATA TERMOIZOLACIJA HIDROIZOLACIJA GIPSARSKI RADOVI ZIDARSKI RADOVI TESARSKI RADOVI MOLERSKI RADOVI FASADERSKI RADOVI DEMIT FASADE POSTAVLjANjE LAMPERIJE, LAMINATA, PLOČICA, STOLARIJE... STOLARSKI RADOVI PARKETARSKI RADOVI ELEKTROINSTALACIJE VODOINSTALACIJE ADAPTACIJA KROVOVA i POTKROVLjA CENTRALNO GREJANjE SOBOSLIKARSKI RADOVI PRIPREMNI RADOVI NA GRADILIŠTU",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "FACADE_CONTRACTOR",
+      "website": "http://www.pap.co.rs"
+    },
+    {
+      "name": "Termika zrenjanin",
+      "city": "Zrenjanin",
+      "description": "PROIZVODNjA PERLITA TERMOIZOLACIONI MALTER i BETON MATERIJALI ZA ZAVRŠNE RADOVE U GRAĐEVINARSTVU",
+      "sourceCategory": "Termo izolacija, zvučna izolacija",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/termo-izolacija-zvucna-izolacija",
+      "expected": "UNKNOWN",
+      "website": "http://www.termika.rs",
+      "note": "Perlite producer."
+    },
+    {
+      "name": "Topers",
+      "city": "Beograd",
+      "description": "ZAVRŠNI RADOVI, RESTAURACIJE - TOPERS TOPERS d.o.o je duži niz godina prepoznatljiv u oblasti građevinarstva po izvođenju završnih radova u građevinarstvu, a posebno po radovima na revitalizaciji/restauraciji i sanaciji fasada objekata koji su pod tretmanom Zavoda za zaštitu spomenika kulture.",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "FACADE_CONTRACTOR",
+      "website": "http://www.skele-topers.co.rs"
+    },
+    {
+      "name": "Gradište Komerc",
+      "city": "Veliko Gradište",
+      "description": "ZAVRŠNI RADOVI - GRADIŠTE KOMERC PRODAJA PLACEVA I IZGRADNJA KUĆA - PO ŽELJI - KLJUČ U RUKE - IZGRADNJA I PRODAJA APARTMANA",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "https://www.gradistekomerc.com/"
+    },
+    {
+      "name": "Ratko mitrović construction čačak",
+      "city": "Čačak",
+      "description": "INŽENJERING i KONSALTING VISOKOGRADNJA NISKOGRADNJA HIDROGRADNJA ZAVRŠNI RADOVI REKONSTRUKCIJE PROIZVODNJA i TRANSPORT BETONA PROIZVODNJA i PRODAJA BETONSKE GALANTERIJE IZVOĐENJE GRAĐEVINSKIH RADOVA Osnovna delatnost firme \"Ratko Mitrović Construction\" d.o.o. je izvođenje građevinskih radova. U tom smislu bavimo se izvođenjem objekata: Visokogradnje Niskogradnje Hidrogradnje Posebno želimo da istaknemo veliko iskustvo koje posedujemo u rekonstruckiji i sanaciji svih vrsta objekata. INŽENJERING Služba inženjeringa predstavlja posebnu celinu u okviru firme \"Ratko Mitrović Construction\" d.o.o. Na osnovu dugogodišnjeg iskustva i praćenja svetskih trendova i standarda, pružamo usluge koje …",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.rmconstruction.co.rs"
+    },
+    {
+      "name": "Proinvest čačak",
+      "city": "Čačak",
+      "description": "IZVOĐENjE GRAĐEVINSKIH RADOVA PRODAJA STANOVA ARHITEKTURA i PROJEKTOVANjE PROIZVODNjA BETONSKE GALANTARIJE Preduzeće \"Proinvest\" osnovano je 01.03.1989. godine u Čačku. Osnovna delatnost na kojima se zasniva naša razvojna strategija su: - Investiranje i izgradnja objekata po sistemu \"ključ u ruke\" - Izvođenje građevinsko-zanatskih radova koa i rekonstrukcija, restauracija i proširenje objekata - Inženjering u visokogradnji - Projektovanje objekata i enterijera - Nadzor izvođačkih radova - Proizvodnja betonske galanterije, fert gredica i armirački pogon PROJEKTNI BIRO Čine ga inženjeri sa iskustvom na poslovima i projektovanja i izvođenja građevinsko-zanatskih radova. PROIZVODNjA BETONSKE …",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.proinvest.co.rs"
+    },
+    {
+      "name": "Gradnja dekor d",
+      "city": "Beograd",
+      "description": "ZAVRŠNI RADOVI U GRAĐEVINARSTVU ADAPTACIJE Zavrni radovi u građevinarstvu je osnovna delatnost preduzeća Gradnja Dekor D. Postojimo od 2015 godine. Poštovanje datih rokova i zadovoljni klijenti su naša najbolja preporuka. Na vama je da samo izrazite svoje želje na početku radova i svoje zadovoljstvo na njihovom kraju, nakon čega možete odmah da počnete da uživate u svom novom ambijentu. USLUGE Keramičarski radovi Molerski radovi Gipsani radovi Parketarski radovi Vodoinstalacije Rušenje zidova Krečenje zidova Postavljanje klimatizacije ADAPTACIJA Adaptacija je izvođenje radova na postojećem objektu i njima se najčešće vrši promena organizacije prostora, rušenjem ili zidanjem pregradnih …",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN"
+    },
+    {
+      "name": "Soneks visinski radovi",
+      "city": "Beograd",
+      "description": "AGENCIJA ZA IZVOĐENjE VISINKSIH RADOVA ODRŽAVANjE FASADA",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "FACADE_CONTRACTOR",
+      "website": "http://www.soneks.rs"
+    },
+    {
+      "name": "Pet - prom",
+      "city": "Beograd",
+      "description": "POSTAVLjANjE i IZRADA GASNIH INSTALACIJA POSTAVLjANjE VODOVODNIH INSTALACIJA UGRADNjA i INSTALACIJA GREJANjA RASHLADNI SISTEMI, KLIMATIZACIJA i VENTILACIJA ZAVRŠNI RADOVI U GRAĐEVINARSTVU BRAVARSKI RADOVI LIMARSKI RADOVI PROTIVPOŽARNI SISTEMI VIDEO - NADZOR FASADERSKI RADOVI",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "FACADE_CONTRACTOR",
+      "website": "http://www.petprom.rs"
+    },
+    {
+      "name": "Bohor",
+      "city": "Užice",
+      "description": "BOHOR je savremeni poslovni sistem koji postoji i uspešno radi od 1978. godine , sa isključivo privatnim kapitalom Firma koja stoji na čvrstom uverenju da samo uspešni postoje i opstaju bez obzira na teška vremena i uslove privređivanja. Zahvaljujući jasno postavljenim poslovnim ciljevima, stalnom podsticanju kreativnosti i brizi o visokom kvalitetu u radu, pravoj orijentaciji u proizvodnom programu, stabilnim finansijama, dugoročnom planu kadrovske politike, BOHOR postepenom, ali sigurnom uzlaznom linijom ide u razvoj, pri tome strogo prateći zahteve tržišta. BOHOR je organizovan tako da u svakom momentu znanje, rad i kreativnost usmeri ka tržištu i odgovori prefinjenoj i kreativnoj mašti …",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.bohor.co.rs"
+    },
+    {
+      "name": "Gradjevinar balkan",
+      "city": "Beograd",
+      "description": "NISKOGRADNjA VISOKOGRADNjA PRATEĆI RADOVI ZAVRŠNI RADOVI Osnovna delatnost je građevinarstvo i to kako u oblasti niskogradnje tako i u oblasti visokogradnje. Osposobljeni smo za izvođenje svih pratećih radova koji se tiču gradilišta i gradnje, poput ispitivanja zemljišta, grubih zemljanih radova, pa sve do finih završnih zanatskih radova. Pored svoje osnovne delatnosti u okviru koje smo registrovani za izgradnju objekata infrastrukture, privrednih i stambenih objekata naše preduzeće je registrovano i za usluge u oblasti saobraćaja i trgovine. Raspolažemo kvalitetnim voznim parkom i sposobnim radnicima i spremni smo ispuniti najrazličitije zahteve naših klijenata u pogledu prevoza različitih …",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN"
+    },
+    {
+      "name": "Crna Trava projekt",
+      "city": "Beograd",
+      "description": "Građevinsko preduzeće Crna Trava Projekt osnovano je 1992.godine Imamo veoma veliko iskustvo u oblastii izgradnje stambenih objekata a takođe radi i objekte iz oblasti industrije poljoprivrede sporta zdrastvene objekte turističke objekte i objekte administracije G.P. Crna Trava Projekt je za predhodnih 17 godina, sagradila na desetine hiljada kvadratnih metara, poslovno - stambenog prostora. Takođe se bavi adaptacijom, rekonstrukcijom i dogradnjom postojećih objekata. Izvodi enterijer i završne radove u građevinarstvu.",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.crnatravaprojekt.co.rs"
+    },
+    {
+      "name": "Stan - javno komunalno preduzeće novi sad",
+      "city": "Novi Sad",
+      "description": "ELEKTRO INSTALACIJE CENTRALNO GREJANJE KLIMATIZACIJA STAMBENIH i POSLOVNIH OBJEKATA ZAVRŠNI RADOVI IZGRADNJA OBJEKATA PROJEKTOVANJE-PRODAJA-SERVIS-MONTAŽA-ODRŽAVANJE KOMPRESORSKIH STANICA KOMPRESORSKIH AGREGATA PNEUMATSKOG ALATA PUMPI i PUMPNIH AGREGATA PRODAJA, SERVIS i ODRŽAVANJE PUMPI PODVODNIH BUNARSKIH MULJNIH KANALIZACIONIH KANALNIH ZAPREMINSKIH ODRŽAVANJE Tekuće i investiciono održavanje stambenih i poslovnih objekata. održavanje zidarsko-graževinskih elemenata, održavanje liftova, elektro-instalacija, instalacija centralnog grejanja... ZANATSKI RADOVI Molersko-farbarski radovi, podnopolagački i keramičarski radovi, stolarski radovi, bravarski radovi, limarski radovi, staklorezački …",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.stanns.rs"
+    },
+    {
+      "name": "Knauf amf",
+      "city": "Beograd",
+      "description": "Nemački proizvođač funkcionalnih plafona od različitih materijala sa odličnim građevinsko-fizičkim karakteristikama u zvučnoj i protivpožarnoj zaštiti Minearlni (na bazi biološki razgradljive kamene vune) Metalni plafoni Gips plafoni i drveni funkcionalni plafoni",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.amf-yu.co.rs"
+    },
+    {
+      "name": "Slovan progres",
+      "city": "Selenča",
+      "description": "VISOKOGRADNjA NISKOGRADNjA ZAVRŠNI RADOVI BETON BETONSKA GALANTERIJA PVC i ALU STOLARIJA blokovi, vezni elementi za popločavanje dekorativno popločavanje ivičnjaci montaža krovnih konstrukcija i pokrivanje krova montaža industriski proizvedenih čeličnih elemenata savijanje armature zidanje opekom i kamenom postavljanje električnih vodova i pribora postavljanje vodovodnih instalacija i sanitarne opreme postavljanje instalacija za grejanje, ventilaciju, opreme i kanala za hladenje ili klimatizaciju ugradnja stolarije unutrašnje i spoljno bojenje zgrada izrada fasada",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "FACADE_CONTRACTOR",
+      "website": "http://www.slovan.co.rs",
+      "note": "A general contractor whose service list ends with `izrada fasada`. Facade work is shown, so the rubric says FACADE_CONTRACTOR even though facades are a small part of the business."
+    },
+    {
+      "name": "Gips plus",
+      "city": "Beograd",
+      "description": "ZAVRŠNI RADOVI U GRAĐEVINARSTVU KREČENjE MOLERSKI RADOVI GIPSANI RADOVI IZVOĐENjE, MONTAŽA i UGRADNjA RASVETE OBLAGANjE KAMENOM ZIDARSKI, KERAMIČKI, PARKETARSKI i STOLARSKI RADOVI ZAVRŠNI DEKORATIVNI RADOVI ZAHVATI NA ELEKTRIČNIM i VODOVODNIM INSTALACIJAMA",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.krecenje-beograd.rs"
+    },
+    {
+      "name": "Ornament gips enterijeri",
+      "city": "Novi Pazar",
+      "description": "GIPS ENTERIJERI SPUŠTENI PLAFONI PREGRADE MOLERAJ PO SPECIFIČNIM NIJANSAMA OIKOS BOJE OVLAŠĆENI ZASTUPNICI",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.onramentnp.com"
+    },
+    {
+      "name": "Opek",
+      "city": "Loznica",
+      "description": "",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.opek.co.rs"
+    },
+    {
+      "name": "Binor",
+      "city": "Beograd",
+      "description": "BINOR SPORTSKA SALA PROIZVODNjA, PRODAJA i ISPORUKA FERT GREDICA OBRADA BETONSKOG GVOŽĐA PO SPECIFIKACIJI IZVOĐENjE GRUBIH GRAĐEVINSKIH RADOVA NA OBJEKTIMA VISOKOGRADNjE IZVOĐENjE ZAVRŠNIH GRAĐEVINSKIH RADOVA U STAMBENIM i POSLOVNIM OBJEKTIMA MAŠINSKO MALTERISANjE KREČNO-GIPSANIM i CEMENTNO-KREČNIM MALTERIMA IZRADA SVIH VRSTA FASADA",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.binor.rs"
+    },
+    {
+      "name": "Gk d.o.o. Beograd",
+      "city": "Beograd",
+      "description": "FABRIKA BETONA ARHITEKTONSKI BIRO IZVOĐENjE GRUBIH GRAĐEVINSKIH RADOVA",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.gk.co.rs"
+    },
+    {
+      "name": "Varomont",
+      "city": "Futog",
+      "description": "METALNE KONSTRUKCIJE GRAĐEVINSKA BRAVARIJA LIMARIJA ZAVRŠNI RADOVI U GRAĐEVINARSTVU IZRADA POLIURETANSKIH PANELA ZA SPECIJALNE NAMENE - HLADNjAČ, SUŠARE IZRADA REZERVOARA i CISTERNI OD METALA ZA MLEKARSKU i PREHRAMBENU INDUSTRIJU",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.varomont.com"
+    },
+    {
+      "name": "Weldmont inženjering",
+      "city": "Beograd",
+      "description": "Izvođenje instalacija i objekata nafte i gasa Izgradnja industrijskih i energetskih postrojenja i objekata Projetovanje i izvođenje procesnih, termotehničkih i termoenergetskih postrojenja i objekata Remont i održavanje procesnih, termotehničkih i termoenergetskih postrojenja i objekata Projektovanje i izvođenje instalacija i objekata nafte i gasa Projektovanje i izvođenje fasada, spuštenih plafona, oblaganje stubova primenom savremenih kompozitnih materijala (ALUBOND) Program zastupanja (enterijerska oprema benzinskih stanica) proizvođača MBG - Češka Republika",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.weldmont.co.rs"
+    },
+    {
+      "name": "Agens beograd",
+      "city": "Beograd",
+      "description": "ZAVRŠNI RADOVI U GRAŠEVINARSTVU Trgovina na veliko i malo (građevinskim materijalom) Zastupanje firmi (gipsara “Komar” Donji Vakuyf, danas Federacija BiH) Proizvodnja i montaža gips elemenata sa ugradnjom Izrada plafona i zidova od gipsa Završni radovi u građevinarstvu Malterisanje gipsanim malterom (mašinskim putem)",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "http://www.agens.co.rs",
+      "note": "Wholesale and retail of building materials alongside plasterboard works; no facade evidence."
+    },
+    {
+      "name": "Spektar rsd",
+      "city": "Beograd",
+      "description": "GRAĐEVINSKO ZANATSKI RADOVI UGRADNjA METALNIH KONSTRUKCIJA ENTERIJERSKI RADOVI TRGOVINA CRNOM METALURGIIJOM USLUGE GRAĐEVINSKIM MAŠINAMA",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.spektarrsd.rs"
+    },
+    {
+      "name": "Sloboda metal obrenovac",
+      "city": "Beograd",
+      "description": "lzvođenje radova na termoenergetskim i industrijskim objektima lzrada, isporuka i ugradnja rezervnih delova za energetska i industrijska postrojenja Izrada i isporuka čeličnih konstrukcija Termoizolaterski i limarski radovi A.K.Z. i farbarsko molerski-radovi Hidroizolacija Građevinarstvo - oblast niskogradnje i visokogradnje Završni radovi u građevinarstvu Ostale usluge (posredovanje, marketing, inženjering...)",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.metal-obrenovac.rs",
+      "note": "Industrial `termoizolaterski radovi` on power and process plant — not a building facade."
+    },
+    {
+      "name": "Kej valjevo",
+      "city": "Valjevo",
+      "description": "IZGRADNjA PO SISTEMU KLjUČ U RUKE ZAVRŠNI RADOVI NA OBJEKTIMA REKONSTRUKCIJE i ADAPTACIJE OBJEKATA RADOVI NA IZRADI ELEKTRIČNIH INSTALACIJA STRUČNI NADZOR i PRAĆENjE PROCESA IZGRADNjE OBJEKTA OD POČETKA DO ZAVRŠETKA RADOVA",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.kej.rs"
+    },
+    {
+      "name": "Aqua speed",
+      "city": "Beograd",
+      "description": "ZAVRŠNI RADOVI ODGUŠENjE KANALIZACIJE SNIMANjE KANALIZACIJE SPECIJALNIM KAMERAMA POSTAVLjANjE VODOVODNE KANALIZACIJE POVEZIVANjE VODOVODNE KANALIZACIJE VODOINSTALATERSKI RADOVI MONTAŽA SANITARNIH ELEMENATA OTKLANjANjE KVAROVA NA VODOVODNOJ INSTALACIJI OTKLANjANjE KVAROVA NA KANALIZACIONOJ INSTALACIJI",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN"
+    },
+    {
+      "name": "Plafon inženjering",
+      "city": "Novi Sad",
+      "description": "SISTEM SUVE GRADNjE SPUŠTENI PLAFONI PREGRADNI ZIDOVI OBLAGANjE POTKROVLjA SUVO MALTERISANjE ZIDOVA (LEPLjENjE GIPS PLOČA) PODNO OBLAGANjE i IZRAVNAVANjE IZDRAVA RAZLIČITIH VRSTA FASADA ESTETSKA OBRADA INSTALACIJA ZIDOVA ZA KUHINjE, KUPATILA, VATROOTPORNIH OBLOGA NOSAČA STUBOVA i SLIČNO PROIZVODI Mineralne, metalne i gips ploče za raster plafone Profili za raster Armstrong i Amf plafone: T-3600,T-1200,T-600, L-3000 Visilice, žice L=025-3,00m Gips ploče standardne, parootporne, vatrootporne Profili za gips-čelične podkonstrukcije raznih dimenzija za plafone, zidove, gips obloge CD, UD, CW50, UW50, CW75, UW75, ugaone lajsne… Ankeri, distanceri, žice, ukrsni komadi, nastavci Sistemi za vrata, …",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "FACADE_CONTRACTOR",
+      "website": "http://www.plafon.co.rs"
+    },
+    {
+      "name": "Delfin doo",
+      "city": "Veternik",
+      "description": "IZGRADNjA OBJEKATA VISOKOGRADNjE i NISKOGRADNjE IZRADA INDUSTRIJSKIH PODOVA PROIZVODNjA BETONSKE GALANTERIJE ZAVRŠNI RADOVI U GRAĐEVINARSTVU SPECIJALISTIČKI RADOVI NA SANACIJI, OJAČANjIMA, REKONSTRUKCIJI i ADAPTACIJI",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.delfindoo.co.rs"
+    },
+    {
+      "name": "Toplux",
+      "city": "Beograd",
+      "description": "Proizvodi: FLUO SVETILJKE HALOGENE SVETILjKE 12V i220V KOMPAKT SVETILjKE REFLEKTORI DEKORATIVNE ZIDNE SVETILjKE, PLAFONJERE, LUSTERI PROTIVPANICNA RASVETA SVE VRSTE SIJALICA PHILIPS i OSRAM Osnovna delatnost preduzeća jesu završni radovi u građevinarstvu, a pre svega izrada mineralnih i gipsanih plafona, pregradnih zidova, izrada elektro-instalacija i instalacija svih vrsta rasvete za enterijer i eksterijer. U nastojanju da sto kvalitetnije i potpunije zadovolji sve zahteve tržišta i kupaca, TOPLUX poseduje kvalitetnu opremu i alate, 12 stalno zaposlenih montažera, a potvrda kvaliteta je i Licenca Ministarstva Građevina RS o ispunjenosti uslova za gradjenje objekata Prema podacima Privredne …",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN"
+    },
+    {
+      "name": "Yum commerce",
+      "city": "Subotica",
+      "description": "UGAONE LAJSNE ZIDNE LAJSNE i UGLOVI ORNAMENT LAJSNE PLAFONSKE OBLOGE ROZETE UNUTRAŠNjI ELEMENTI SPOLjAŠNjE LAJSNE SPOLjAŠNI ELEMENTI SPECIJALNI ELEMENTI",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.yumcommerce.rs"
+    },
+    {
+      "name": "Stig inženjering",
+      "city": "Požarevac",
+      "description": "VISOKOGRADNjA NISKOGRADNjA IZGRADNjA OBJEKATA SVIH NAMENA GRUBI GRAĐEVINSKI RADOVI GRAĐEVINSKO-ZANATSKI RADOVI INSTALATERSKI RADOVI ZAVRŠNI RADOVI",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.stiging.rs"
+    },
+    {
+      "name": "Banat gik",
+      "city": "Zrenjanin",
+      "description": "objekti hidrogradnje objekti niskogradnje objekti visokogradnje završni zanatski radovi u građevinarstvu",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.gik-banat.co.rs"
+    },
+    {
+      "name": "Dedal",
+      "city": "Beograd",
+      "description": "IZGRADNjA i REKONSTRUKCIJA GRAĐEVINSKO-ZANATSKI RADOVI",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.dedal.co.rs"
+    },
+    {
+      "name": "Dragović doo",
+      "city": "Čenta",
+      "description": "PROIZVODNjA PRAŠKASTIH MATERIJALA ALUMINIJUMSKIH ELEMENATA GVOŽĐA i OSTALIH METALA DRVENIH PALETA i REZANE GRAĐE BEHATON PLOČA i PROIZVODA OD BETONA GIPSANIH ELEMENATA",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.dragovic.co.rs"
+    },
+    {
+      "name": "Sng parket",
+      "city": "Novi Sad",
+      "description": "PODNE OBLOGE POSTAVLjANjE PARKETA PROJEKTOVANjE ENTERIJERA OPREMANjE ENTERIJERA IZRADA NAMEŠTAJA PO MERI SNG-Parket je kompanija specijalizovana za postavljanje parketa i svih drugih podnih obloga. U svom radu koristimo najmodernije tehnologije kao i materijale svetski poznatih proizvođača i vrhunskog kvaliteta. Pružamo usluge projektovanja i opremanja enterijera, kao i izrade nameštaja pomeri. SNG parket nudi kompletna rešenja ugradnje i restauracije podnih i zidnih obloga: Restaruracija starih drvenih podova Obrada profesionalnim mašinama uz minimum prašine Primena kvalitetnih i proverenih materijala od domaćih i inostranih proizvođača Oblaganje stepeništa drvenim oblogama Izrada …",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN"
+    },
+    {
+      "name": "Veliki majstor",
+      "city": "Novi Sad",
+      "description": "VODOINSTALATERSKE USLUGE KERAMIČARSKI, ZIDARSKI RADOVI GIPSARSKO-MOLERSKI RADOVI KOMPLETNA KUPATILA i OSTALI ADAPTACIONI GRAĐEVINSKI RADOVI",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN"
+    },
+    {
+      "name": "Duking",
+      "city": "Smederevska Palanka",
+      "description": "Izvođenje svih vrsta građevinskih, građevinsko-zanatskih radova u visokogradnji Instalaterski radovi Imamo uveden standard kvaliteta ISO 9001:2008 Iza sebe imamo brojne izgrađene, rekonstruisane, adaptirane i sanirane objekte",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.duking.co.rs"
+    },
+    {
+      "name": "Zap",
+      "city": "Beograd",
+      "description": "Projektovanje, planiranje i izrada tehnicke dokumentacije",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.zapp.eu.com"
+    },
+    {
+      "name": "Fasbeton djordjević",
+      "city": "Negotin",
+      "description": "Proizvodi od betona: rimski stubovi balusteri za ograde baštenske figure fontane Proizvodi od gipsa: lajsne rozetne konzole rimski stubovi figurice u boji zlata",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.fasbeton.rs",
+      "note": "Concrete and plaster ornaments. Name starts `Fas…` but the business has nothing to do with facades."
+    },
+    {
+      "name": "Ekoprojekt inženjering",
+      "city": "Beograd",
+      "description": "Preduzeće Ekoprojekt Inženjering osnovano je u julu 1996. godine željom Osnivača da svoja znanja, ideje i iskustva razvija u privrednom subjektu koji nije opterećen svakodnevnim teretima postojećih preduzeća kao sto su višak zaposlenih, loša kadrovska struktura, dugovanja prema dobavljačima i državi. Oblast rada preduzeća je građevinarstvo sa posebnim akcentom na izvođenje završnih zanatskih radova, izradu svih vrsta instalacija kao i projektovanje izrada i opremanje enterijera. Poseban zadatak preduzeća jeste razvoj, prezentovanje i primena savremenih načina gradnje uz primenu najmodernijih materijala i alata kao i sistema gradnje",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.ekoprojekt.rs"
+    },
+    {
+      "name": "Panongrad",
+      "city": "Subotica",
+      "description": "Usluge u građevinarstvu",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN"
+    },
+    {
+      "name": "Abs commerce",
+      "city": "Beograd",
+      "description": "ALU i PVC PROFILI PVC i METALNI TRIMOVI LAJSNE ZA ZAŠTITU STEPENIŠTA NEPROPUSTNI ELEMENTI OD PVC-a PRELAZI IZMEDJU RAZLIČITIH TIPOVA PODOVA LAJSNE SISTEMI ZA FIKSIRANJE TEPIHA NA STEPENICAMA FUG MASA STARLIKE „ABS COMMERCE“ D.O.O. je uvoznik i distributer firmi GENESIS i PROLUX svetskih lidera u proizvodnji završenih radova u građevinarstvu i našem tržištu nudi različite profile od PVC, AL, INOX-a i mesinga. Firma „ABS COMMERCE „ D.O.O. bavi se veleprodajom i snabdevanjem maloprodajnih objekata. Abs commerce Vam nudi profile tipa: ETR Ugradni polukružni PVC profil za zaštitu ivice zida. Postoje jednobojni profili i profili boje mermera, koji se mogu uskladiti sa bojom pločica. Postavlja se …",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.abscommerce.rs"
+    },
+    {
+      "name": "Jadran a.d.",
+      "city": "Beograd",
+      "description": "PODNOPOLAGAČKI RADOVI ANTIKOROZIVNA ZAŠTITA ZAŠTITA PROTIVPOŽARNIM PREMAZIMA MOLERSKO - FARBARSKI RADOVI PROJEKTOVANjE ENTERIJERI HITNE INTERVENCIJE",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.jadran-bg.rs"
+    },
+    {
+      "name": "Deneza m inženjering",
+      "city": "Beograd",
+      "description": "Visokogradnja kao i izgradnja objekata svih vrsta i namena. Preduzeće je sa svojim sopstvenim kapacitetima i sa proverenim kooperantima osposobljeno za kompletnu izgradnju objekata (od grubih građevinskih radova, građevinsko - zanatskih, instalaterskih i završnih radova). Karakteristika poslovanja preduzeća su kvalitetan i efikasan rad a time i kratki rokovi i prihvatljive cene.",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.denezam.com"
+    },
+    {
+      "name": "Tehnogradnja Beograd",
+      "city": "Vladičin Han",
+      "description": "IZVOĐENjE RADOVA U GRAĐEVINARSTVU POSLOVNI OBJEKTI STAMBENI OBJEKTI AERODROMSKE ZGRADE SPORTSKI OBJEKTI VILE i REZIDENCIJE INDUSTRIJSKI BOJEKTI ENTERIJERSKI RADOVI RESTAURACIONI RADOVI",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.tehnogradnja.net"
+    },
+    {
+      "name": "Neimar projekt",
+      "city": "Niš",
+      "description": "POLIKARBONATNE PLOČE GRAĐEVINSKI MATERIJAL ISOVER KNAUF GUTTAL BIM RIGIPS KOEMMERLING AUSTROTHERM MUREXIN ARMSTRONG - SPUŠTENI PLAFONI IZVOĐENjE ZAVRŠNIH RADOVA U GRAĐEVINARSTVU PREGRADNI ZIDOVI SPUŠTENI PLAFONI FASADE MOLERSKO-FARBARSKI RADOVI",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "BOTH",
+      "website": "http://www.neimarprojekt.com",
+      "note": "Stocks Isover/Austrotherm/Knauf and performs finishing works including `FASADE`."
+    },
+    {
+      "name": "Parket mont",
+      "city": "Novi Sad",
+      "description": "GIPSANI RADOVI POSTAVLjANjE PARKETNIH OBLOGA IZRADA SPORTSKIH PODOVA U SPORTSKIM DVORANAMA BRUŠENjE i LAKIRANjE STAROG PARKETA PROIZVODNjA PARKET LAJSNI OD PUNOG DRVETA, KAO i FURNIRANIH LAJSNI PRODAJA MATERIJALA ZA ZAVRŠNE RADOVE : LAJSNE PARKETI ULAZNA i SOBNA VRATA BOJE LEPKOVI GLET MASE FASADE IZOLACIJE PURPENI SILIKONI LEPKOVI",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "CONSTRUCTION_MATERIAL_STORE",
+      "website": "http://www.parket-mont.com",
+      "note": "A floor company whose retail line explicitly includes facade materials."
+    },
+    {
+      "name": "Mig metal",
+      "city": "Beograd",
+      "description": "PRODAJA i USLUGE U OBLASTI OBOJENIH METALA SKLADIŠTENjE ROBE SA KOMPLETNOM USLUGOM ZAVRŠNI RADOVI U GRAĐEVINARSTVU Preduzeće ”MIG METAL”, D.O.O. Beograd, je osnovano 1990. godine, i od svog osnivanja bavi se prodajom i uslugama u oblasti obojenih metala. Svoje poslovne aktivnosti razvijali smo širom zemlje, tako da danas sarađujemo sa firmama iz cele bivše Jugoslavije, kao i sa firmama istočne i zapadne Evrope. Najveći kapital stečen tokom prethodnog perioda jeste otvoren i prijateljski odnos sa svim svojim klijentima, bilo malim zanatskim radjnama, bilo velikim sistemima, građevinskim ili metaloprerađivačkim preduzećima. U želji da ostvarimo lakši kontakt, kao i čvršću povezanost sa starim …",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.migmetal.com"
+    },
+    {
+      "name": "Construct - pro",
+      "city": "Kanjiža",
+      "description": "PROJEKTOVANjE STAMBENIH, POSLOVNIH i DRUGIH OBJEKATA INŽENjERING ADAPTACIJE i POPRAVKE IZRADA BAZENA IZVOĐENjE GRAĐEVINSKIH RADOVA OD TEMELjA DO KLjUČA",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.construct-pro.co.rs"
+    },
+    {
+      "name": "Parketi Tomić",
+      "city": "Leskovac",
+      "description": "Izvodenje parketarskih radova",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.parkethome.co.yu"
+    },
+    {
+      "name": "Vertical construction",
+      "city": "Beograd",
+      "description": "SANACIJE HIDROIZOLACIJA ODRŽAVANjE i ZAŠTITA U SAVREMENOM GRAĐEVINARSTVU i INDUSTRIJI GENERALNI ZASTUPNI PETZL KOMPANIJE GENERALNI ZASTUPNI PETZL KOMPANIJE ZA PROIZVODNjU OPREME ZA RADOVE NA VISINI ALPINIZAM SPECIJALNE JEDINICE VOJSKE i POLICIJE REŠENjA ZA PROBLEME U SAVREMENOM GRAĐEVINARSTVU INDUSTRIJI i POSLOVNIM OBJEKTIMA i UKAZIVANjE NA POTREBE ZA SANACIJAMA, ODRŽAVANjEM i DUGOTRAJNOM ZAŠTITOM VERTIKALNE HIDROIZOLACIJE - SANACIJE Diletacija, oštečenja, spojeva HIDROIZOLACIJE - SANACIJE Ravnih i kosih krovova Terasa, bazena ODRŽAVANJE ZAŠTITA FASADA Beton, Mermer, Prirodni i veštački kamen Terakota i malterisane površine Staklo Alubond Inox SANACIJA BETONSKIH ELEMENATA i AB KONSTRUKCIJA …",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.verticalcon.com",
+      "note": "Rope-access remediation and Petzl distribution; waterproofing only, no facade work."
+    },
+    {
+      "name": "Profil sistem",
+      "city": "Kragujevac",
+      "description": "KAPCI ALUMINIJUMSKE OGRADE KOMARNICI ROLETNE PROZORI HARMONIKA VRATA ULAZNA VRATA ALUBOND FASADA KONTINUALNA FASADA POLUSTRUKTURALNA FASADA STRUKTURALNA FASADA Preduzeće Profil Sistem je registrovano i kao takvo postoji vec 7 godina, ali iskustvo koje stoji iza ove firme postoji od ranije. Profil sistem je podrška Vama i Vašim nastojanjima da projektujete i gradite savremene i moderne objekte. Veliki asortiman robe, profesionalna usluga i želja da izgradimo dugorocni poslovni odnos sa našim poslovnim partnerima su deo naše poslovne politike. Alubond je aluminijumski kompozitni panel koji se sastoji od dva aluminijumska lima izmedu kojih je termoplastična ispuna. Alubond daje arhitektama …",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "note": "Aluminium joinery: shutters, roller blinds, windows — plus ALUBOND / structural curtain-wall `fasada`. Four `fasada` matches, wrong industry."
+    },
+    {
+      "name": "Info market",
+      "city": "Beograd",
+      "description": "OKOVI ZA STOLARIJU PODNE OBLOGE OD PLUTE ZIDNE OBLOGE OD PLUTE TERMO IZOLACIJA MEDITHERM SISTEM GREJANjA i HLAĐENjA ELASTIČNE GUMENE PLOČE SPORTSKI TERENI THORTEX - MATERIJALI ZA ZAŠTITU i REPARATURU Nudimo Vam GRAĐEVINSKE OKOVE za: fasadnu stolariju za PVC drvene i aluminijumske konstrukcije (otklopno-nagibne, otklopne i harmonika klizne portale, lučne i trapezaste) GEZE – ventusi, aurtomati za vrata i podni automati Dr. Hahn – šarke za ulazna vrata HOPPE – kvake KFV, EURO-ELZETT – okove za ulazna vrata, usadne brave, ROMB - kvalitetni okretno-nagibni okovi iz Poljske BEXON – UV stabilne, univerzalne podprozorske daske za unutrasnju i spoljasnju upotrebu Info Market je prvi, najveći kod …",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "note": "Window hardware, including `okovi za fasadnu stolariju`. `fasadn…` matches on joinery, not on a facade."
+    },
+    {
+      "name": "Trnići invest",
+      "city": "Beograd",
+      "description": "KROVNI POKRIVAČI KROVOPOKRIVAČKI RADOVI FASADNE OBLOGE LIMARSKI RADOVI TERMOIZOLACIJA BRAVARSKI RADOVI GRAĐEVINSKI RADOVI TESARSKI ZIDARSKI MOLERSKI",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "FACADE_CONTRACTOR",
+      "note": "A roofer, but `fasadne obloge` + `termoizolacija` + masonry make it a real facade installer."
+    },
+    {
+      "name": "Lazuro",
+      "city": "Beograd",
+      "description": "UGRADNjA PARKETA ZAVRŠNI RADOVI U GRAĐEVINARSTVU : KERAMIČARSKI RADOVI GIPSARSKI RADOVI MOLERSKO-FARBARSKI RADOVI ELEKTROINSTALATERSKI RADOVI VODOINSTALATERSKI RADOVI",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.parketugradnja.com"
+    },
+    {
+      "name": "Aquanex",
+      "city": "Beograd",
+      "description": "VODOINSTALATERSKE USLUGE ELEKTRIČARSKE USLUGE KERAMIČARSKE USLUGE MOLERSKO FARBARSKE USLUGE GIPSARSKE USLUGE PARKETARSKE USLUGE",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.aquanex.co.rs"
+    },
+    {
+      "name": "Društvo za inženjering čiks",
+      "city": "Novi Sad",
+      "description": "PROJEKTOVANjE STAMBENIH OBJEKATA, PORODIČNIH KUĆA, VIKENDICA DIZAJN ENTERIJERA GRUBI GRAĐEVINSKI RADOVI ZAVRŠNI RADOVI U GRAĐEVINARSTVU VODOVOD i KANALIZACIJA: INSTALACIJE VODOVODA i KANALIZACIJE, UGRADNjA SANITARIJA i GALANTERIJE, UREĐAJI ZA POVEĆANjE PRITISKA GREJANjE: INSTALACIJE, KOTLARNICE, SOLARNI POTENCIJAL, TOPLOTNE PUMPE, RADIJATORI i FANCOLERI, HLAĐENjE ELEKTRO RADOVI POSTAVLjANjE PARKETA, LAMINATA i BRODSKOG PODA",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.ciksinzenjering.com"
+    },
+    {
+      "name": "Degrad",
+      "city": "Beograd",
+      "description": "VODOINSTALATERSKI RADOVI ELEKTRIČARSKI RADOVI MOLERSKI RADOVI STOLARSKI RADOVI KERAMIČKI RADOVI BRAVARSKI RADOVI HIDROIZOLACIJA",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN",
+      "website": "http://www.majstorluk.rs"
+    },
+    {
+      "name": "Majstor u kući radojko",
+      "city": "Beograd",
+      "description": "VODOINSTALATERSKI RADOVI KERAMIČKI RADOVI ELEKTRO INSTALACIJE MOLERSKO-FARBARSKI RADOVI SA i BEZ MATERIJALA POSTAVLjANjE SVIH VRSTA PODOVA: LAMINATA, PARKETA... RAZNA RUŠENjA i ZIDANjE PREGRADNIH ZIDOVA GIPSARSKI RADOVI",
+      "sourceCategory": "Završni radovi, restauracije",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/zavrsni-radovi-restauracije",
+      "expected": "UNKNOWN"
+    },
+    {
+      "name": "New York - čišćenje i održavanje objekata",
+      "city": "Beograd",
+      "description": "ČIŠĆENjE i ODRŽAVANJE OBJEKATA ČIŠĆENjE FASADA INDUSTRIJSKO ČIŠĆENjE HEMIJSKO ČIŠĆENjE PRANjE AUTOMOBILA TEHNIČKO ODRŽAVANjE OBJEKATA UREĐENjE ZELENIH POVRŠINA ZIMSKO ODRŽAVANjE PRODAJA MAŠINA i SREDSTAVA ZA ČIŠĆENjE Poštovani, Preduzeće New York Trade DOO se bavi pružanjem usluga iz oblasti održavanja higijene ( čišćenja ) i održavanja objekata. New York Trade DOO je osnovan 2.juna.1992.god. sa sedištem u Beogradu u ulici Koste Glavenića br.2 Pružamo usluge čišćenja u preko sedamdeset mesta u Srbiji, Americi ( Manhattan, Brooklyn, Staten Island, Bronx, Queens), Srbiji (preko 70 mesta) i Makedoniji ( preko 20 mesta). USLUGE: 1. ODRŽAVANJE HIGIJENE (ČIŠĆENJE) : Održavanje higijene spada u …",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.newyork.rs"
+    },
+    {
+      "name": "Tip Top Pokretni toaleti",
+      "city": "Beograd",
+      "description": "ČIŠĆENJE FASADA, SKIDANJE GRAFITA - TIO TOP Koristimo najsavremenija sredstva za uklanjanje grafita kako bi kabine bile čiste i sa spoljašnje strane.",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.tiptopnml.com"
+    },
+    {
+      "name": "Secut - čišćenja i održavanja higijene",
+      "city": "Beograd",
+      "description": "Preduzeće Secut pruža usluge čišćenja i održavanja higijene poslovnih i stambenih objekata generalna čišćenja nakon završnih radova u građevinarstvu pranje fasada sistemom užadi pranje i zaštita tvrdih podnih obloga pranje mekih podnih obloga industrijska čišćenja pranja i usisavanja velikih otvorenih i zatvorenih površina (hale, industrijski pogoni, garaže, parking prostori, magacini i sl.) Preduzeće je uspostavilo sistem menadžmenta kvalitetom prema zahtevima standarda JUS ISO 9001/2001. Preduzeće za pružanje usluga SECUT d.o.o. osnovano je 23.09. 2002. godine u Beogradu. Preduzeće je uspostavilo, dokumentovalo, sprovodi, održava i stalno poboljšava Sistem menadžmenta kvalitetom (QMS), u …",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.secut.rs"
+    },
+    {
+      "name": "Visinski radovi Beograd - Vertical System",
+      "city": "Beograd",
+      "description": "ČIŠĆENJE FASADA, SKIDANJE GRAFITA - VERTICAL SYSTEM Pružamo usluge čišćenja fasada.",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.verticalsystem.rs",
+      "note": "Same business as #150, different source record: this one says only `čišćenje fasada`, which is not facade work."
+    },
+    {
+      "name": "Teribo",
+      "city": "Beograd",
+      "description": "UKLANjANjE GRAFITA i ANTIGRAFITNA ZAŠTITA REFERENCE Srpska Pravoslavna crkva Robne kuće Beograd Biblioteka grada Beograda Nike C market Maxi Tempo Toyota Telenor Vojvodjanska banka NLB banka Defektološki fakultet I beogradska gimnazija Zemunska gimnazija Drinsko limske hidroelektrane Opština Novi Beograd Dom zdravlja Novi Beograd Dom zdravlja Zemun Niška tvrdjava Dečije ustanove Beograd EDB Republicki zavod za sport Direkcija za izgradnju Novi Pazar Strauss Adriatic DHL LTH MPS Group doo Lasta AD Delta sport AP Sport Lilly GP Napred Projmetal AD",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.teribo.com"
+    },
+    {
+      "name": "Fit group",
+      "city": "Novi Sad",
+      "description": "PROFESIONALNO ODRŽAVANjE HIGIJENE PROSTORA MAŠINE ZA ČIŠĆENjE PROFESIONALNA OPREMA ZA ČIŠĆENjE SREDSTVA ZA ODRŽAVANjE HIGIJENE PROFESIONALNO ODRŽAVANjE HIGIJENE PROSTORA Pranje i zaštita tvrdih podnih i zidnih površina Generalno pranje i održavanje podnih površina (keramika, granit, mermer...) - u određenim unapred ugovorenim rokovima Svakodnevno pranje i održavanje podnih površina (keramika, granit, mermer...) Povremeno pranje i održavanje podnih površina (keramika, granit, mermer...) – po potrebi klijenata Skidanje grafita sa fasada objekata (mermer, kamen, granit itd.) Zaštita fasade od vremenskih uslova i ponovnog nanošenja grafita Svakodnevno održavanje higijene prostora Praženjenje i …",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.fitgroup.rs"
+    },
+    {
+      "name": "Agencija za čišćenje objekata master",
+      "city": "Beograd",
+      "description": "ČIŠĆENjE i ODRŽAVANjE STANOVA i POSLOVNIH PROSTORIJA FINALNO ČIŠĆENjE NOVOSAGRAĐENIH OBJEKATA DETALjNO ČIŠĆENjE POSLE ADAPTACIJA, KREČENjA NEGA i POMOĆ STARIM LICIMA PRANjE i PESKARANjE FASADA SKIDANjE GRAFITA SA FASADA PRANjE NEDOSTUPNIH STAKLENIH POVRŠINA ČIŠĆENjE i ODRŽAVANjE OBJEKATA Agencija MASTER brzo, profesionalno organizuje čišćenje poslovnih, stambenih prostora nakon završnih radova, pranje i peskiranje fasada, nedostupnih površina uz pomoć alpinista. ZAVRŠNO ČIŠĆENjE ZGRADA PRANjE i PESKARENjE FASADA Pozovite nas i uverite se u našu efikasnost i profesionalnost!",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN"
+    },
+    {
+      "name": "Cerak vranje",
+      "city": "Vranje",
+      "description": "PROIZVODNjA SVIH VRSTA TERMOIZOLACIONIH STAKALA PRODAJA i UGRADNjA SVIH VRSTA STAKALA PVC STOLARIJA PO SISTEMU TROCAL ALUMINIJUMSKA BRAVARIJA OD GRČKIH I NISALOVIH PROFILA SPUŠTENI PLAFONI TIPA CASOPRANO, DEKOGIPS, GYPTONE i RIGITON SA PRATEĆOM PODKONSTRUKCIJOM ZAVRŠNI ZANATSKI RADOVI U GRAĐEVINARSTVU PRANjE STAKLENIH FASADA SA SPOLjNE i UNUTRAŠNjE STRANE IZRADA PREKO 50 VRSTA RAMOVA ZA SLIKE i GOBLENE PRODAJA i UGRADNjA GIPS KARTON PLOČA PRODAJA i UGRADNjA SVIH VRSTA LEXANA, SVIH VRSTA PLIVAJUĆIH PODOVA ZAVARIVANjE HIDROIZOLACIJA RAVNIH i KOSIH KROVOVA, BAZENA, TERASA... MOLERSKO-FARBARSKI RADOVI UGRADNJA GARAŽNIH VRATA",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.cerak.co.rs",
+      "note": "Insulating glass, PVC and aluminium joinery — the window false positive."
+    },
+    {
+      "name": "Kgvh eco company",
+      "city": "Beograd",
+      "description": "ČIŠĆENjE KLIMATIZACIJE i VENTILACIJE ČIŠĆENjE SUVIM LEDOM NABAVKA i UGRADNjA FILTERA ZA SISTEME DISTRIBUCIJE VAZDUHA SPOLjAŠNj ČIŠĆENjE FASADA OBJEKATA, PLOČNIKA i JAVNIH POVRŠINA",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.kgvh-eko.rs"
+    },
+    {
+      "name": "Kristal pk",
+      "city": "Futog",
+      "description": "MAŠINSKO BRUŠENjE i POLIRANjE ZAŠTITA VOSKIRANjEM AKEPOKS PROTIVKLIZNE TRAKE IMPREGNACIJA - ZAŠTITA GRAFITI - ANTIGRAFITNA ZAŠTITA PRANjE i ČIŠĆENjE NADGROBNI SPOMENICI - REVITALIZACIJA",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.kristalpk.com"
+    },
+    {
+      "name": "Simaček",
+      "city": "Beograd",
+      "description": "ČIŠĆENjE i ODRŽAVANjE POSLOVNIH OBJEKATA PRANjE i ČIŠĆENjE PROZORA i FASADA ODRŽAVANjE HIGIJENE U BOLNICAMA i KLINIKAMA USLUŽNO ČIĆENjE i ODRŽAVANjE HOTELA KETERING ODRŽAVANjE DOMAĆINSTAVA USLUGE SPECIJALNOG PROFESIONLNOG ČIŠĆENjA ĆIŠĆENjE VOZILA JAVNOG PREVOZA SUZBIJANjE ŠTETOČINA ZAŠTITA OD GOLUBOVA OBEZBEĐENjE i NADZOR ODABIR i IZNAJMLjIVANjE OSOBLjA USLUZNO PRANjE i PEGLANjE VEŠA UKLANjANjE OTPADA",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.simacek.com"
+    },
+    {
+      "name": "Enserv beograd",
+      "city": "Beograd",
+      "description": "ODGLUŠENjE i ČIŠĆENjE KANALIZACIJE ČIŠĆENjE SVIH VRSTA PODNIH POVRŠINA ČIŠĆENjE CEVI BUNARA DO 200m DUBINE ČIŠĆENjE i PRANjE FASADA PRANjE GRAFITA",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.enserv.net"
+    },
+    {
+      "name": "Clean windows servis",
+      "city": "Beograd",
+      "description": "MAŠINSKO PRANjE SVIH VRSTA FASADA VISINSKI RADOVI ČIŠĆENjE GRAFITA MONTAŽA i DEMONTAŽA OPREME - VISINSKI RADOVI ZAVRŠNI RADOVI U GRAĐEVINARSTVU - VISINSKI RADOVI ZAŠTITA OD LEDA",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.cws.co.rs",
+      "note": "Facade washing at height."
+    },
+    {
+      "name": "Braća glišić",
+      "city": "Beograd",
+      "description": "HITNE INTERVENCIJE BRAGLI - ZAŠTITMA MREŽA ZA SANACIJU ZIDOVA, NAROČITO FASADNIH VISINSKI RADOVI HIDROIZOLACIJA TERMO-IZOLACIJA ZAVRŠNI RADOVI UNUTAR OBJEKATA SEČENjE PENASTIH MATERIJALA - PROIZVODNjA ELEMENATA OD STIROPORA IZRADA i POSTAVLjANjE REKLAMA, BANERA, PANOA... PRANjE i ODRŽAVANjE FASADA i STAKLENIH POVRŠINA",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "FACADE_CONTRACTOR",
+      "website": "http://www.bracaglisic.com"
+    },
+    {
+      "name": "Global green održavanje objekata",
+      "city": "Sombor",
+      "description": "SKIDANjE GRAFITA PRANjE FASADE ZAŠTITA FASADE PRANjE, ČIŠĆENjE i ZAŠTITA SPOMENIKA PRANjE i POLIRANjE SA ZAŠTITOM SVIH TVRDIH POVRŠINA (PLOČICE, MERMER, VINIL, TERAZZO, LAMINAT...) PRANjE PROZORA SPOLjA i UNUTRA GENERALNO ČIŠĆENjE POSLE RAZNIH RADOVA",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.globalgreen-so.com"
+    },
+    {
+      "name": "Pilot cleaning",
+      "city": "Beograd",
+      "description": "UKLANjANjE GRAFITA SA FASADA i PODLOGA OD MALTERA UKLANjANjE GRAFITA SA KAMENA i GRANITNI PLOČA UKLANjANjE GRAFITA SA BETONA i CIGLE UKLANjANjE GRAFITA SA KERAMIČKIH PLOČICA i PLASTIKE UKLANjANjE GRAFITA SA METALNIH i DRVENI PODLOGA",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.pilot-cleaning.rs"
+    },
+    {
+      "name": "Mediator",
+      "city": "Beograd",
+      "description": "SKIDANjE GRAFITA i ZAŠTITA SVIH VRSTA FASADA OD GRAFITA PRANjE iČIŠĆENjE FASADA UKLANjANjE GRAFITA SA VOZOVA, TROLEJBUSA, AUTOBUSA, TRAMVAJA, SAOBRAĆAJNIH ZNAKOVA... UKLANjANjE BOJA SA KROVOVA i FASADA KAO i MOSTOVA ČIŠĆENjE, SANIRANjE POSLEDICA POŽARA i UKLANjANjE BUĐI, LIŠAJEVA, GLjIVA, SOLI... DISTRIBUCIJA SREDSTAVA ZA ČIŠĆENjE i ODRŽAVANjE HIGIJENE REKAL SVENSKA AB i TRION TENSID AB",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.mediator.rs"
+    },
+    {
+      "name": "Taski",
+      "city": "Kikinda",
+      "description": "PRANjE TEPIHA i ETISONA PRANjE MEBLA i AUTO MEBLA PRANjE STAKLA PRANjE TENDE PRANjE i POLIRANjE MERMERA, PVC, TERASA, PLOČICA, LAMINATA SKIDANjE GRAFITA VLAŽNO i SUVO PESKIRANjE i ANTIKOROZIVNA ZAŠTITA BRUŠENjE BETONA, FARBANjE INDUSTRIJSKIH PODOVA HEMIJSKI TRETMAN KOTLOVA POSTAVLjANjE PROTIV KLIZNIH PODOVA RESTAURACIJA SPOMENIKA",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.taski-kikinda.com"
+    },
+    {
+      "name": "Immo clean",
+      "city": "Beograd",
+      "description": "ČIŠĆENjE POSLOVNIH i DRUGIH OBJEKATA ČIŠĆENjE POSLE GRAĐEVINSKIH RADOVA ČIŠĆENjE SVIH VRSTA PODOVA ČIŠĆENjE MAŠINA i UREĐAJA HOTELSKI SERVIS HAUSMAJSTORSKE USLUGE PRANjE PROZORA ČIŠĆENjE STAKLA i FASADA MALE POPRAVKE MONTAŽNI i DEMONTAŽNI POSLOVI TEHNIČKO ODRŽAVANjE RASVETE NEGA VRTOVA ZIMSKA SLUŽBA... Kao jedna od vodećih firmi koje nude usluge čišćenja i održavanja objekata nudimo sledeće usluge: - Čišćenje biroa - Tržnih centara - Industrijskih preduzeća - Hotelski servis - Čišćenje aviona - Posebna čišćenja - Hausmajstorske usluge - Održavanje stubišta - Pranje prozora - Čišćenje podova - Male popravke - Montažni i demontažni poslovi - Čišćenje posle požara i poplava - Obezbeđenje …",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.immoclean.org"
+    },
+    {
+      "name": "Brasco",
+      "city": "Beograd",
+      "description": "ANGAŽOVANjE SPREMAČICA PODNI PREKRIVAČI NAMEŠTAJ TKANINE TVRDE PODNE i ZIDNE OBLOGE ČIŠĆENjE FASADA - PRANjE i PESKIRANjE FASADA - SKIDANjE GRAFITA SA FASADE PRANjE i ČIŠĆENjE TEŠKO DOSTUPNIH POVRŠINA PRANjE SUNCOBRANA i TENDI PRANjE TEPIHA PRANjE i POLIRANjE MERMERA Bilo da imate poslovnu zgradu sa hiljadama kvadrata, kancelariju, maloprodajni prostor, restoran ili čekaonicu, BRASCO može da Vam ponudi širok spektar usluga iz oblasti održavanja higijene, kao i mašinskog pranja i čišćenja prostora. Nama možete prepustiti kompletno održavanje. Visokoobučeni tim će ispuniti sve Vaše zahteve iz domena čišćenja i to: angažovanje spremačica, mašinsko pranje mekih i tvrdih podova, nameštaja, …",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.brasco.co.rs"
+    },
+    {
+      "name": "Mobil clean",
+      "city": "Beograd",
+      "description": "AUTO PERIONICA DUBINSKO PRANjE NAMEŠTAJA HIGIJENA OBJEKATA PRANjE SUNCOBRANA, TENDI, CIRADA i TRAKASTIH ZAVESA PRANjE FASADA PRANjE IZLOGA, PROZORA PERIONICA VEŠA",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.mobilclean.co.rs"
+    },
+    {
+      "name": "Akter tehnik",
+      "city": "Beograd",
+      "description": "GENERALNO ČIŠĆENjE OBJEKATA TEKUĆE ČIŠĆENjE i ODRŽAVANjE PRANjE PROZORA i STAKLENIH POVRŠINA PRANjE TEPIHA SKIDANjE GRAFITA SPECIJALNA ČIŠĆENjA MAĐINSKO PRANjE PODOVA HEMIJSKO ČIŠĆENjE MAŠINSKO ODGUŠENjE CEVI Uvek zadovoljan klijent je naš glavni i jedini cilj poslovanja, kojim se stalno rukovodimo. A osnovna smernica u našem poslovanju je konstantno praćenje potreba klijenata i novina na tržištu. To nam pomaže da usavršavanjem postojećih i uvođenjem novih usluga i servisa budemo uvek spremni da profesionalno odgovorimo na sve zahteve naših klijenata i ponudimo celokupnu paletu usluga za normalno funkcionisanje objekata. Poverite čišćenje vašeg objekata baš nama jer: - Imamo uspostavljen …",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.ciscenjeiodrzavanje.com"
+    },
+    {
+      "name": "Clean shop",
+      "city": "Beograd",
+      "description": "USLUGE ODRŽAVANjA i ČIŠĆENjA POSLOVNIH i DRUGIH OBLEKATA ČIŠČENjE i ODRŽAVANjE BAZENA PRE UPOTREBE i ZA VREME KORIŠĆENjA PRANjE FASADA i UKLANjANjE GRAFITA",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.cleanshop.rs"
+    },
+    {
+      "name": "Nordensanering",
+      "city": "Beograd",
+      "description": "ČIŠĆENjE i SANIRANjE FASADA ČIŠĆENjE GRAFITA UKLANjANjE AZBESTNIH NASLAGA BRUŠENjE i HOBLOVANjE PARKETA BRUŠENjE i POLIRANjE SVIH VRSTA KAMENA UGRADNjA SISTEMA SOLARNE ENERGIJE",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.nordensanering.com"
+    },
+    {
+      "name": "Singmont j & m",
+      "city": "Beograd",
+      "description": "ČIŠĆENjE i ODRŽAVANjE POSLOVNIH PROSTORIJA GENERALNA i GRAĐEVINSKA ČIŠĆENjA ČIŠĆENjE INDUSTRIJSKIH PODOVA MOBILNE EKIPE PRANjE FASADA i SKIDANjE GRAFITA TEHNIČKO ODRŽAVANjE OBJEKATA i GRAĐEVINARSTVO",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.singmont.com"
+    },
+    {
+      "name": "Eurocom novi sad",
+      "city": "Novi Sad",
+      "description": "DUBINSKO PRANjE i ČIŠĆENjE ULICA i OTVORENIH PROSTORA UKLANjANjE GRAFITA i ANTIGRAFITNA ZAŠTITA",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.urbanteh.com"
+    },
+    {
+      "name": "Cm alpin",
+      "city": "Kać",
+      "description": "RADOVI NA VISINI UŽETA HIDROIZOLACIJA MOLERSKO-FARBARSKI RADOVI BRAVARSKI RADOVI LIMARSKI RADOVI USLUGE ČIŠĆENjA POVRŠINA PRANjE FASADE SKIDANjE OPASNIH LEDENICA i SNEGA SA KROVA POSTAVLjANjE REKLAMNIH PANOA i RASVETE POSTAVLjANjE KONDENZA OD KLIMA UKRAŠAVANjE OBJEKATA POSTAVKA GREJAČA ZA HORIZONTALNE i VERTIKALNE OLUKE OTKLANjANjE OPASNIH DELOVA FASADE i STENA SA SAOBRAĆAJNIH DEONICA",
+      "sourceCategory": "Čišćenje fasada, skidanje grafita",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/ciscenje-fasada-skidanje-grafita",
+      "expected": "UNKNOWN",
+      "website": "http://www.cmalpin.com",
+      "note": "Rope access, painting and waterproofing; `pranje fasade` is washing."
+    },
+    {
+      "name": "Novkol",
+      "city": "Beograd",
+      "description": "GEOTEHNIČKI RADOVI HIDROTEHNIČKI INFRASTRUKTURNI OBJEKTI PROJEKTOVANjE ZAŠTITE TEMELjNIH JAMA POTPORNIH KONSTRUKCIJA ZAŠTITE DUBOKIH ISKOPA SNIŽAVANjA NIVOA PODZEMNIH VODA SANACIJE OBJEKATA",
+      "sourceCategory": "Sanacije građevinskih objekata",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/sanacije-gradjevinskih-objekata",
+      "expected": "UNKNOWN",
+      "website": "http://www.novkol.co.rs"
+    },
+    {
+      "name": "Erehteon",
+      "city": "Beograd",
+      "description": "IZVOĐENjE GRAĐEVINSKIH RADOVA VISOKOGRADNjA i NISKOGRADNjA ENTERIJERSKI RADOVI SANACIJE i REKONSTRUKCIJE REVITALIZACIJA i ADAPTACIJA STARIH i OŠTEĆENIH OBJEKATA PROIZVODNjA i PRODAJA ELEMENATA UMT SISTEMA BETON SERVIS - RUŠENjE i PROBOJ BETONSKIH ZIDOVA i PLOČA DIJAMANTSKA BUŠENjA OTVORA DO 250mm U BETONU",
+      "sourceCategory": "Sanacije građevinskih objekata",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/sanacije-gradjevinskih-objekata",
+      "expected": "UNKNOWN",
+      "website": "http://www.erehteon.co.rs"
+    },
+    {
+      "name": "Dinamika szr",
+      "city": "Novi Sad",
+      "description": "IZGRADNjA STAMBENIH OBJEKATA IZGRADNjA POSLOVNIH OBJEKATA SANACIJE GRUBI GRAĐEVINSKI RADOVI",
+      "sourceCategory": "Sanacije građevinskih objekata",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/sanacije-gradjevinskih-objekata",
+      "expected": "UNKNOWN",
+      "website": "http://www.dinamika.rs"
+    },
+    {
+      "name": "Inco beograd",
+      "city": "Beograd",
+      "description": "SANACIJE KONSTRUKCIJA SPECIJALNE HIDROIZOLACIJE IZRADA NOVIH SISTEMA KARBONSKA VLAKNA KARBONSKA VLAKNA U savremenom gradjevinarstvu sve više se primenjuju složeni materijali, poznati pod opštim nazivom kompoziti, u okviru kojih se, izmedju ostalog, kao kostituente javljaju i različita vlakna. U najnovije vreme posebno su aktuelna tkz karbonska ili ugljenična vlakna koja se dobijaju u vidu niti vrlo malih, mikronskih debljina, primenom posebnih tehnologija. Ovako dobijena vlakna se koriste kao konstituente kompozita u formi različitih laminata i tkanina. Primenjuju se u područiju ojačanja i rehabilitacije betonskih, zidanih i raznih drugih konstrukcija, gde se ovi materijali postupkom …",
+      "sourceCategory": "Sanacije građevinskih objekata",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/sanacije-gradjevinskih-objekata",
+      "expected": "UNKNOWN",
+      "website": "http://www.inco.co.rs"
+    },
+    {
+      "name": "Neos - ing",
+      "city": "Beograd",
+      "description": "GRUBI GRAĐEVINSKI RADOVI IZOLACIJA VISOKOGRADNjA KROVNI POKRIVAČI SANACIJE GRAĐEVINSKIH OBJEKATA ZAVRŠNI RADOVI",
+      "sourceCategory": "Sanacije građevinskih objekata",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/sanacije-gradjevinskih-objekata",
+      "expected": "UNKNOWN",
+      "note": "Rough construction and roofing; bare `izolacija` with no facade context."
+    },
+    {
+      "name": "Visinski radovi Beograd - Vertical System",
+      "city": "Beograd",
+      "description": "RADOVI NA VISINI - VERTICAL SYSTEM - MOLERSKO - FARBARSKI RADOVI - GIPSARSKI RADOVI - DEMIT FASADE - GRAĐEVINSKA LIMARIJA - KROVOPOKRIVAČKI RADOVI - ELEKTRO INSTALACIJE - SISTEMI VIDEO NADZORA - GROMOBRANSKA ZAŠTITA",
+      "sourceCategory": "Radovi na visini",
+      "sourceId": "portal-srbija",
+      "sourceUrl": "https://www.portal-srbija.com/radovi-na-visini",
+      "expected": "FACADE_CONTRACTOR",
+      "website": "http://www.verticalsystem.rs",
+      "note": "Rope-access firm advertising `DEMIT FASADE` — the record that makes this business a contractor."
+    },
+    {
+      "name": "Moler Dragomir",
+      "city": "Kraburma",
+      "description": "",
+      "sourceCategory": "Molerski, fasaderski i gipsarski radovi",
+      "sourceId": "poslovni-kontakt",
+      "sourceUrl": "https://poslovnikontakt.com/kategorija/molerski-fasaderski-gipsarski-radovi-srbija/",
+      "expected": "UNKNOWN",
+      "note": "Sole trader, name and city only. `moler` alone is a painter, not a facade contractor."
+    },
+    {
+      "name": "Molerski Radovi Nebojša Novi Sad",
+      "city": "Novi Sad",
+      "description": "",
+      "sourceCategory": "Molerski, fasaderski i gipsarski radovi",
+      "sourceId": "poslovni-kontakt",
+      "sourceUrl": "https://poslovnikontakt.com/kategorija/molerski-fasaderski-gipsarski-radovi-srbija/",
+      "expected": "UNKNOWN"
+    },
+    {
+      "name": "Moler Dragan",
+      "city": "Kosovska Beograd",
+      "description": "",
+      "sourceCategory": "Molerski, fasaderski i gipsarski radovi",
+      "sourceId": "poslovni-kontakt",
+      "sourceUrl": "https://poslovnikontakt.com/kategorija/molerski-fasaderski-gipsarski-radovi-srbija/",
+      "expected": "UNKNOWN"
+    },
+    {
+      "name": "Moler Zoltan Novi Sad",
+      "city": "Novi Sad",
+      "description": "",
+      "sourceCategory": "Molerski, fasaderski i gipsarski radovi",
+      "sourceId": "poslovni-kontakt",
+      "sourceUrl": "https://poslovnikontakt.com/kategorija/molerski-fasaderski-gipsarski-radovi-srbija/",
+      "expected": "UNKNOWN"
+    },
+    {
+      "name": "Moler Sreten",
+      "city": "Doktor  Branka i Jelene 20 Beograd",
+      "description": "",
+      "sourceCategory": "Molerski, fasaderski i gipsarski radovi",
+      "sourceId": "poslovni-kontakt",
+      "sourceUrl": "https://poslovnikontakt.com/kategorija/molerski-fasaderski-gipsarski-radovi-srbija/",
+      "expected": "UNKNOWN"
+    },
+    {
+      "name": "Izrada enterijera,molerski,fasaderski radovi Omerović",
+      "city": "Loznica",
+      "description": "",
+      "sourceCategory": "Molerski, fasaderski i gipsarski radovi",
+      "sourceId": "poslovni-kontakt",
+      "sourceUrl": "https://poslovnikontakt.com/kategorija/molerski-fasaderski-gipsarski-radovi-srbija/",
+      "expected": "FACADE_CONTRACTOR",
+      "note": "Sole trader whose name carries `fasaderski radovi` — name-only classification."
+    },
+    {
+      "name": "Molerski gipsarski fasaderski radovi Veljko Beograd",
+      "city": "Beograd",
+      "description": "",
+      "sourceCategory": "Molerski, fasaderski i gipsarski radovi",
+      "sourceId": "poslovni-kontakt",
+      "sourceUrl": "https://poslovnikontakt.com/kategorija/molerski-fasaderski-gipsarski-radovi-srbija/",
+      "expected": "FACADE_CONTRACTOR",
+      "note": "Sole trader whose name carries `fasaderski radovi`."
+    },
+    {
+      "name": "Građevinski radovi moler baki Beograd",
+      "city": "Beograd",
+      "description": "",
+      "sourceCategory": "Molerski, fasaderski i gipsarski radovi",
+      "sourceId": "poslovni-kontakt",
+      "sourceUrl": "https://poslovnikontakt.com/kategorija/molerski-fasaderski-gipsarski-radovi-srbija/",
+      "expected": "UNKNOWN"
+    },
+    {
+      "name": "Molersko-farbarski i gipsarksi radovi Besim",
+      "city": "Čukarica",
+      "description": "",
+      "sourceCategory": "Molerski, fasaderski i gipsarski radovi",
+      "sourceId": "poslovni-kontakt",
+      "sourceUrl": "https://poslovnikontakt.com/kategorija/molerski-fasaderski-gipsarski-radovi-srbija/",
+      "expected": "UNKNOWN",
+      "note": "Painter and plasterer; no facade term in the name."
+    },
+    {
+      "name": "Moler Ćira Novi Sad",
+      "city": "21000 Novi Sad",
+      "description": "",
+      "sourceCategory": "Molerski, fasaderski i gipsarski radovi",
+      "sourceId": "poslovni-kontakt",
+      "sourceUrl": "https://poslovnikontakt.com/kategorija/molerski-fasaderski-gipsarski-radovi-srbija/",
+      "expected": "UNKNOWN"
+    }
+  ]
+}

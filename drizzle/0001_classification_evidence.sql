@@ -1,0 +1,1 @@
+ALTER TABLE `leads` ADD `classification_evidence` text;

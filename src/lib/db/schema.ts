@@ -308,6 +308,13 @@ export const leads = sqliteTable(
       .default('UNKNOWN'),
     /** 0–1. How sure the classifier is, not how likely a sale is. */
     classificationConfidence: real('classification_confidence'),
+    /**
+     * JSON: the spans `classifyLead` matched, the spans it deliberately did not
+     * count, and the arithmetic between them. A label a reviewer cannot audit
+     * gets overridden or ignored, so the evidence is stored with the label
+     * rather than recomputed from text that may since have changed.
+     */
+    classificationEvidence: text('classification_evidence'),
     cityId: text('city_id'),
     municipalityId: text('municipality_id'),
     /** The place string the source published, before it was matched to a slug. */
