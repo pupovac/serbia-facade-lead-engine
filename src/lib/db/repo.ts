@@ -121,6 +121,8 @@ export interface LeadInput {
   readonly taxId?: string | null | undefined;
   readonly classification?: LeadClassification | undefined;
   readonly classificationConfidence?: number | null | undefined;
+  /** JSON from `classifyLead`, so the label can be explained without re-running it. */
+  readonly classificationEvidence?: string | null | undefined;
   /** `data/serbia-geo.json` id of the most specific unit matched. */
   readonly cityId?: string | null | undefined;
   /** `data/serbia-geo.json` id of the local self-government unit it rolls up to. */
@@ -544,6 +546,7 @@ function insertLead(tx: Executor, input: LeadInput, at: Date): number {
       taxId: input.taxId ?? null,
       classification: input.classification ?? 'UNKNOWN',
       classificationConfidence: input.classificationConfidence ?? null,
+      classificationEvidence: input.classificationEvidence ?? null,
       cityId: input.cityId ?? null,
       municipalityId: input.municipalityId ?? null,
       cityRaw: input.cityRaw ?? null,
@@ -604,6 +607,7 @@ function updateLeadFillingBlanks(tx: Executor, existing: Lead, input: LeadInput,
     if (existing.classification === 'UNKNOWN') {
       patch.classification = input.classification;
       patch.classificationConfidence = input.classificationConfidence ?? null;
+      patch.classificationEvidence = input.classificationEvidence ?? null;
     }
   }
   if (input.leadScore != null) patch.leadScore = input.leadScore;
@@ -834,6 +838,39 @@ function upsertContactClaim(
  * what feeds the lead score and the merge confidence — is a query over them,
  * not a number someone maintained by hand.
  */
+/** What `classifyLead` and `scoreLead` produced for one lead. */
+export interface GradingInput {
+  readonly classification: LeadClassification;
+  readonly classificationConfidence: number;
+  /** `JSON.stringify` of the classification result — evidence, suppressions, arithmetic. */
+  readonly classificationEvidence?: string | null | undefined;
+  readonly leadScore: number;
+  /** `JSON.stringify` of the score components. */
+  readonly scoreBreakdown?: string | null | undefined;
+}
+
+/**
+ * Write a re-computed classification and lead score onto an existing lead.
+ *
+ * Unlike `upsertLead`, which only ever fills a gap, this overwrites: grading is
+ * derived data, and a re-run over better text is meant to replace the previous
+ * verdict rather than lose to it. A reviewer's own decision lives in
+ * `leads.status` and `review_note`, which this never touches.
+ */
+export function applyGrading(db: Db, leadId: number, grading: GradingInput, at = new Date()): void {
+  db.update(leads)
+    .set({
+      classification: grading.classification,
+      classificationConfidence: grading.classificationConfidence,
+      classificationEvidence: grading.classificationEvidence ?? null,
+      leadScore: grading.leadScore,
+      scoreBreakdown: grading.scoreBreakdown ?? null,
+      updatedAt: at,
+    })
+    .where(eq(leads.id, leadId))
+    .run();
+}
+
 export function attachSource(db: Db, leadId: number, provenance: Provenance): void {
   db.transaction((tx) => {
     attachSourceTx(tx, leadId, provenance, provenance.seenAt ?? new Date());
@@ -1305,6 +1342,7 @@ export function recordMerge(db: Db, input: MergeInput): MergeResult {
     if (survivor.classification === 'UNKNOWN' && merged.classification !== 'UNKNOWN') {
       inherited.classification = merged.classification;
       inherited.classificationConfidence = merged.classificationConfidence;
+      inherited.classificationEvidence = merged.classificationEvidence;
     }
     tx.update(leads)
       .set({
@@ -1458,6 +1496,7 @@ export function revertMerge(db: Db, mergeLogId: number, note?: string): void {
     }
     restoredSurvivor.classification = before.classification;
     restoredSurvivor.classificationConfidence = before.classificationConfidence;
+    restoredSurvivor.classificationEvidence = before.classificationEvidence;
     restoredSurvivor.firstSeenAt = new Date(before.firstSeenAt);
     restoredSurvivor.lastSeenAt = new Date(before.lastSeenAt);
     restoredSurvivor.lastScrapedAt =
