@@ -14,6 +14,11 @@ export default defineConfig({
       // rejection reason, every confidence step, every place a page can hide a
       // number — is reachable from the test tables, and this is what keeps it
       // that way.
+      //
+      // The text reporter only prints a file that is below 100% on some metric,
+      // so `src/lib/phone` having no rows in the coverage table is what passing
+      // looks like — not a threshold that matches nothing. Starve the phone
+      // tests, or leave one branch uncovered, and this block exits 1.
       thresholds: {
         'src/lib/phone/**/*.ts': {
           statements: 100,
