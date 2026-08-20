@@ -42,3 +42,6 @@ playwright-report/
 Thumbs.db
 .idea/
 .vscode/
+
+# scraper caches — the Overture extract is re-derivable, and large
+data/cache/
