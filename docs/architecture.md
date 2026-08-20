@@ -47,17 +47,26 @@ A source adapter that needs a new rule adds it here, with tests, and calls it.
 
 ## The adapter boundary
 
-An adapter is given a query and a page; it returns **raw records** and nothing
-more.
+An adapter is given a source and a page; it returns **raw records** and nothing
+more. **Adding a source means writing one directory under
+`src/scraper/sources/`** — nothing shared is edited to register it. The contract
+lives in `src/scraper/types.ts`; `docs/writing-an-adapter.md` walks through
+building one end to end.
 
-1. Fetch (through the shared HTTP helper, which enforces `robots.txt`, the
-   User-Agent and the per-host rate limit).
+1. Fetch (through `ctx.http`, which enforces `robots.txt`, the User-Agent, the
+   per-host rate limit, the retry ladder and the per-run request budget — an
+   adapter cannot opt out, and can only ask to be gentler).
 2. Parse — a **pure function of the response body**, tested against saved
-   fixtures, never against the live site.
-3. Validate with the zod schema from `src/lib` **at the boundary**. A record that
-   fails validation is reported in the run log, not silently dropped.
+   fixtures, never against the live site. A selector that matches nothing
+   **raises `StructureChangedError`**; it never yields zero leads quietly.
+3. Validate with the zod schema in `src/scraper/raw-lead.ts` **at the boundary**.
+   The schema sits with the contract rather than in `src/lib` because `RawLead`
+   is the scraper's input shape and nothing in `app/` has any use for it. A
+   record that fails is reported in the run log and archived in `raw_records`,
+   never silently dropped.
 4. Attach provenance: source id and the exact source URL, for every record.
-5. Return. The pipeline normalizes, deduplicates, classifies and scores.
+5. Return. `src/scraper/pipeline.ts` normalizes, deduplicates, classifies and
+   scores, calling `src/lib` for every one of those rules.
 
 An adapter never canonicalizes a phone, never decides a lead's type, never
 merges and never writes to the database.

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="sr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Fasaderski radovi — Primer direktorijum</title>
+  </head>
+  <body>
+    <!--
+      The same listing page after the source redesigned it: `ul.lista-firmi` and
+      `li.firma-kartica` are gone, replaced by a card grid. The page is a normal
+      200 full of companies — a parser that reports "0 leads" here is the exact
+      silent failure `StructureChangedError` exists to prevent.
+    -->
+    <h1>Fasaderski radovi u Srbiji</h1>
+
+    <div class="results-grid">
+      <div class="result-card">
+        <h3 class="result-card__title">
+          <a href="/firme/termo-fasade-novi-sad">Termo Fasade Novi Sad d.o.o.</a>
+        </h3>
+        <span class="result-card__city">Novi Sad</span>
+        <span class="result-card__phone">021/456-789</span>
+      </div>
+
+      <div class="result-card">
+        <h3 class="result-card__title">
+          <a href="/firme/fasaderski-radovi-markovic">Fasaderski radovi Marković PR</a>
+        </h3>
+        <span class="result-card__city">Čačak</span>
+        <span class="result-card__phone">063/478-115</span>
+      </div>
+    </div>
+
+    <nav class="pager"><a class="pager__next" href="/firme/fasaderi?strana=2">2</a></nav>
+  </body>
+</html>

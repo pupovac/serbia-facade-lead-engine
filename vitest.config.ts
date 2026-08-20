@@ -8,7 +8,10 @@ export default defineConfig({
     globals: false,
     coverage: {
       provider: 'v8',
-      include: ['src/lib/**/*.ts'],
+      // The scraper is included for visibility, not for a gate: only the phone
+      // module carries a threshold. Fixture servers and the CLI entry point are
+      // marked with `c8 ignore` where they are genuinely not worth covering.
+      include: ['src/lib/**/*.ts', 'src/scraper/**/*.ts'],
       // The phone module decides what a phone number is, and it is both the
       // deliverable and the strongest dedup key. Every branch of it — every
       // rejection reason, every confidence step, every place a page can hide a

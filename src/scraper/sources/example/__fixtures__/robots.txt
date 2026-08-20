@@ -1,0 +1,11 @@
+# Primer direktorijum — robots.txt
+# A shape the real Serbian directories actually publish: the company pages are
+# open, the search endpoint is not, and everyone is asked to slow down.
+
+User-agent: *
+Disallow: /pretraga
+Disallow: /admin/
+Allow: /firme/
+Crawl-delay: 1
+
+Sitemap: http://127.0.0.1/sitemap.xml
