@@ -6,17 +6,17 @@ Next.js app import from this directory; neither of them re-implements any of it.
 
 ## What belongs here
 
-| Area         | What it owns                                                                                                                                       |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `db/`        | Drizzle schema, migrations, the better-sqlite3 connection, and the repository functions that read and write leads. See `docs/data-model.md`.       |
-| `text/`      | Whitespace and diacritic folding — the `građevinski` / `gradjevinski` pair every query and every name comparison needs.                            |
-| `phone/`     | Parsing and canonicalization to `+381641234567` via `libphonenumber-js` (region `RS`), landlines and mobiles alike, always keeping the raw string. |
-| `normalize/` | Turning a validated raw record into the canonical field shapes: names, addresses, cities, emails, website URLs.                                    |
-| `dedup/`     | Match scoring and the merge itself. Signal strength, strongest first: normalized phone → website domain → email → company name + city → address.   |
-| `classify/`  | `FACADE_CONTRACTOR` / `CONSTRUCTION_MATERIAL_STORE` / `BOTH` / `UNKNOWN`.                                                                          |
-| `score/`     | The lead score — data completeness and relevance, not purchase likelihood.                                                                         |
-| `export/`    | The `exceljs` XLSX writer. Serbian column headers.                                                                                                 |
-| `types/`     | Shared domain types and the zod schemas adapters validate against.                                                                                 |
+| Area         | What it owns                                                                                                                                                                                                                                                                                     |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `db/`        | Drizzle schema, migrations, the better-sqlite3 connection, and the repository functions that read and write leads. See `docs/data-model.md`.                                                                                                                                                     |
+| `text/`      | Whitespace and diacritic folding — the `građevinski` / `gradjevinski` pair every query and every name comparison needs.                                                                                                                                                                          |
+| `phone/`     | Parsing and canonicalization to `+381641234567` via `libphonenumber-js` (region `RS`), landlines and mobiles alike, always keeping the raw string.                                                                                                                                               |
+| `normalize/` | Turning a validated raw record into the canonical field shapes: names, addresses, cities, emails, website URLs. `name.ts` produces the display name, the matching keys and the similarity score; `city.ts` resolves free text to a `data/serbia-geo.json` slug pair, or to `null` with a reason. |
+| `dedup/`     | Match scoring and the merge itself. Signal strength, strongest first: normalized phone → website domain → email → company name + city → address.                                                                                                                                                 |
+| `classify/`  | `FACADE_CONTRACTOR` / `CONSTRUCTION_MATERIAL_STORE` / `BOTH` / `UNKNOWN`.                                                                                                                                                                                                                        |
+| `score/`     | The lead score — data completeness and relevance, not purchase likelihood.                                                                                                                                                                                                                       |
+| `export/`    | The `exceljs` XLSX writer. Serbian column headers.                                                                                                                                                                                                                                               |
+| `types/`     | Shared domain types and the zod schemas adapters validate against.                                                                                                                                                                                                                               |
 
 ## Rules
 

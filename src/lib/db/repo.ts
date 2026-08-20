@@ -114,7 +114,7 @@ export interface LeadInput {
   /** Skip matching and write to this lead. Used by the merge engine and the UI. */
   readonly leadId?: number | undefined;
   readonly name: string;
-  /** `foldForComparison(name)`. Supplied by the caller so `src/lib/db` stays free of text rules. */
+  /** `normalizeCompanyName(name).ascii`. Supplied by the caller so `src/lib/db` stays free of text rules. */
   readonly nameNormalized: string;
   readonly legalForm?: string | null | undefined;
   readonly registrationNumber?: string | null | undefined;
