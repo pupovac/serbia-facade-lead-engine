@@ -288,9 +288,17 @@ async function* walkCategory(
 async function* discover(ctx: CrawlContext): AsyncIterable<DiscoveredItem> {
   const categories = selectCategories(ctx.scope.queries);
   const surfaces = selectSurfaces(ctx.scope.queries);
-  const wantsModern = surfaces.includes('modern');
 
-  const modernUrls: Map<string, string> = wantsModern
+  // The section index is only worth fetching if some modern category is
+  // actually due a walk. A second run the same afternoon should cost zero
+  // requests, not one — the difference matters because a run that finds
+  // nothing to do is exactly the run that happens most often.
+  const needsSectionIndex =
+    surfaces.includes('modern') &&
+    categories.some(
+      (category) => !ctx.state.resume(scopeKeyOf(category, 'modern'), ctx.scope, ctx.now()).skip,
+    );
+  const modernUrls: Map<string, string> = needsSectionIndex
     ? await modernCategoryUrls(ctx, categories)
     : new Map();
 
@@ -300,8 +308,12 @@ async function* discover(ctx: CrawlContext): AsyncIterable<DiscoveredItem> {
         if (ctx.signal.aborted || ctx.http.budgetExhausted()) return;
         const indexUrl =
           surface === 'modern'
-            ? (modernUrls.get(category.listId) as string)
+            ? modernUrls.get(category.listId)
             : legacyIndexUrl(category.legacyCode);
+        // `undefined` only when the section index was skipped because every
+        // modern scope is fresh; `walkCategory` would return without a request
+        // anyway, so there is nothing to do and nothing to say.
+        if (indexUrl === undefined) continue;
         yield* walkCategory(ctx, category, surface, indexUrl);
       }
     }
@@ -386,11 +398,16 @@ const adapter: SourceAdapter = {
   leadTypes: ['FACADE_CONTRACTOR'],
   category: 'APR-derived national business directory, indexed by KD-2010 activity code',
   requiresJs: false,
-  // ~9,830 core-code detail pages plus five index fetches has to clear in one
-  // run or the walk never finishes. Still a fuse: a discovery loop that stops
-  // terminating stops here. `requestDelayMs` is deliberately left alone — the
-  // framework default of 1.5 s is already gentler than the ≤1 req/s this source
-  // was cleared for, and an adapter may only ask for gentler, never faster.
+  // The ceiling this adapter will accept, sized for ~9,830 core-code detail
+  // pages plus five index fetches. It does *not* raise anything on its own:
+  // `resolveConfig` takes the **smaller** of adapter and environment, so the
+  // 5,000 default still wins and a full crawl needs `--budget 12000` on the
+  // command line. What this line does is refuse a budget larger than one full
+  // walk — a fuse for a discovery loop that stops terminating.
+  //
+  // `requestDelayMs` is deliberately left alone: the framework default of 1.5 s
+  // is already gentler than the ≤1 req/s this source was cleared for, and an
+  // adapter may only ask for gentler, never faster.
   config: { requestBudget: 12_000 },
   // The site publishes no email of its own — its footer carries region links
   // and a `kontakt.php` form — and the record block holds no anchors at all,

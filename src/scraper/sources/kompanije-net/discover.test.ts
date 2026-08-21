@@ -206,8 +206,9 @@ describe('discover', () => {
 
     const second = harness({ state: first.state });
     expect(await collect(second.ctx)).toEqual([]);
-    // Not even the section index: the walk returns before the first request.
-    expect(second.requested).toEqual([SECTION]);
+    // Not even the section index. A run that finds nothing to do is the run
+    // that happens most often, and it should cost the host nothing.
+    expect(second.requested).toEqual([]);
   });
 
   it('re-walks once the window has passed, to find businesses registered since', async () => {
