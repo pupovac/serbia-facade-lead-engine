@@ -53,6 +53,15 @@ import { normalizeRawLead } from '@/scraper/pipeline';
 import { rawLeadSchema } from '@/scraper/raw-lead';
 
 const SOURCE = 'kompanije-net';
+/**
+ * A matični broj APR open data could hold.
+ *
+ * Every one of the 133,634 registration numbers in that dataset begins 0, 1 or
+ * 2; a preduzetnik's begins 5 or 6. The split is what makes a liveness check
+ * possible at all — without it a sole trader and a deregistered company are
+ * both just "absent".
+ */
+const COMPANY_MB = /^[012]/;
 /** The five codes FUZZ-45 scoped in; anything else is an opt-in `--query` run. */
 const CORE_CODES = new Set(['43.31', '43.39', '43.99', '43.34', '43.29']);
 
@@ -94,13 +103,15 @@ const crawl = new Database(crawlPath, { readonly: true });
 
 const payloads = crawl
   .prepare(
-    `select payload from raw_records where source_id = ? and status = 'accepted' order by id`,
+    // `normalized` is what the pipeline stamps on a record that validated and
+    // reached the leads table; `rejected` never became a lead and is not yield.
+    `select payload from raw_records where source_id = ? and status = 'normalized' order by id`,
   )
   .all(SOURCE)
   .map((row) => (row as { payload: string }).payload);
 
 if (payloads.length === 0) {
-  throw new Error(`no accepted ${SOURCE} raw records in ${crawlPath} — has the crawl run?`);
+  throw new Error(`no normalized ${SOURCE} raw records in ${crawlPath} — has the crawl run?`);
 }
 
 const quarantine = loadQuarantine(baseline as Db);
@@ -122,10 +133,14 @@ let withTaxId = 0;
 let withWebsite = 0;
 let withCityResolved = 0;
 let companyLayout = 0;
+let companyMbRecords = 0;
 const phoneE164 = new Set<string>();
 
-/** matični broj → whether the record is one kompanije.net calls a company. */
-const mbSeen = new Map<string, { isCompany: boolean; name: string; code: string }>();
+/** matični broj → what the record was, for the APR join. */
+const mbSeen = new Map<
+  string,
+  { companyMb: boolean; formaPrinted: boolean; name: string; code: string }
+>();
 
 for (const payload of payloads) {
   const lead = rawLeadSchema.parse(JSON.parse(payload));
@@ -152,12 +167,20 @@ for (const payload of payloads) {
   const websites = contacts.filter((contact) => contact.kind === 'website');
   if (websites.length > 0) withWebsite += 1;
 
-  // kompanije.net prints `Forma:` only on the privredno društvo layout, which
-  // is the only subset APR open data can speak to.
-  const isCompany = lead.legalForm != null;
-  if (isCompany) companyLayout += 1;
+  // Which records APR open data can speak to at all.
+  //
+  // The obvious test — does the page print `Forma:`? — turns out to be wrong:
+  // in the FUZZ-45 sample only 8 of 38 records carrying a company matični broj
+  // printed one. The reliable test is the number itself. APR's registration
+  // numbers are allocated by entity type, and the split is total: all 133,634
+  // matični brojevi in APR open data begin 0, 1 or 2, while a preduzetnik's
+  // begins 5 or 6. `Forma:` is still recorded, as the weaker signal it is.
+  const formaPrinted = lead.legalForm != null;
+  const companyMb = input.registrationNumber != null && COMPANY_MB.test(input.registrationNumber);
+  if (formaPrinted) companyLayout += 1;
+  if (companyMb) companyMbRecords += 1;
   if (input.registrationNumber != null) {
-    mbSeen.set(input.registrationNumber, { isCompany, name: lead.name, code });
+    mbSeen.set(input.registrationNumber, { companyMb, formaPrinted, name: lead.name, code });
   }
 
   const record = leadRecord({
@@ -216,51 +239,79 @@ const counts = tally(decisions);
 
 let aprReport: unknown = null;
 if (apr !== null) {
-  const inApr: string[] = [];
-  const companiesInApr: string[] = [];
-  const companiesNotInApr: { mb: string; name: string }[] = [];
-  const statuses: string[] = [];
+  const status: string[] = [];
   const codeAgreement: string[] = [];
+  const soleTraderInApr: string[] = [];
+  const deregistered: { mb: string; name: string }[] = [];
+  let companyMbInApr = 0;
 
   for (const [mb, seen] of mbSeen) {
     const entry = apr.byMb.get(mb);
-    if (entry !== undefined) {
-      inApr.push(mb);
-      statuses.push(entry.NazivStatus);
-      codeAgreement.push(
-        entry.SifraDelatnosti === seen.code.replace('.', '') ? 'same code' : 'different code',
-      );
-      if (seen.isCompany) companiesInApr.push(mb);
-    } else if (seen.isCompany) {
-      companiesNotInApr.push({ mb, name: seen.name });
+    if (!seen.companyMb) {
+      // A sole-trader number should never be in a company register. If one is,
+      // the prefix rule this measurement rests on is wrong and it must say so.
+      if (entry !== undefined) soleTraderInApr.push(mb);
+      continue;
     }
+    if (entry === undefined) {
+      deregistered.push({ mb, name: seen.name });
+      continue;
+    }
+    companyMbInApr += 1;
+    status.push(entry.NazivStatus);
+    codeAgreement.push(
+      entry.SifraDelatnosti === seen.code.replace('.', '') ? 'same code' : 'different code',
+    );
   }
 
-  const companies = companyLayout;
+  const statusCounts = tally(status);
+  // Present and `Активан` is the only combination that means the business is
+  // still trading. Liquidation and bankruptcy are in the dataset with their own
+  // status, and absence means struck off the register entirely.
+  const alive = statusCounts['Активан'] ?? 0;
+  const notAlive = companyMbRecords - alive;
+
   aprReport = {
     cutDate: apr.cutDate,
-    aprActiveCompanies: apr.byMb.size,
-    note:
-      'APR open data covers privredna društva only. A record absent from it is ' +
-      'either a dead company or a preduzetnik, so the dead-record rate is ' +
-      'computed over the company-layout subset alone.',
+    aprRecords: apr.byMb.size,
+    method:
+      'Joined on matični broj. APR open data covers privredna društva only, and every ' +
+      "registration number in it begins 0, 1 or 2 — a preduzetnik's begins 5 or 6 — so the " +
+      'liveness check is computed over the company-number subset alone and says nothing about ' +
+      'the sole traders, which are most of this source.',
+    prefixRuleHolds: soleTraderInApr.length === 0,
+    soleTraderNumbersFoundInApr: soleTraderInApr,
+    deadRecordRate: {
+      companyMbRecords,
+      formaPrintedOnPage: companyLayout,
+      formaPrintedNote:
+        "The page's own `Forma:` field is an unreliable company indicator — see how far it is " +
+        'from companyMbRecords. The registration number is the one that holds.',
+      presentInApr: companyMbInApr,
+      struckOffTheRegister: deregistered.length,
+      statusOfThosePresent: statusCounts,
+      stillTrading: alive,
+      deadOrDying: notAlive,
+      deadRecordRate: companyMbRecords === 0 ? null : pct(notAlive, companyMbRecords),
+      examplesStruckOff: deregistered.slice(0, 10),
+    },
     duplicateRisk: {
       distinctMaticniBrojScraped: mbSeen.size,
-      alsoInAprOpenData: inApr.length,
-      share: pct(inApr.length, mbSeen.size),
+      withACompanyNumber: companyMbRecords,
+      alreadyInAprOpenData: companyMbInApr,
+      shareOfAllRecords: pct(companyMbInApr, mbSeen.size),
       activityCodeAgreement: tally(codeAgreement),
-    },
-    deadRecordRate: {
-      companyLayoutRecords: companies,
-      stillActiveInApr: companiesInApr.length,
-      absentFromApr: companiesNotInApr.length,
-      deadRecordRate: companies === 0 ? null : pct(companiesNotInApr.length, companies),
-      aprStatusOfMatches: tally(statuses),
-      examplesAbsent: companiesNotInApr.slice(0, 10),
+      note:
+        'This is the HIGH duplicate risk FUZZ-41 flagged, and it is bounded by how few records ' +
+        'here are companies at all. apr-opendata carries no phone, so a match adds a registered ' +
+        'name and municipality to a lead this source already brought a number for.',
     },
     soleTraders: {
-      records: total - companies,
-      note: 'No free register-grade liveness check exists for preduzetnici. Every number needs first-call verification.',
+      records: total - companyMbRecords,
+      share: pct(total - companyMbRecords),
+      note:
+        'No free register-grade liveness check exists for preduzetnici — that is precisely what ' +
+        'an APR purchase would buy. Every number needs first-call verification.',
     },
   };
 }
