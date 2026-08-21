@@ -1,0 +1,172 @@
+{
+  "schema_version": "1.0",
+  "issue": "FUZZ-41",
+  "title": "APR business register: costed data-acquisition options",
+  "researched_at": "2026-08-21",
+  "researcher": "Istrazivac (research analyst)",
+  "fx": { "eur_rsd": 117.33, "source": "open.er-api.com", "as_of": "2026-08-21" },
+  "recommendation": {
+    "verdict": "DO_NOT_BUY_YET",
+    "reason": "The free open data already covers companies. What money buys is preduzetnici plus an OPTIONAL contact-phone field whose fill rate is unmeasurable from outside. A free source found during this spike (kompanije.net) covers the same preduzetnik gap at a measured ~68% phone fill and 0 RSD. Harvest that first, then re-cost APR against the residual.",
+    "if_bought_anyway": "apr-portal-prosireni",
+    "blocking_measurement": "Share of registered preduzetnici that filled in the optional Telefon field. Two free ways to get it, in order: (1) ~15 minutes of a human on pretraga.apr.gov.rs checking ~20 facade preduzetnici; (2) register the free Besplatni paket on portal-info.apr.gov.rs (5 subject views + 1 XLSX per month) to confirm the export carries a Telefon column at all.",
+    "decision_rule": {
+      "phone_fill_ge_30pct": "Buy Prosireni (36.000 RSD / EUR 307 / 12 months). 14,400 subjects/year covers the whole ~10,000-record preduzetnik gap in one year.",
+      "phone_fill_10_to_30pct": "Buy Osnovni (18.000 RSD / EUR 153 / 12 months) and run 500/month against 43.31 -> 43.34 -> 43.39 in that order.",
+      "phone_fill_lt_10pct": "Do not buy. APR is then an enrichment target list only, and kompanije.net beats it at that job for free."
+    }
+  },
+  "decisive_finding_phone": {
+    "question": "Does APR data include phone numbers?",
+    "answer": "YES, but the field is optional. When a business registers it, APR publishes it publicly.",
+    "evidence_source": "https://www.apr.gov.rs/upload/Portals/0/privredna drustva/2025/JRPPS___DOO_2025_T.pdf (HTTP 200, 616907 bytes, 14 pages), page 5",
+    "quote_sr": "KONTAKT PODACI DRUSTVA / Telefon 1.: Telefon 2.: Faks: Internet adresa: www. / Kontakt podaci nisu obavezan predmet registracije. Ukoliko se odlucite da ih registrujete napominjemo da ce isti biti javno objavljeni na internet strani Agencije za privredne registre.",
+    "email_is_mandatory": true,
+    "email_quote_sr": "ADRESA ZA PRIJEM ELEKTRONSKE POSTE / *E-posta: ... Adresa za prijem elektronske poste je obavezan predmet registracije.",
+    "mandatory_phone_exists_but_not_published": "KONTAKT PODACI ZA PORESKU UPRAVU ... *Broj telefona (obavezan podatak) - collected for the Tax Administration, not registered and not published.",
+    "fill_rate": "UNMEASURED. Renders only behind the reCAPTCHA-gated detail page or inside a portal account."
+  },
+  "free_baseline": {
+    "id": "apr-opendata-companies",
+    "url": "https://openapi.apr.gov.rs/api/opendata/companies",
+    "http_status": 200,
+    "bytes": 57673691,
+    "datum_preseka": "2026-07-31",
+    "records_total": 133634,
+    "records_active": 125005,
+    "municipalities": 192,
+    "fields": ["PoslovnoIme", "SifraOpstine", "NazivOpstine", "NazivStatus", "DatumOsnivanja", "NazivPravneForme", "SifraDelatnosti"],
+    "has_phone": false,
+    "has_email": false,
+    "has_street_address": false,
+    "has_pib": false,
+    "covers_preduzetnici": false,
+    "probed_404_endpoints": ["/api/opendata", "/api/opendata/entrepreneurs", "/api/opendata/preduzetnici", "/api/opendata/soleproprietors", "/api/opendata/shops", "/api/opendata/associations", "/api/opendata/datasets"],
+    "note": "This is what money does NOT need to be spent on. It is also thinner than previously recorded: municipality only, no street address."
+  },
+  "activity_codes": {
+    "note": "Core set CORRECTED vs the FUZZ-41 issue body, which proposed 43.31/43.34/43.91/43.99. 43.91 is the weakest (64 companies); the set omitted 43.39 (largest finishing bucket) and 43.29 (carries thermal/acoustic insulation).",
+    "core_contractor": ["4331", "4334", "4339", "4399", "4329"],
+    "core_store": ["4673", "4752"],
+    "wide_net_needs_name_filtering": ["4120"],
+    "counts": [
+      { "code": "4331", "name": "Malterisanje", "companies_active_apr_opendata": 90, "kompanije_net_all_forms": 900, "kompanije_net_preduzetnici_legacy": 852 },
+      { "code": "4334", "name": "Bojenje i zastakljivanje", "companies_active_apr_opendata": 141, "kompanije_net_all_forms": 2619, "kompanije_net_preduzetnici_legacy": 2558 },
+      { "code": "4339", "name": "Ostali zavrsni radovi", "companies_active_apr_opendata": 515, "kompanije_net_all_forms": 2880, "kompanije_net_preduzetnici_legacy": 2340 },
+      { "code": "4399", "name": "Ostali nepomenuti specificni gradjevinski radovi", "companies_active_apr_opendata": 1299, "kompanije_net_all_forms": 2779, "kompanije_net_preduzetnici_legacy": 1757 },
+      { "code": "4329", "name": "Ostali instalacioni radovi u gradjevinarstvu", "companies_active_apr_opendata": 245, "kompanije_net_all_forms": 652, "kompanije_net_preduzetnici_legacy": 494 },
+      { "code": "4673", "name": "Trgovina na veliko drvetom, gradj. materijalom i sanitarnom opremom", "companies_active_apr_opendata": 1047, "kompanije_net_all_forms": 1486, "kompanije_net_preduzetnici_legacy": 218 },
+      { "code": "4752", "name": "Trgovina na malo metalnom robom, bojama i staklom", "companies_active_apr_opendata": 578, "kompanije_net_all_forms": 2166, "kompanije_net_preduzetnici_legacy": 1834 },
+      { "code": "4120", "name": "Izgradnja stambenih i nestambenih zgrada", "companies_active_apr_opendata": 6278, "kompanije_net_all_forms": 5663, "kompanije_net_preduzetnici_legacy": 3109 },
+      { "code": "4333", "name": "Postavljanje podnih i zidnih obloga", "companies_active_apr_opendata": 316, "kompanije_net_all_forms": 2121, "kompanije_net_preduzetnici_legacy": 1896 },
+      { "code": "4332", "name": "Ugradnja stolarije", "companies_active_apr_opendata": 127, "kompanije_net_all_forms": 551, "kompanije_net_preduzetnici_legacy": 467 },
+      { "code": "4391", "name": "Krovni radovi", "companies_active_apr_opendata": 64, "kompanije_net_all_forms": 329, "kompanije_net_preduzetnici_legacy": 283 },
+      { "code": "4311", "name": "Rusenje objekata", "companies_active_apr_opendata": 123, "kompanije_net_all_forms": null, "kompanije_net_preduzetnici_legacy": 1106 },
+      { "code": "4312", "name": "Pripremni radovi na gradilistu", "companies_active_apr_opendata": 313, "kompanije_net_all_forms": null, "kompanije_net_preduzetnici_legacy": 185 }
+    ],
+    "core_contractor_companies_active": 2290,
+    "core_store_companies_active": 1625,
+    "core_contractor_all_forms_kompanije_net": 9830,
+    "preduzetnik_gap_estimate": 7540,
+    "preduzetnik_gap_method": "9,830 all-form records in the five core codes (kompanije.net /Srbija/ category pages) minus 2,290 active companies in the same codes (APR open data). Independently corroborated: the site's legacy /preduzetnici/ index counts 8,001 for the same five codes, agreeing within ~6%."
+  },
+  "options": [
+    {
+      "id": "apr-portal-besplatni",
+      "path": "A",
+      "name": "portal-info.apr.gov.rs - Besplatni paket",
+      "legal_basis": "portal-info.apr.gov.rs/Naknade",
+      "price_rsd_per_12_months": 0,
+      "price_eur_per_12_months": 0,
+      "volume": "5 subject views/month, 1 XLSX + 1 PDF report/month, 1 subject monitored",
+      "advanced_search_export": "none",
+      "covers_preduzetnici": true,
+      "phones_included": "yes when the business registered one (optional field)",
+      "verdict": "DO THIS FIRST. Zero cost, no card. Confirms whether the export carries a Telefon column at all. Not done in this pass: creating an account in the member's name is his call."
+    },
+    {
+      "id": "apr-portal-osnovni",
+      "path": "A",
+      "name": "portal-info.apr.gov.rs - Osnovni paket",
+      "legal_basis": "Odluka cl. 25 st. 1 t. 1 (ceiling 30.000 RSD) with the up-to-40% reduction of cl. 25 st. 2 applied",
+      "price_rsd_per_12_months": 18000,
+      "price_eur_per_12_months": 153,
+      "volume": "2,000 subject views/month; 30 XLSX + 5 PDF reports/month; 50 subjects monitored",
+      "advanced_search_export": "500 subjects/month = 6,000/year",
+      "covers_preduzetnici": true,
+      "phones_included": "yes when registered (optional field)",
+      "verdict": "Fallback if phone fill lands between 10% and 30%. 6,000/year covers ~60% of the preduzetnik gap in year one."
+    },
+    {
+      "id": "apr-portal-prosireni",
+      "path": "A",
+      "name": "portal-info.apr.gov.rs - Prosireni paket",
+      "legal_basis": "Odluka cl. 25 st. 1 t. 2 (ceiling 60.000 RSD), reduced",
+      "price_rsd_per_12_months": 36000,
+      "price_eur_per_12_months": 307,
+      "volume": "5,000 subject views/month; 50 XLSX + 30 PDF reports/month; 200 subjects monitored",
+      "advanced_search_export": "1,200 subjects/month = 14,400/year",
+      "covers_preduzetnici": true,
+      "phones_included": "yes when registered (optional field)",
+      "verdict": "RECOMMENDED IF BUYING. 14,400/year covers the entire ~10,000-record preduzetnik gap plus the company codes inside one licence year."
+    },
+    {
+      "id": "apr-portal-poslovni",
+      "path": "A",
+      "name": "portal-info.apr.gov.rs - Poslovni paket",
+      "legal_basis": "Odluka cl. 25 st. 1 t. 3 (ceiling 90.000 RSD), reduced",
+      "price_rsd_per_12_months": 55000,
+      "price_eur_per_12_months": 469,
+      "volume": "25,000 subject views/month; 60 XLSX + 30 PDF reports/day; unlimited monitoring",
+      "advanced_search_export": "15,000 subjects/month = 180,000/year",
+      "covers_preduzetnici": true,
+      "verdict": "Oversized. The whole national target list is ~14,000 records; 180,000/year buys headroom nobody needs."
+    },
+    {
+      "id": "apr-special-arrangement",
+      "path": "A",
+      "name": "Specijalni aranzman / bulk extract (FTP, e-mail, medium)",
+      "legal_basis": "Odluka cl. 23 st. 1 t. 1",
+      "price_rule": "do 45,00 dinara po registrovanom subjektu, u zavisnosti od grupe podataka",
+      "price_rsd_for_10000_subjects_at_ceiling": 450000,
+      "price_eur_for_10000_subjects_at_ceiling": 3835,
+      "verdict": "REJECTED. More than 12x the Prosireni package for the same rows; loses even at a quarter of the ceiling."
+    },
+    {
+      "id": "apr-web-service",
+      "path": "A",
+      "name": "Automatizovano izdavanje podataka (veb-servis)",
+      "legal_basis": "Odluka cl. 27",
+      "price_rule": "7,00 RSD per subject initial load + 32,00 RSD PER SUBJECT PER MONTH for continuous change delivery + 7.500,00 RSD/month platform maintenance",
+      "price_rsd_for_10000_subjects_year_one": 4717500,
+      "price_eur_for_10000_subjects_year_one": 40206,
+      "verdict": "REJECTED. Priced for banks doing continuous KYC monitoring, not for a sales list. The per-subject-per-month term is disqualifying."
+    },
+    {
+      "id": "apr-api-scrape",
+      "path": "B",
+      "name": "Scrape pretraga.apr.gov.rs through a reCAPTCHA solving service",
+      "captcha_solves_estimated": 11000,
+      "captcha_cost_usd": "7-33",
+      "captcha_cost_rsd": "700-3300",
+      "captcha_rate_basis": "CapSolver ~$0.65/1k at volume (low end); 2Captcha published reCAPTCHA v3 $1.45-$2.99/1k",
+      "measured_blockers": [
+        "WAF blocks honest identification. GET https://pretraga.apr.gov.rs/robots.txt with UA 'SerbiaFacadeLeadEngine-Research/1.0 (+contact: ...)' returns an HTML block page ('Pristup je blokiran! ... Attack ID: 20000021'). The SAME URL with a Chrome UA returns HTTP 200 and the body 'User-agent: * / Disallow:' - robots.txt permits everything, the WAF forbids anyone who says who they are.",
+        "POST /api/search/PrivrednaDrustva/PretragaNaziva -> HTTP 405; /api/searchNazivi -> HTTP 404. Never got past the method gate, so it is unconfirmed that a delatnost filter exists at all; the surfaced routes are name-oriented, which may make exhaustive enumeration by activity code impossible.",
+        "Legacy host gone: pretraga2.apr.gov.rs -> HTTP 403; /ObjedinjenePretrage/Search/Search -> HTTP 503.",
+        "It is a state agency's portal accessed against its own access controls."
+      ],
+      "verdict": "NOT RECOMMENDED and NOT equivalent to Path A. The project's own compliance rule is 'identify the crawler honestly', and the WAF makes that impossible - Path B cannot be run without breaking it. Path A costs EUR 153-307/yr and carries none of this."
+    }
+  ],
+  "enrichment_estimate_if_apr_is_target_list_only": {
+    "target_list_records": 10000,
+    "assumed_website_share": "8-15%",
+    "crawlable_sites": "800-1500",
+    "phone_extraction_rate_assumed": "70-80%",
+    "raw_phones": "560-1200",
+    "net_new_after_dedup_against_existing_1900_unique": "300-700",
+    "confidence": "LOW. The 8-15% website share is an assumption, not a measurement - the Sajt field was empty on every kompanije.net record inspected. Measure it on 50 records before relying on this.",
+    "conclusion": "The enrichment case alone does not justify the purchase. What the purchase would still buy at 0% phone fill is a register-grade frame for sole traders (legal name, municipality, activity code, status, maticni broj) - the classification ground truth and dedup spine that the open-data company file gives us for companies and nothing currently gives us for preduzetnici."
+  }
+}
