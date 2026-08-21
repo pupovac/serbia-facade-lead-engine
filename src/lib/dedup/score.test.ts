@@ -261,6 +261,63 @@ describe('rule 4: name similarity plus city is strong, never decisive', () => {
     expect(kinds(match)).toContain('address');
   });
 
+  it('merges a name match corroborated by an address two sources punctuate differently', () => {
+    const match = bothWays(
+      leadRecord({
+        name: 'Mika Fasade',
+        cityId: 'novi-sad',
+        municipalityId: 'novi-sad',
+        addressNormalized: 'Temerinska 12, 21000 Novi Sad',
+      }),
+      leadRecord({
+        name: 'Mika Fasade doo',
+        cityId: 'novi-sad',
+        municipalityId: 'novi-sad',
+        addressNormalized: 'Ul. Temerinska br. 12, 21000, Novi Sad',
+      }),
+    );
+    expect(match.decision).toBe('merge');
+    expect(kinds(match)).toContain('address');
+  });
+
+  it('will not let a neighbouring house number corroborate anything', () => {
+    const match = bothWays(
+      leadRecord({
+        name: 'Mika Fasade',
+        cityId: 'novi-sad',
+        municipalityId: 'novi-sad',
+        addressNormalized: 'Temerinska 12, Novi Sad',
+      }),
+      leadRecord({
+        name: 'Mika Fasade doo',
+        cityId: 'novi-sad',
+        municipalityId: 'novi-sad',
+        addressNormalized: 'Temerinska 12a, Novi Sad',
+      }),
+    );
+    expect(match.decision).toBe('review');
+    expect(kinds(match)).not.toContain('address');
+  });
+
+  it('will not let a street with no house number corroborate anything', () => {
+    const match = bothWays(
+      leadRecord({
+        name: 'Mika Fasade',
+        cityId: 'novi-sad',
+        municipalityId: 'novi-sad',
+        addressNormalized: 'Bulevar oslobođenja, Novi Sad',
+      }),
+      leadRecord({
+        name: 'Mika Fasade doo',
+        cityId: 'novi-sad',
+        municipalityId: 'novi-sad',
+        addressNormalized: 'Bulevar oslobodjenja 5, Novi Sad',
+      }),
+    );
+    expect(match.decision).toBe('review');
+    expect(kinds(match)).not.toContain('address');
+  });
+
   it('merges a name match corroborated by a shared Facebook page', () => {
     const match = bothWays(
       leadRecord({

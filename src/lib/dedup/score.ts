@@ -38,7 +38,13 @@
  * carries its evidence, and a reviewer's `no` is remembered so the pair is not
  * proposed again.
  */
-import { RECOMMENDED_NAME_MATCH_THRESHOLD, normalizedNameSimilarity } from '../normalize/index.js';
+import type { NormalizedAddress } from '../normalize/index.js';
+import {
+  RECOMMENDED_ADDRESS_MATCH_THRESHOLD,
+  RECOMMENDED_NAME_MATCH_THRESHOLD,
+  normalizedAddressSimilarity,
+  normalizedNameSimilarity,
+} from '../normalize/index.js';
 import { areaCodeFor } from '../phone/index.js';
 import {
   BANDS,
@@ -196,14 +202,25 @@ export function scoreMatch(
 
   /* -- Corroboration -------------------------------------------------------- */
 
-  const address = sameValue(a.addressNormalized, b.addressNormalized);
-  if (address != null) {
+  // Compared through `src/lib/normalize`, not as strings: two sources almost
+  // never agree down to the comma, and `Temerinska 12, 21000 Novi Sad` and
+  // `Temerinska 12, 21000, Novi Sad` are one address. What the module will not
+  // do is call two house numbers one — that stays a hard non-match, which is
+  // why this reads as a threshold and never as a partial credit.
+  const addressScore = normalizedAddressSimilarity(a.addressKey, b.addressKey);
+  if (addressScore >= RECOMMENDED_ADDRESS_MATCH_THRESHOLD) {
+    // The fuller of the two keys is the one to log: when only one side named the
+    // town, `merge_log` should carry the address that says where it is.
+    const address = fullerAddress(a.addressKey, b.addressKey);
     signals.push({
       kind: 'address',
       value: address,
       weight: SIGNAL_WEIGHTS.address,
       role: 'corroborating',
-      detail: `both at ${address}`,
+      detail:
+        addressScore >= 1
+          ? `both at ${address}`
+          : `both at ${address} (${round(addressScore)} address similarity)`,
     });
   }
 
@@ -383,6 +400,17 @@ function overlap(a: readonly string[], b: readonly string[]): string[] {
   if (a.length === 0 || b.length === 0) return [];
   const other = new Set(b);
   return [...new Set(a)].filter((value) => other.has(value));
+}
+
+/**
+ * Which of two matching address keys to file the signal under: the one that
+ * resolved a town, and otherwise the longer.
+ */
+function fullerAddress(a: NormalizedAddress | null, b: NormalizedAddress | null): string {
+  if (a == null) return b?.ascii ?? '';
+  if (b == null) return a.ascii;
+  if (a.localityId !== b.localityId) return a.localityId === undefined ? b.ascii : a.ascii;
+  return a.ascii.length >= b.ascii.length ? a.ascii : b.ascii;
 }
 
 function sameValue(a: string | null, b: string | null): string | null {

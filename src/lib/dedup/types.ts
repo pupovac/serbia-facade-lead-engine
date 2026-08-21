@@ -8,7 +8,7 @@
  * shape, which is what makes the rules testable without a database.
  */
 import type { IdentifierKind, MergeSignal } from '../db/schema.js';
-import type { NormalizedCompanyName } from '../normalize/index.js';
+import type { NormalizedAddress, NormalizedCompanyName } from '../normalize/index.js';
 
 /**
  * What the engine decided about a pair.
@@ -107,7 +107,17 @@ export interface LeadRecord {
   readonly nameKey: NormalizedCompanyName;
   readonly cityId: string | null;
   readonly municipalityId: string | null;
+  /**
+   * The stored `leads.address_normalized` string. Kept as published-by-the-
+   * pipeline so a row can be read back and re-keyed; never compared directly.
+   */
   readonly addressNormalized: string | null;
+  /**
+   * The parsed address — the thing that *is* compared. Built once per record
+   * rather than per pair, exactly like `nameKey`, because `scoreMatch` runs
+   * over every pair in a city block.
+   */
+  readonly addressKey: NormalizedAddress | null;
   readonly registrationNumber: string | null;
   readonly taxId: string | null;
   /** Canonical `+381…`, valid numbers only. An unparseable string never anchors a merge. */

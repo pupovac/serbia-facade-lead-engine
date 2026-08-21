@@ -46,7 +46,7 @@ import {
   toContactInputs,
 } from '@/lib/contact';
 import { leadRecord } from '@/lib/dedup';
-import { resolveCityDetailed } from '@/lib/normalize';
+import { normalizeAddress, resolveCityDetailed } from '@/lib/normalize';
 import { extractPhones, toPhoneInput, normalizePhone } from '@/lib/phone';
 import { normalizeWhitespace } from '@/lib/text/fold.js';
 import type { ExtractedSocials } from '@/lib/contact';
@@ -111,7 +111,9 @@ export function readPage(options: ReadPageOptions): PageEvidence {
     // Structured only. A labelled address may place the business, but it may
     // not be the corroboration that promotes a name match to a merge.
     addressNormalized:
-      address.grade === 'structured' && address.full !== null ? address.full.toLowerCase() : null,
+      address.grade === 'structured' && address.full !== null
+        ? normalizeAddress(address.full).ascii
+        : null,
     phones: phones.map((phone) => phone.e164),
     websiteDomains: website === null ? [] : [website.registrableDomain],
     emails,
