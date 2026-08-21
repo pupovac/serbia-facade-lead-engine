@@ -158,6 +158,29 @@ export interface ClassificationResult {
   readonly suppressed: readonly SuppressedMatch[];
   /** One sentence, safe to render in the review UI. */
   readonly reason: string;
+  /**
+   * Set when the label came from the source rather than from the text.
+   *
+   * A company listed under `nadjimajstora.rs/gradjevinski-radovi/fasader` is a
+   * fasader because the directory says so, and reading its name for facade
+   * words can only lose it — `Srdjan Todić` contains no evidence of anything.
+   * So a pre-filtered source asserts the label and the word-scorer never gets
+   * a vote.
+   *
+   * It is a distinct flag rather than a high confidence score because the two
+   * mean different things to a reviewer, and because an audit of the
+   * classifier's precision has to be able to exclude the labels it did not
+   * produce.
+   */
+  readonly sourceAsserted?: boolean;
+  /**
+   * What the word-scorer would have said, kept for exactly that audit.
+   *
+   * Never used for the label. It is how we find out that a source-asserted
+   * corpus reads as `UNKNOWN` to the classifier — which is the measurement
+   * that says whether the signal list is missing terms.
+   */
+  readonly inferred?: ClassificationResult;
 }
 
 export interface ClassificationInput {

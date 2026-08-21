@@ -36,6 +36,22 @@ export interface FetchOptions {
   readonly retries?: number | undefined;
   /** Treat these non-2xx statuses as a normal result instead of an error. */
   readonly acceptStatuses?: readonly number[] | undefined;
+  /**
+   * A form POST, url-encoded. Set it and the request becomes a `POST` carrying
+   * `application/x-www-form-urlencoded`.
+   *
+   * This exists because a directory that hides a phone number behind a button
+   * usually hides it behind one of these, and replaying the button's own
+   * request is both cheaper and gentler than rendering the page in a browser to
+   * click it. Everything else still applies unchanged — `robots.txt` is checked
+   * for the endpoint, the host rate limit is shared with the page fetches, the
+   * budget is spent, and the retry ladder is the same one.
+   *
+   * A form POST is a read here and nowhere else: the only endpoints an adapter
+   * may reach this way are the ones a page's own JavaScript calls to display
+   * data it already published. It is not a route for submitting anything.
+   */
+  readonly form?: Readonly<Record<string, string>> | undefined;
 }
 
 export interface FetchResult {
@@ -80,6 +96,13 @@ const RETRYABLE_STATUSES = new Set([408, 425, 429, 500, 502, 503, 504, 522, 524]
 
 const realSleep = (ms: number): Promise<void> =>
   ms <= 0 ? Promise.resolve() : new Promise((resolve) => setTimeout(resolve, ms));
+
+/** A form body, url-encoded the way a browser encodes one. */
+export function encodeForm(form: Readonly<Record<string, string>>): string {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(form)) params.append(key, value);
+  return params.toString();
+}
 
 /** `Retry-After` is either seconds or an HTTP date. Both appear in the wild. */
 export function parseRetryAfter(value: string | null, now: number): number | null {
@@ -232,14 +255,21 @@ export class PoliteFetcher {
       this.signal?.addEventListener('abort', onOuterAbort, { once: true });
 
       try {
+        // Built per attempt: a `URLSearchParams` body is a stream once read, so
+        // a retry has to encode its own rather than replay a spent one.
+        const body = options.form === undefined ? undefined : encodeForm(options.form);
         const response = await this.fetchImpl(url, {
-          method: 'GET',
+          method: options.form === undefined ? 'GET' : 'POST',
           redirect: 'follow',
           headers: {
             'user-agent': this.config.userAgent,
             'accept-language': 'sr,sr-Latn;q=0.9,en;q=0.6',
+            ...(body === undefined
+              ? {}
+              : { 'content-type': 'application/x-www-form-urlencoded; charset=UTF-8' }),
             ...(options.headers ?? {}),
           },
+          ...(body === undefined ? {} : { body }),
           signal: controller.signal,
         });
         lastStatus = response.status;

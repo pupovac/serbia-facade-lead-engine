@@ -515,31 +515,41 @@
       "notes": "Serbia's biggest classifieds site and structurally the richest pool of active fasaderi - and it yields nothing under our compliance rules, because the number is behind a click-gate whose endpoint robots.txt names explicitly. Worth recording loudly so nobody spends a week rediscovering this."
     },
     {
-      "id": "nadjimajstora",
-      "name": "NadjiMajstora.rs - Fasader",
-      "url": "https://www.nadjimajstora.rs/gradjevinski-radovi/fasader.htm",
+      "id": "nadjimajstora-rs",
+      "name": "Nađi Majstora",
+      "url": "https://www.nadjimajstora.rs",
       "category": "tradesman directory",
       "has_contractors": true,
       "has_stores": false,
-      "estimated_records": 56,
-      "estimate_method": "Category page states '1 - 20 od 56' with a 3-page pager - 56 registered fasaderi nationally.",
-      "fields_available": ["craftsman_name", "city", "average_rating", "service_type"],
-      "phone_coverage_estimate": "0% measured. I fetched 5 profile pages (andrija-petkovic--4169, bojan-nikolic--4162, david-ivkovic--3816, djordje-pantovic-ribnica-28, gzim-jahirovic--3788): zero phone-shaped strings on any of them. Contact runs through an on-site form.",
+      "estimated_records": 89,
+      "estimate_method": "CORRECTED BY FUZZ-40 from a full crawl, not an estimate: 56 under `fasader` and 33 under `izolater`, 89 profiles, all of them walked. Two adjacent-category facts matter. (1) Page 1 must carry the pager’s own sort parameters (`?p=1&s=o&st=asc`): the bare category URL sorts rating-descending while the pager sorts ascending, so walking page 1 bare and pages 2+ paged returns 56 rows holding only 36 distinct masters. (2) The header count is not the row count — `moler` prints \"od 456\" and paginates 450.",
+      "fields_available": [
+        "craftsman_name",
+        "phone",
+        "city",
+        "municipality",
+        "address",
+        "opening_hours",
+        "average_rating",
+        "service_type",
+        "registered_on"
+      ],
+      "phone_coverage_estimate": "100% measured — 89 of 89 profiles, 93 distinct numbers, every one of them valid under libphonenumber-js region RS. This CORRECTS the 0% recorded by FUZZ-4, which was right about the page and wrong about the source: the profile HTML genuinely carries no phone, but the contact tab’s \"Prikaži brojeve telefona\" button calls `POST /master/show_tel/` with `id=<masterId>` and no cookie, token, referer or session, and that returns the number as JSON. Contact does not run through a form.",
       "pagination": {
         "exists": true,
-        "how_addressed": "Numbered pager, 20 per page, 3 pages. Profile URLs are /gradjevinski-radovi/fasader/{ime-prezime}--{id}.htm."
+        "how_addressed": "`?p=<n>&s=o&st=asc`, 20 per page, sent on every page including the first. Profile URLs are /gradjevinski-radovi/<trade>/<slug>-<id>.htm; the listing spells an empty city slug as a doubled dash (`srdjan-todic--2298.htm`) while the profile’s own tabs spell it `srdjan-todic-2298`, so the master id, not the URL, is the stable key."
       },
       "requires_js": false,
       "robots_allows": "ALLOWED. https://www.nadjimajstora.rs/robots.txt: \"User-agent: *\" / \"Disallow: /cgi-bin/\" / \"Disallow: /mezimci/\" / \"Disallow: /ac/\" plus one named noindex URL, and \"Sitemap: http://www.nadjimajstora.rs/sitemap.xml\". Nothing blocks the fasader category.",
-      "recommended_approach": "Skip. Robots would permit a crawl, but 56 records with no phone on any of them fails the primary criterion. Revisit only if a later phase adds email/form-based outreach.",
-      "duplicate_risk": "Low - individual majstori, mostly not in the corporate registers.",
-      "priority": "Low",
+      "recommended_approach": "Crawl — adapter shipped in FUZZ-40 as `nadjimajstora-rs`. Three requests per master (profile, contact tab, phone endpoint), 272 for the whole source, ~7 minutes at 1 req/s. cheerio only; no headless browser. Classification is source-asserted from the trade category, because these are sole traders whose names carry no facade words.",
+      "duplicate_risk": "Low against other sources — measured zero overlap with `portal-srbija` at lead, phone and name-key level over 78 vs 477 leads. Non-trivial *within* the source: a tradesman registered in two trades gets two master ids (Knauf Profi is 380 and 395) and some register more than once in one trade, so 89 records merge to 78 leads on the phone key.",
+      "priority": "Medium",
       "sample_urls": [
         "https://www.nadjimajstora.rs/gradjevinski-radovi/fasader.htm",
         "https://www.nadjimajstora.rs/gradjevinski-radovi/fasader/srdjan-todic--2298.htm",
         "https://www.nadjimajstora.rs/gradjevinski-radovi/fasader/bojan-nikolic--4162.htm"
       ],
-      "notes": "Textbook example of the ranking rule in the brief: a clean, facade-named, crawlable directory with 56 real contractors, ranked Low because five sampled profiles produced zero phone numbers. Name + city + rating only."
+      "notes": "The reason FUZZ-4’s ranking rule misfired here, and worth remembering: \"no phone on the profile page\" is not the same fact as \"no phone\". Five sampled profiles produced zero numbers and the source was ranked Low; the number was one un-authenticated POST away, and the full crawl returns 100% coverage. Every lead is a facade or insulation installer by the site’s own filing, so none of them land in UNKNOWN."
     },
     {
       "id": "samsvojmajstor",

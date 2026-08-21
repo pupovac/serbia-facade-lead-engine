@@ -42,7 +42,7 @@ import {
   type Provenance,
   type UpsertLeadResult,
 } from '@/lib/db';
-import { classifyLead, type ClassificationResult } from '@/lib/classify';
+import { assertClassification, classifyLead, type ClassificationResult } from '@/lib/classify';
 import {
   extractEmails,
   extractSocials,
@@ -200,7 +200,7 @@ export function normalizeRawLead(
   });
   const city = cityResolution.ok ? cityResolution.match : null;
 
-  const classification = classifyLead({
+  const inferred = classifyLead({
     name,
     ...(trimOrNull(lead.description) === null
       ? {}
@@ -211,6 +211,19 @@ export function normalizeRawLead(
       return website === undefined ? {} : { website: website.value };
     })(),
   });
+
+  // A source that pre-filters by trade outranks the word-scorer, and the
+  // scorer's answer is kept beside it rather than discarded: it is the only way
+  // to measure the classifier against a corpus whose label is already known.
+  const classification =
+    lead.assertedType === null || lead.assertedType === undefined
+      ? inferred
+      : assertClassification({
+          label: lead.assertedType,
+          reason:
+            trimOrNull(lead.assertedTypeReason) ?? `listed by ${lead.sourceId ?? 'the source'}`,
+          inferred,
+        });
 
   const score = scoreLead({
     phones: phones.map((phone) => ({ e164: phone.e164, type: phone.type, valid: phone.valid })),

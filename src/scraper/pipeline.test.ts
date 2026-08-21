@@ -229,6 +229,64 @@ describe('normalizeRawLead', () => {
   });
 });
 
+/**
+ * The epic's rule, tested where it takes effect. A sole trader from a
+ * contractor-only listing must not be scored on their name — the pilot's 84%
+ * `UNKNOWN` rate is what that produces.
+ */
+describe('source-asserted classification', () => {
+  it('takes the source’s label instead of scoring a personal name', () => {
+    const lead = raw({
+      name: 'Srdjan Todić',
+      categories: ['Fasader'],
+      assertedType: 'FACADE_CONTRACTOR',
+      assertedTypeReason: 'listed under gradjevinski-radovi/fasader',
+    });
+    const { input, classification } = normalizeRawLead(lead, {}, NOW);
+
+    expect(classification.label).toBe('FACADE_CONTRACTOR');
+    expect(classification.sourceAsserted).toBe(true);
+    expect(input.classification).toBe('FACADE_CONTRACTOR');
+    expect(input.classificationConfidence).toBe(1);
+  });
+
+  it('keeps the inferred label in the stored evidence for auditing', () => {
+    const lead = raw({
+      name: 'Srdjan Todić',
+      assertedType: 'FACADE_CONTRACTOR',
+      assertedTypeReason: 'listed under gradjevinski-radovi/fasader',
+    });
+    const { input, classification } = normalizeRawLead(lead, {}, NOW);
+
+    // Without the assertion this record is UNKNOWN and leaves the export.
+    expect(classification.inferred?.label).toBe('UNKNOWN');
+    expect(JSON.parse(input.classificationEvidence as string)).toMatchObject({
+      sourceAsserted: true,
+      inferred: { label: 'UNKNOWN' },
+    });
+  });
+
+  it('scores a record the source asserted no worse than one it did not', () => {
+    const asserted = normalizeRawLead(
+      raw({
+        name: 'Srdjan Todić',
+        phones: ['064 588 06 69'],
+        city: 'Palilula',
+        assertedType: 'FACADE_CONTRACTOR',
+      }),
+      {},
+      NOW,
+    );
+    expect(asserted.input.leadScore).toBeGreaterThan(0);
+  });
+
+  it('leaves an ordinary record on the word-scorer', () => {
+    const { classification } = normalizeRawLead(raw(), {}, NOW);
+    expect(classification.sourceAsserted).toBeUndefined();
+    expect(classification.label).toBe('FACADE_CONTRACTOR');
+  });
+});
+
 describe('persistLead', () => {
   it('writes the lead, the raw record and the provenance', () => {
     const lead = raw({ city: 'Novi Sad', phones: ['021/456-789'] });
