@@ -10,14 +10,15 @@
     "Phone counting used the regex (\\+381|00381|\\b0)[0-9 /-]{7,13}[0-9] against the raw HTML, then de-duplicated after stripping separators. Image filenames occasionally produce false positives; every High-priority number below was spot-checked against rendered page text.",
     "robots.txt was fetched directly for every source; the quoted rule is verbatim from the file on 2026-08-19.",
     "Serbian queries were run in both diacritic and ASCII-folded form (fasader/fasaderi, gradjevinski/gradevinski, izrada fasade, termo fasada, demit fasada, termoizolacija, stiropor fasada, molersko fasaderski radovi, zavrsni gradjevinski radovi, majstori za fasadu).",
-    "Amended 2026-08-20 (FUZZ-28) to land two corrections measured by FUZZ-8: portal-srbija's city-scoped category pages are not strict subsets of the national page (+80% on the one category measured, with 14 city slugs deterministically 500ing including beograd), and the APR register is available as free open data at openapi.apr.gov.rs rather than only through a commercial licensing conversation. Where FUZZ-4 and FUZZ-8 disagree, the measured FUZZ-8 finding wins; the superseded FUZZ-4 text is kept inline so the change is auditable. Nothing else in this registry was re-measured on that date."
+    "Amended 2026-08-20 (FUZZ-28) to land two corrections measured by FUZZ-8: portal-srbija's city-scoped category pages are not strict subsets of the national page (+80% on the one category measured, with 14 city slugs deterministically 500ing including beograd), and the APR register is available as free open data at openapi.apr.gov.rs rather than only through a commercial licensing conversation. Where FUZZ-4 and FUZZ-8 disagree, the measured FUZZ-8 finding wins; the superseded FUZZ-4 text is kept inline so the change is auditable. Nothing else in this registry was re-measured on that date.",
+    "Amended 2026-08-21 (FUZZ-44) to add companywall.rs as REJECTED on Terms of Service, and to record the rule that produced that verdict: a permissive robots.txt is not a licence. companywall publishes 'Allow: /' over its company profiles while its Uslovi koriscenja forbid 'scraping, crawling, indeksiranje ili bilo koji oblik masovnog izvlacenja informacija' by name and bind on access rather than registration. Where the two disagree, the contract wins. Every future source evaluation in this registry should read the ToS as well as robots.txt before reporting a yield number, because measuring the yield is itself the prohibited act."
   ],
   "summary": {
-    "sources_evaluated": 31,
+    "sources_evaluated": 32,
     "high": 6,
     "medium": 6,
     "low": 11,
-    "rejected": 8,
+    "rejected": 9,
     "rejected_ids": [
       "apr-registry",
       "facebook-pages",
@@ -26,7 +27,8 @@
       "e-majstori",
       "nekretnine-rs",
       "lalafo-rs",
-      "stovarista-rs"
+      "stovarista-rs",
+      "companywall"
     ],
     "raw_records_reachable_high_priority": 16409,
     "raw_records_reachable_high_priority_method": "portal-srbija 642 + gradjevinarstvo.rs 11,291 + navidiku.rs 330 + gradjevinskefirme.cu.rs ~3,000 + poslovnikontakt 746 + 011info ~400. FUZZ-8 note: the portal-srbija 642 is a floor - its national category pages truncate, and a city-iterated sweep measured +80% on the one category tested, so this total understates by an unmeasured margin.",
@@ -700,6 +702,50 @@
         "https://data.gov.rs/sr/datasets/api-za-registar-privrednikh-drushtava/"
       ],
       "notes": "Found by FUZZ-8; it reopens the source FUZZ-4 had to reject. Priority Low is the phone-first rule applied honestly (zero phones), NOT a judgement on value - as a coverage frame and a classifier oracle it is High. The hard limitation: this dataset covers privredna drustva only (DOO, AD). It does NOT cover preduzetnici, the sole traders that the project brief names as a large share of Serbian fasaderi. /api/opendata/entrepreneurs and /api/opendata/preduzetnici were both probed and both return 404, and data.gov.rs holds no preduzetnici dataset. Also checked by FUZZ-8: data.gov.rs carries 3,516 datasets across 216 organisations and, apart from this register, none is a business directory with contact data."
+    },
+    {
+      "id": "companywall",
+      "name": "CompanyWall Business - Srbija (komercijalni kreditni biro / APR mirror)",
+      "url": "https://www.companywall.rs/",
+      "category": "commercial credit-bureau portal mirroring the APR register",
+      "has_contractors": true,
+      "has_stores": true,
+      "covers_preduzetnici": true,
+      "estimated_records": 613000,
+      "estimate_method": "NOT a yield estimate - a size estimate only, read off /sitemap without fetching any profile: an index of 613 SiteMap/Companies?p=N pages at 1,000 profile URLs each. Contact fill rate was NOT measured for facade contractors and must not be: doing so requires the bulk /firma/ fetching the ToS forbid. The only figure on record is 4/7 phone and 4/7 email across 7 all-trades profiles read on 2026-08-21 while triaging FUZZ-39, before the ToS were known. Treat it as an anecdote, not a number.",
+      "fields_available": [
+        "company_name",
+        "phone",
+        "email",
+        "street_address",
+        "pib",
+        "maticni_broj",
+        "sifra_delatnosti",
+        "director",
+        "owner",
+        "founding_date",
+        "employees",
+        "credit_rating",
+        "blockade_status"
+      ],
+      "phone_coverage_estimate": "Not measured, and must not be measured. See estimate_method.",
+      "pagination": {
+        "exists": true,
+        "how_addressed": "N/A - source rejected. For the record: profiles live at /firma/<slug>/<opaque-id> and the opaque id is mandatory (/firma/<slug> 404s), so a profile URL cannot be constructed from a company name. The only enumeration path is the 613-page sitemap index, and walking it is exactly the 'masovno ili sistematicno preuzimanje' the ToS prohibits."
+      },
+      "requires_js": false,
+      "robots_allows": "ALLOWED for /firma/*, AND IRRELEVANT. https://www.companywall.rs/robots.txt (fetched 2026-08-21) is 'User-agent: *' with Disallow on /pretraga*, /Home/Search*, /Home/Company*, /Home/ExportCsv*, /Home/ExportExcel*, /Home/GetMapDetails*, /Account/Login*, /registracija and others, then 'Allow: /' plus two Sitemap lines. Profile pages are outside every Disallow prefix. This does not grant permission - see tos_forbids.",
+      "tos_forbids": "YES - DECISIVE. https://www.companywall.rs/uslovi-koriscenja (last updated 14.08.2025), section 'b. Strogo zabranjene aktivnosti', forbids the user to: 'Automatizovano, robotsko, skriptovano, masovno ili sistematicno preuzima podatke, kao I da radi scraping, crawling, indeksiranje ili bilo koji oblik masovnog izvlacenja informacija bez prethodne pisane saglasnosti CompanyWall-a.' The Terms bind on access, not registration: 'Pristupanjem i/ili koriscenjem Portala, Korisnik potvrduje da je procitao, razumeo i prihvatio ove Uslove.' Section 'a. Dozvoljeno koriscenje' separately bars using portal data 'radi izgradnje, unapredenja ili obogacivanja sopstvenih baza podataka, servisa ili proizvoda koji se nude trecim licima' - which is a verbatim description of the enrichment path FUZZ-44 proposed, and bites even on hand-collected data. Their fair-use policy treats 1,000 company views per month as above-average usage; the proposed daibau join alone was 748.",
+      "recommended_approach": "REJECTED on Terms of Service. Do not fetch /firma/ profiles, do not walk the sitemap, do not build a SourceAdapter or an src/scraper/enrich source against this host. The three things it uniquely offered all have free, compliant and more authoritative substitutes: (1) 'U blokadi' -> NBS Registar duznika u prinudnoj naplati at https://nbs.rs/sr/drugi-nivo-navigacije/servisi/duznici-dupn (redirects to webappcenter.nbs.rs/PnWebApp/...), queryable by maticni broj or PIB, which kompanije.net already publishes per record; nbs.rs/robots.txt restricts only two unrelated prefixes and webappcenter.nbs.rs serves no robots.txt at all. (2) freshness / active status -> APR open data at openapi.apr.gov.rs, already free (FUZZ-8, FUZZ-41), joinable on maticni broj, though it excludes preduzetnici. (3) email -> not a project blocker under the phone-first rule. If companywall is ever wanted, the only lawful route is 'prethodna pisana saglasnost' - a written licensing conversation with CompanyWall doo, which is a commercial decision, not a scraping task.",
+      "duplicate_risk": "N/A - rejected. Would have been HIGH against apr-opendata and kompanije-net; all three derive from the same APR register and expose maticni broj.",
+      "priority": "Low",
+      "sample_urls": [
+        "https://www.companywall.rs/robots.txt",
+        "https://www.companywall.rs/uslovi-koriscenja",
+        "https://www.companywall.rs/izjava-o-privatnosti"
+      ],
+      "compliance_notes": "Their izjava-o-privatnosti takes the position that a preduzetnik's business-activity data (maticni broj, PIB, account numbers) falls outside the ZZPL because a preduzetnik is a 'fizicko lice koje obavlja delatnost' rather than a 'fizicko lice'. That is their reading, recorded here because it is a data point on how the Serbian market treats sole-trader business data - it is not this project's legal position, and a mobile phone number is a weaker case for that argument than a PIB is.",
+      "notes": "REJECTED (Terms of Service) by FUZZ-44 on 2026-08-21. The trap this source sets is that its robots.txt is permissive and its profile pages are clean server-rendered HTML with plain-text phone numbers, so it reads as an easy win until you open the contract behind it. Recorded here so the next source survey does not re-discover it and re-run the same reasoning. Full write-up with quoted clauses: research/2026-08-21-fuzz-44-companywall-rs.md. Four pages were fetched in total during the spike (robots.txt, homepage, the ToS and the privacy statement); no company profile was fetched."
     },
     {
       "id": "facebook-pages",

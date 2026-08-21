@@ -17,9 +17,9 @@ afterEach(() => {
 describe('registrySourceRows', () => {
   it('carries every source from both registries, with the overlap merged once', () => {
     const rows = registrySourceRows();
-    // 31 contractor + 20 store entries, 3 of which appear in both.
-    expect(rows).toHaveLength(48);
-    expect(new Set(rows.map((r) => r.id)).size).toBe(48);
+    // 32 contractor + 20 store entries, 3 of which appear in both.
+    expect(rows).toHaveLength(49);
+    expect(new Set(rows.map((r) => r.id)).size).toBe(49);
   });
 
   it('unions the segment flags for a source both registries listed', () => {
@@ -64,8 +64,8 @@ describe('parseRobotsVerdict', () => {
 
 describe('seedSources', () => {
   it('writes the registries into the database', () => {
-    expect(seedSources(db)).toBe(48);
-    expect(db.select().from(sources).all()).toHaveLength(48);
+    expect(seedSources(db)).toBe(49);
+    expect(db.select().from(sources).all()).toHaveLength(49);
 
     const portal = getSource(db, 'portal-srbija');
     expect(portal?.name).toBe('Portal Srbija');
@@ -83,7 +83,7 @@ describe('seedSources', () => {
     seedSources(db, second);
     const after = getSource(db, 'portal-srbija');
 
-    expect(db.select().from(sources).all()).toHaveLength(48);
+    expect(db.select().from(sources).all()).toHaveLength(49);
     expect(after?.createdAt.toISOString()).toBe(before?.createdAt.toISOString());
     expect(after?.updatedAt.toISOString()).toBe(second.toISOString());
   });
