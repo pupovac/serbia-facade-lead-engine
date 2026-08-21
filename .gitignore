@@ -45,3 +45,6 @@ Thumbs.db
 
 # scraper caches — the Overture extract is re-derivable, and large
 data/cache/
+
+# Pilot run artefacts — fetched pages and reports containing lead data.
+runlogs/
