@@ -28,6 +28,7 @@ import { createHash } from 'node:crypto';
 import { and, asc, desc, eq, inArray, isNull, or, sql } from 'drizzle-orm';
 import type { Db } from './client.js';
 import {
+  type AdjacentIndustry,
   type ContactKind,
   type CrawlStateStatus,
   crawlRuns,
@@ -46,6 +47,8 @@ import {
   leadSources,
   leads,
   type IdentifierKind,
+  isInScope,
+  isUnclassified,
   type MergeCandidate,
   type MergeCandidateStatus,
   type MatchSignalName,
@@ -132,6 +135,8 @@ export interface LeadInput {
   readonly classificationConfidence?: number | null | undefined;
   /** JSON from `classifyLead`, so the label can be explained without re-running it. */
   readonly classificationEvidence?: string | null | undefined;
+  /** Set with an `OUT_OF_SCOPE` label: the adjacent trade that decided it. */
+  readonly classificationIndustry?: AdjacentIndustry | null | undefined;
   /** `data/serbia-geo.json` id of the most specific unit matched. */
   readonly cityId?: string | null | undefined;
   /** `data/serbia-geo.json` id of the local self-government unit it rolls up to. */
@@ -147,6 +152,9 @@ export interface LeadInput {
   readonly openingHours?: string | null | undefined;
   readonly leadScore?: number | undefined;
   readonly scoreBreakdown?: string | null | undefined;
+  readonly relevanceScore?: number | undefined;
+  readonly relevanceBreakdown?: string | null | undefined;
+  readonly contactabilityScore?: number | undefined;
   readonly phones?: readonly PhoneInput[] | undefined;
   readonly contacts?: readonly ContactInput[] | undefined;
 }
@@ -321,6 +329,80 @@ export function leadFieldClaims(db: Executor, leadId: number): LeadFieldValue[] 
   return db.select().from(leadFieldValues).where(eq(leadFieldValues.leadId, leadId)).all();
 }
 
+/**
+ * The source categories this business was filed under, recovered from the raw
+ * payloads it was normalized from.
+ *
+ * `leads` has no category column — a directory's taxonomy is a statement about
+ * the shelf rather than about the business, and promoting it onto the row
+ * would make it look like a fact we established. The classifier still reads it
+ * as corroborating evidence, so a re-grade that cannot see it is grading on
+ * less than the first pass did: `Žaluzine, Roletne, Vrata` is exactly how the
+ * classifier knows EVROMETAL is a joinery wholesaler.
+ *
+ * Two joins, both necessary:
+ *
+ * - `(source_id, source_url)`, because `raw_records.lead_id` is only set by the
+ *   paths that write it and is null across the whole FUZZ-22 pilot.
+ * - the published **name**, because one URL can carry many businesses — the
+ *   Austrotherm distributor list is 292 of them behind a single URL, and
+ *   without this every one of them would inherit every other one's categories.
+ *
+ * The names come from `lead_field_values`, not from `leads.name`. A merged lead
+ * keeps one published name on the row and the rest as claims, so matching the
+ * row alone silently drops the merged-in side's categories: lead 605 is
+ * `Miljić TR` on Overture and `MILJIĆ` on Austrotherm, and Austrotherm is the
+ * source that says it sells `građevinski materijal`.
+ */
+export function leadCategories(db: Executor, leadId: number): string[] {
+  const claimedNames = new Set(
+    db
+      .select({ value: leadFieldValues.value })
+      .from(leadFieldValues)
+      .where(and(eq(leadFieldValues.leadId, leadId), eq(leadFieldValues.field, 'name')))
+      .all()
+      .map((row) => row.value.trim().toLowerCase()),
+  );
+  const row = db.select({ name: leads.name }).from(leads).where(eq(leads.id, leadId)).get();
+  if (row !== undefined) claimedNames.add(row.name.trim().toLowerCase());
+
+  const rows = db
+    .select({ payload: rawRecords.payload })
+    .from(leadSources)
+    .innerJoin(
+      rawRecords,
+      and(
+        eq(rawRecords.sourceId, leadSources.sourceId),
+        eq(rawRecords.sourceUrl, leadSources.sourceUrl),
+      ),
+    )
+    .where(eq(leadSources.leadId, leadId))
+    .all();
+
+  const categories: string[] = [];
+  const seen = new Set<string>();
+  for (const raw of rows) {
+    let payload: { name?: unknown; categories?: unknown };
+    try {
+      payload = JSON.parse(raw.payload) as typeof payload;
+    } catch {
+      // A payload we cannot read is a parser problem, not a reason to fail a
+      // re-grade. `raw_records` keeps the original either way.
+      continue;
+    }
+    const published = typeof payload.name === 'string' ? payload.name.trim().toLowerCase() : '';
+    if (!claimedNames.has(published)) continue;
+    if (!Array.isArray(payload.categories)) continue;
+    for (const category of payload.categories) {
+      if (typeof category !== 'string' || category.trim() === '') continue;
+      if (seen.has(category)) continue;
+      seen.add(category);
+      categories.push(category);
+    }
+  }
+  return categories;
+}
+
 /** One entry per distinct number, with the sources that corroborate it. */
 export interface DistinctPhone {
   readonly e164: string;
@@ -464,7 +546,7 @@ function fieldClaimsFrom(input: LeadInput): FieldClaim[] {
   add('opening_hours', input.openingHours);
   add('registration_number', input.registrationNumber);
   add('tax_id', input.taxId);
-  if (input.classification && input.classification !== 'UNKNOWN') {
+  if (input.classification && isInScope(input.classification)) {
     add('classification', input.classification);
   }
   if (input.latitude != null && input.longitude != null) {
@@ -590,9 +672,10 @@ function insertLead(tx: Executor, input: LeadInput, at: Date): number {
       legalForm: input.legalForm ?? null,
       registrationNumber: input.registrationNumber ?? null,
       taxId: input.taxId ?? null,
-      classification: input.classification ?? 'UNKNOWN',
+      classification: input.classification ?? 'UNCLASSIFIED',
       classificationConfidence: input.classificationConfidence ?? null,
       classificationEvidence: input.classificationEvidence ?? null,
+      classificationIndustry: input.classificationIndustry ?? null,
       cityId: input.cityId ?? null,
       municipalityId: input.municipalityId ?? null,
       cityRaw: input.cityRaw ?? null,
@@ -605,6 +688,9 @@ function insertLead(tx: Executor, input: LeadInput, at: Date): number {
       openingHours: input.openingHours ?? null,
       leadScore: input.leadScore ?? 0,
       scoreBreakdown: input.scoreBreakdown ?? null,
+      relevanceScore: input.relevanceScore ?? 0,
+      relevanceBreakdown: input.relevanceBreakdown ?? null,
+      contactabilityScore: input.contactabilityScore ?? 0,
       firstSeenAt: at,
       lastSeenAt: at,
       lastScrapedAt: at,
@@ -649,15 +735,22 @@ function updateLeadFillingBlanks(tx: Executor, existing: Lead, input: LeadInput,
   fill('description', input.description);
   fill('openingHours', input.openingHours);
 
-  if (input.classification && input.classification !== 'UNKNOWN') {
-    if (existing.classification === 'UNKNOWN') {
+  // `UNCLASSIFIED` is the absence of a label and an incoming one fills it.
+  // `OUT_OF_SCOPE` is not absence — it is a decision, and a thinner listing
+  // from a second directory must not quietly overwrite it.
+  if (input.classification && !isUnclassified(input.classification)) {
+    if (isUnclassified(existing.classification)) {
       patch.classification = input.classification;
       patch.classificationConfidence = input.classificationConfidence ?? null;
       patch.classificationEvidence = input.classificationEvidence ?? null;
+      patch.classificationIndustry = input.classificationIndustry ?? null;
     }
   }
   if (input.leadScore != null) patch.leadScore = input.leadScore;
   if (input.scoreBreakdown != null) patch.scoreBreakdown = input.scoreBreakdown;
+  if (input.relevanceScore != null) patch.relevanceScore = input.relevanceScore;
+  if (input.relevanceBreakdown != null) patch.relevanceBreakdown = input.relevanceBreakdown;
+  if (input.contactabilityScore != null) patch.contactabilityScore = input.contactabilityScore;
 
   patch.lastSeenAt = at > existing.lastSeenAt ? at : existing.lastSeenAt;
   patch.lastScrapedAt =
@@ -890,9 +983,18 @@ export interface GradingInput {
   readonly classificationConfidence: number;
   /** `JSON.stringify` of the classification result — evidence, suppressions, arithmetic. */
   readonly classificationEvidence?: string | null | undefined;
-  readonly leadScore: number;
-  /** `JSON.stringify` of the score components. */
+  /** Set with an `OUT_OF_SCOPE` label, cleared with any other. */
+  readonly classificationIndustry?: AdjacentIndustry | null | undefined;
+  /** 0–100. Is this a lead for us — the label and its evidence, nothing else. */
+  readonly relevanceScore: number;
+  /** `JSON.stringify` of the relevance components. */
+  readonly relevanceBreakdown?: string | null | undefined;
+  /** 0–100. How much contact data we hold. */
+  readonly contactabilityScore: number;
+  /** `JSON.stringify` of the contactability components. */
   readonly scoreBreakdown?: string | null | undefined;
+  /** Derived: `relevance × contactability / 100`. One sort key for the export. */
+  readonly leadScore: number;
 }
 
 /**
@@ -909,6 +1011,10 @@ export function applyGrading(db: Db, leadId: number, grading: GradingInput, at =
       classification: grading.classification,
       classificationConfidence: grading.classificationConfidence,
       classificationEvidence: grading.classificationEvidence ?? null,
+      classificationIndustry: grading.classificationIndustry ?? null,
+      relevanceScore: grading.relevanceScore,
+      relevanceBreakdown: grading.relevanceBreakdown ?? null,
+      contactabilityScore: grading.contactabilityScore,
       leadScore: grading.leadScore,
       scoreBreakdown: grading.scoreBreakdown ?? null,
       updatedAt: at,
@@ -1387,10 +1493,11 @@ export function recordMerge(db: Db, input: MergeInput): MergeResult {
       if (incoming == null || incoming === '') continue;
       (inherited as Record<string, unknown>)[key] = incoming;
     }
-    if (survivor.classification === 'UNKNOWN' && merged.classification !== 'UNKNOWN') {
+    if (survivor.classification === 'UNCLASSIFIED' && merged.classification !== 'UNCLASSIFIED') {
       inherited.classification = merged.classification;
       inherited.classificationConfidence = merged.classificationConfidence;
       inherited.classificationEvidence = merged.classificationEvidence;
+      inherited.classificationIndustry = merged.classificationIndustry;
     }
     tx.update(leads)
       .set({

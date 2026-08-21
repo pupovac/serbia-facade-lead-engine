@@ -6,7 +6,16 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { sql } from 'drizzle-orm';
 import { closeDatabase, openTestDatabase, type Db } from './client.js';
-import { leadPhones, leads, sources } from './schema.js';
+import {
+  EXPORTABLE_CLASSIFICATIONS,
+  IN_SCOPE_CLASSIFICATIONS,
+  LEAD_CLASSIFICATIONS,
+  isInScope,
+  isUnclassified,
+  leadPhones,
+  leads,
+  sources,
+} from './schema.js';
 
 let db: Db | undefined;
 
@@ -168,5 +177,51 @@ describe('portable SQL', () => {
       .from(leads)
       .get();
     expect(row?.count).toBe(0);
+  });
+});
+
+describe('the classification enum after the UNKNOWN split', () => {
+  it('has no `UNKNOWN` left to hide an out-of-scope business in', () => {
+    expect(LEAD_CLASSIFICATIONS).not.toContain('UNKNOWN');
+    expect(LEAD_CLASSIFICATIONS).toContain('UNCLASSIFIED');
+    expect(LEAD_CLASSIFICATIONS).toContain('OUT_OF_SCOPE');
+  });
+
+  it('rejects the old label at the database, not only in TypeScript', () => {
+    const database = open();
+    expect(() =>
+      database.$client
+        .prepare(
+          `insert into leads (name, name_normalized, classification, first_seen_at, last_seen_at, created_at, updated_at)
+           values ('Stara Firma', 'stara firma', 'UNKNOWN', 0, 0, 0, 0)`,
+        )
+        .run(),
+    ).toThrow(/CHECK constraint/i);
+  });
+
+  it('keeps `classification_industry` inside its enum and allows it to be null', () => {
+    const database = open();
+    const insert = (industry: string | null): void => {
+      database.$client
+        .prepare(
+          `insert into leads (name, name_normalized, classification, classification_industry, first_seen_at, last_seen_at, created_at, updated_at)
+           values ('Firma', 'firma', 'OUT_OF_SCOPE', ?, 0, 0, 0, 0)`,
+        )
+        .run(industry);
+    };
+    expect(() => insert('joinery')).not.toThrow();
+    expect(() => insert(null)).not.toThrow();
+    expect(() => insert('astrology')).toThrow(/CHECK constraint/i);
+  });
+
+  it('names the three labels the export ships, and no undecided one', () => {
+    expect([...EXPORTABLE_CLASSIFICATIONS]).toStrictEqual([...IN_SCOPE_CLASSIFICATIONS]);
+    for (const label of LEAD_CLASSIFICATIONS) {
+      expect(isInScope(label)).toBe(label !== 'UNCLASSIFIED' && label !== 'OUT_OF_SCOPE');
+    }
+    // `OUT_OF_SCOPE` is a decision, not an absence — `upsertLead` and the merge
+    // engine must not let a later thin listing overwrite it.
+    expect(isUnclassified('OUT_OF_SCOPE')).toBe(false);
+    expect(isUnclassified('UNCLASSIFIED')).toBe(true);
   });
 });

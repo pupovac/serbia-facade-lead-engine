@@ -62,10 +62,21 @@ claims; that is what makes "one clean row per business" cheap.
   rolls up to (`beograd`). Outside Belgrade they are the same slug. `city_raw`
   keeps the place string as the source published it, before matching.
 - `classification` is `FACADE_CONTRACTOR` | `CONSTRUCTION_MATERIAL_STORE` |
-  `BOTH` | `UNKNOWN`, enforced by a `CHECK` in the database, not only by
-  TypeScript.
-- `lead_score` measures data completeness and relevance. It is not a
-  purchase-likelihood guess, and nothing may smuggle a sales heuristic into it.
+  `BOTH` | `UNCLASSIFIED` | `OUT_OF_SCOPE`, enforced by a `CHECK` in the
+  database, not only by TypeScript. The last two are not one label with two
+  moods: `UNCLASSIFIED` means the classifier found nothing either way and the
+  record is still worth enriching, `OUT_OF_SCOPE` means it found evidence of a
+  trade we do not sell to and none of one we do. Only `OUT_OF_SCOPE` carries
+  `classification_industry`, which records the trade so the exclusion can be
+  audited and argued with rather than being a row that quietly vanished.
+  Neither reaches the export.
+- `relevance_score` and `contactability_score` are two independent 0–100
+  numbers, separately indexed and separately sortable. Relevance is the label,
+  its confidence and the evidence behind it; contactability is how much contact
+  data the row holds. Neither reads the other's inputs. `lead_score` survives as
+  a derived convenience column, `relevance × contactability / 100`, for the
+  export's single sort key. None of the three is a purchase-likelihood guess,
+  and nothing may smuggle a sales heuristic into them.
 - `merged_into_id` is set when this lead was merged away. The row stays, so
   every id ever handed out keeps resolving.
 
@@ -240,9 +251,10 @@ An update sets a column only where the stored one is empty. A second, different
 value for a field already filled is recorded in `lead_field_values` and counted
 in `conflictsRecorded` — it is never written over the stored one.
 
-Two deliberate exceptions: `UNKNOWN` is not a classification but the absence of
-one, so it upgrades once; and `lead_score` is a derived number the scorer owns
-outright.
+Two deliberate exceptions: `UNCLASSIFIED` is not a classification but the
+absence of one, so it upgrades once — `OUT_OF_SCOPE` is a _decision_ and a
+later, thinner listing must not overwrite it; and the score columns are derived
+numbers the scorer owns outright.
 
 ### What a merge does
 

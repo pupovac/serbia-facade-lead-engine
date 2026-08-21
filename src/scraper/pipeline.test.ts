@@ -224,8 +224,34 @@ describe('normalizeRawLead', () => {
       NOW,
     );
 
-    expect(withPhone.score.score).toBeGreaterThan(withoutPhone.score.score);
-    expect(withoutPhone.score.capped).toBe(true);
+    expect(withPhone.score.contactability).toBeGreaterThan(withoutPhone.score.contactability);
+    // Both are the same business by every other measure, so the label — and
+    // with it the relevance — is identical. The phone moves one number only.
+    expect(withPhone.score.relevance).toBe(withoutPhone.score.relevance);
+  });
+
+  it('caps a phone-less lead below every lead that has a number', () => {
+    const documentedButUnreachable = normalizeRawLead(
+      raw({
+        name: 'Fasaderski radovi Marković PR',
+        city: 'Čačak',
+        emails: ['info@fasade.rs'],
+        website: 'https://fasade.rs',
+        socials: ['https://facebook.com/fasade'],
+      }),
+      {},
+      NOW,
+    );
+    const bareButReachable = normalizeRawLead(
+      raw({ name: 'Neko Drugi', phones: ['063/478-115'] }),
+      {},
+      NOW,
+    );
+
+    expect(documentedButUnreachable.score.capped).toBe(true);
+    expect(bareButReachable.score.contactability).toBeGreaterThan(
+      documentedButUnreachable.score.contactability,
+    );
   });
 });
 

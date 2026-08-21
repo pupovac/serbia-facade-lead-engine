@@ -91,7 +91,7 @@ describe('headline numbers', () => {
       phones: [{ e164: '+381641111111', raw: '064 111 1111', type: 'mobile' }],
     });
     add('B', { classification: 'FACADE_CONTRACTOR' });
-    add('C', { classification: 'UNKNOWN' });
+    add('C', { classification: 'UNCLASSIFIED' });
 
     const byClass = dashboardStats(db).byClassification;
     const contractors = byClass.find((row) => row.classification === 'FACADE_CONTRACTOR');

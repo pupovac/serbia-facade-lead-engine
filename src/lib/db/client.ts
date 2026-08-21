@@ -51,12 +51,27 @@ export function openDatabase(options: OpenDatabaseOptions = {}): Db {
     sqlite.pragma('journal_mode = WAL');
     sqlite.pragma('busy_timeout = 5000');
   }
-  sqlite.pragma('foreign_keys = ON');
-
   const db = drizzle(sqlite, { schema }) as Db;
   if (options.migrate !== false && options.readonly !== true) {
+    // A migration that changes a CHECK constraint has to rebuild the table —
+    // SQLite cannot alter one in place — and SQLite's own recipe for that is
+    // "turn foreign keys off, rebuild, turn them back on, then check". The
+    // `PRAGMA foreign_keys=OFF` drizzle writes into the migration file cannot
+    // do it: the migrator runs inside a transaction and the pragma is a no-op
+    // there. So it happens here, around the whole run, and
+    // `foreign_key_check` afterwards makes sure the rebuild kept every
+    // reference — a silently orphaned `lead_phones` row is a lost phone
+    // number, which is the one thing this project cannot afford.
+    sqlite.pragma('foreign_keys = OFF');
     migrate(db, { migrationsFolder: MIGRATIONS_DIR });
+    const violations = sqlite.pragma('foreign_key_check') as unknown[];
+    if (violations.length > 0) {
+      throw new Error(
+        `migration left ${violations.length} dangling foreign key reference(s): ${JSON.stringify(violations.slice(0, 5))}`,
+      );
+    }
   }
+  sqlite.pragma('foreign_keys = ON');
   return db;
 }
 

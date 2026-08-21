@@ -1,8 +1,9 @@
 # `src/lib/classify` — which buyer group a business belongs to
 
 `classifyLead(input)` returns `FACADE_CONTRACTOR` | `CONSTRUCTION_MATERIAL_STORE` |
-`BOTH` | `UNKNOWN`, a confidence, and **the evidence**: every span it matched,
-every span it deliberately refused to count, and the arithmetic between them.
+`BOTH` | `UNCLASSIFIED` | `OUT_OF_SCOPE`, a confidence, and **the evidence**:
+every span it matched, every span it deliberately refused to count, and the
+arithmetic between them.
 
 ```ts
 import { classifyLead } from '@/lib/classify';
@@ -40,7 +41,7 @@ is a longer phrase containing a shorter one:
 
 So a new false positive is fixed by adding the _longer_ phrase, never by adding
 an exception. The loser is reported in `suppressed`, which is how the review UI
-can answer "this company says fasada six times, why is it UNKNOWN".
+can answer "this company says fasada six times, why is it not a lead".
 
 **2. A gate, not a sum.** `termoizolacija` and `izolacija` never open the facade
 gate, so no quantity of them produces `FACADE_CONTRACTOR` — that single rule is
@@ -57,21 +58,49 @@ Two smaller rules follow the same logic:
   decide alone, ten painters become facade contractors. Measured, not assumed —
   it happened on the first tuning pass.
 - **A manufacturer is a supplier, not a buyer.** A record naming `fabrika` or
-  `proizvodnja` with no counter (`stovarište`, `veleprodaja`, `farbara`) is
-  `UNKNOWN`. An EPS factory is our competitor; a yard that also produces is
-  still a yard.
+  `proizvodnja` with no counter (`stovarište`, `veleprodaja`, `farbara`) gets no
+  label. An EPS factory is our competitor; a yard that also produces is still a
+  yard.
+- **A selling word is not a product list.** `veleprodaja` says the business
+  sells; it does not say _what_. In a record naming no building material at all
+  the signal is demoted to `supporting` **and discounted to
+  `NO_ASSORTMENT_DISCOUNT` (0.3) of its weight**. Demoting without discounting
+  — which is what happened until FUZZ-37 — changes the evidence trail and
+  nothing in the arithmetic, because a `supporting` 0.95 clears the threshold on
+  its own. All eight pilot leads whose store label rested on that one word sell
+  carpets, circuit breakers, hand tools, spare parts, traffic cones or aluminium
+  profiles; `veleprodaja.test.ts` holds them, and holds the three real yards
+  that must keep their labels.
 
 `BOTH` is not a tie-break. Both axes are scored independently and `BOTH` is what
 happens when both clear the threshold — which is the normal state of a
 stovarište that also installs.
 
+## "Not a lead" is two different answers
+
+When neither axis clears the threshold, the label says _why_:
+
+- **`UNCLASSIFIED`** — nothing was found either way. A thin record; a crawl or an
+  enrichment pass may still turn it into a lead. It stays in the review list.
+- **`OUT_OF_SCOPE`** — an adjacent trade was positively identified **and nothing
+  at all argued for either buyer group**. `result.industry` names the trade, and
+  it is persisted to `leads.classification_industry` so the exclusion is
+  auditable and reversible. It is dropped from the default list and the export.
+
+Anything mixed — joinery evidence _and_ a facade term — stays `UNCLASSIFIED`,
+because mixed evidence is a question, not a verdict. On the FUZZ-22 pilot the
+rule ruled out 243 of 3,046 previously-`UNKNOWN` leads, most of them
+general construction, industrial insulation, manufacturing and joinery.
+
 ## Measured precision
 
 `__fixtures__/labelled-businesses.json` holds **161 real Serbian businesses**,
 extracted verbatim from public directory listings and labelled by hand. The set
-is adversarial on purpose: 110 of the 161 are `UNKNOWN`, and most of those
-publish `fasada`, `termoizolacija` or `izolacija` while belonging to a trade we
-do not sell to.
+is adversarial on purpose: 110 of the 161 are neither buyer group, and most of
+those publish `fasada`, `termoizolacija` or `izolacija` while belonging to a
+trade we do not sell to. The fixture labels those `UNKNOWN` — its own vocabulary
+for "neither" — and `toFixtureLabel` folds `UNCLASSIFIED` and `OUT_OF_SCOPE`
+back onto it, so the measurement below is comparable across the FUZZ-37 split.
 
 ```
 Overall accuracy 94.4% (152/161)

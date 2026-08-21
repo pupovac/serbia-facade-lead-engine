@@ -164,7 +164,7 @@ function measure(path: string): void {
       municipalityId: 'beograd',
       hasPhone: true,
       minScore: 40,
-      classifications: ['UNKNOWN', 'CONSTRUCTION_MATERIAL_STORE'],
+      classifications: ['UNCLASSIFIED', 'CONSTRUCTION_MATERIAL_STORE'],
       sort: 'score',
     }),
   );

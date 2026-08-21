@@ -59,6 +59,25 @@ export const ASSORTMENT_GATE = 3;
 /** Bonus once the assortment gate is reached — a yard is its product list. */
 export const ASSORTMENT_BONUS = 0.5;
 
+/**
+ * What an assortment-dependent signal is worth when the record names **no**
+ * building material at all.
+ *
+ * `veleprodaja` says the business sells wholesale. It does not say what, and
+ * the pilot proved the point: all eight leads whose store label rested on that
+ * one word sell carpets, circuit breakers, hand tools, spare parts, traffic
+ * cones or aluminium profiles. Demoting the signal from `core` to `supporting`
+ * without touching its weight — which is what the classifier did before
+ * FUZZ-37 — changes the evidence trail and nothing in the arithmetic, because
+ * a `supporting` 0.95 clears `DECISION_THRESHOLD` on its own.
+ *
+ * 0.3 is chosen so the strongest placement of the word — in the company's own
+ * name, at the 2.5× `name` multiplier — still lands under the threshold
+ * (0.95 × 2.5 × 0.3 = 0.71), while a record that names even one material
+ * escapes the discount entirely and keeps the full weight.
+ */
+export const NO_ASSORTMENT_DISCOUNT = 0.3;
+
 /* -------------------------------------------------------------------------- */
 /* Facade contractor                                                          */
 /* -------------------------------------------------------------------------- */

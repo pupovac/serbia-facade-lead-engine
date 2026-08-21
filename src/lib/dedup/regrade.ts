@@ -14,21 +14,26 @@
  * `review_note`, which nothing here touches.
  */
 import type { Db } from '../db/client.js';
-import { classifyLead } from '../classify/index.js';
-import { scoreLead, toScoreInput } from '../score/index.js';
+import { classifyLead, decidingNet } from '../classify/index.js';
+import { scoreLead, toGrading, toScoreInput } from '../score/index.js';
 import {
   applyGrading,
   distinctPhones,
   getLead,
+  leadCategories,
   leadContactClaims,
   leadSourceRows,
 } from '../db/repo.js';
-import type { LeadClassification } from '../db/schema.js';
+import type { AdjacentIndustry, LeadClassification } from '../db/schema.js';
 
 export interface RegradeResult {
   readonly leadId: number;
   readonly classification: LeadClassification;
   readonly classificationConfidence: number;
+  /** Set only with an `OUT_OF_SCOPE` label: the adjacent trade that decided it. */
+  readonly classificationIndustry: AdjacentIndustry | null;
+  readonly relevanceScore: number;
+  readonly contactabilityScore: number;
   readonly leadScore: number;
 }
 
@@ -40,32 +45,46 @@ export function regradeLead(db: Db, leadId: number, at = new Date()): RegradeRes
   const contacts = leadContactClaims(db, leadId);
   const website = contacts.find((contact) => contact.kind === 'website');
 
+  // The same four fields the scraper pipeline classifies on, categories
+  // included — a re-grade that saw less than the first pass would quietly
+  // downgrade a label every time two leads merged.
+  const categories = leadCategories(db, leadId);
   const classification = classifyLead({
     name: lead.name,
     ...(lead.description == null ? {} : { description: lead.description }),
+    ...(categories.length === 0 ? {} : { categories }),
     ...(website == null ? {} : { website: website.value }),
   });
 
-  const score = scoreLead(
-    toScoreInput({
+  const score = scoreLead({
+    ...toScoreInput({
       lead: { ...lead, classification: classification.label },
       phones: distinctPhones(db, leadId),
       contacts,
       sources: leadSourceRows(db, leadId),
       now: at,
     }),
-  );
+    // The freshly computed arithmetic, not the blob still on the row — that
+    // one belongs to the label this run is about to replace.
+    classification: {
+      label: classification.label,
+      confidence: classification.confidence,
+      evidenceNet: decidingNet(classification),
+    },
+  });
 
   applyGrading(
     db,
     leadId,
-    {
-      classification: classification.label,
-      classificationConfidence: classification.confidence,
-      classificationEvidence: JSON.stringify(classification),
-      leadScore: score.score,
-      scoreBreakdown: JSON.stringify(score.components),
-    },
+    toGrading(
+      {
+        label: classification.label,
+        confidence: classification.confidence,
+        evidence: JSON.stringify(classification),
+        industry: classification.industry ?? null,
+      },
+      score,
+    ),
     at,
   );
 
@@ -73,6 +92,9 @@ export function regradeLead(db: Db, leadId: number, at = new Date()): RegradeRes
     leadId,
     classification: classification.label,
     classificationConfidence: classification.confidence,
+    classificationIndustry: classification.industry ?? null,
+    relevanceScore: score.relevance,
+    contactabilityScore: score.contactability,
     leadScore: score.score,
   };
 }

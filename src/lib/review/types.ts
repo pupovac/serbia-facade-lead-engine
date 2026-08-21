@@ -7,6 +7,7 @@
  * query per row over a table that is meant to hold tens of thousands.
  */
 import type {
+  AdjacentIndustry,
   EnrichmentSuggestion,
   Lead,
   LeadClassification,
@@ -29,6 +30,13 @@ export interface LeadListRow {
   readonly municipalityId: string | null;
   readonly classification: LeadClassification;
   readonly classificationConfidence: number | null;
+  /** Set only on `OUT_OF_SCOPE`: the adjacent trade that ruled this lead out. */
+  readonly classificationIndustry: AdjacentIndustry | null;
+  /** 0–100. Is this a lead for us — the label and its evidence, nothing else. */
+  readonly relevanceScore: number;
+  /** 0–100. How much contact data we hold. Independent of relevance. */
+  readonly contactabilityScore: number;
+  /** 0–100, derived: `relevance × contactability / 100`. */
   readonly leadScore: number;
   readonly status: LeadStatus;
   /** Distinct valid numbers. Invalid claims are excluded — see `validPhones`. */
@@ -45,7 +53,20 @@ export interface LeadListRow {
   readonly lastSeenAt: Date;
 }
 
-export const LEAD_SORT_KEYS = ['score', 'name', 'city', 'lastSeen', 'firstSeen'] as const;
+/**
+ * `relevance` and `contactability` are separate keys on purpose. One column
+ * that folded both together is what put a parking garage in the owner's top
+ * 200; the list has to be able to ask each question on its own.
+ */
+export const LEAD_SORT_KEYS = [
+  'score',
+  'relevance',
+  'contactability',
+  'name',
+  'city',
+  'lastSeen',
+  'firstSeen',
+] as const;
 export type LeadSortKey = (typeof LEAD_SORT_KEYS)[number];
 export type SortDirection = 'asc' | 'desc';
 
@@ -59,6 +80,20 @@ export interface LeadListQuery {
   readonly classifications?: readonly LeadClassification[] | undefined;
   readonly status?: LeadStatus | undefined;
   readonly minScore?: number | undefined;
+  /** Floor on `relevance_score`. Filters independently of `minContactability`. */
+  readonly minRelevance?: number | undefined;
+  /** Floor on `contactability_score`. Filters independently of `minRelevance`. */
+  readonly minContactability?: number | undefined;
+  /**
+   * Show leads the classifier positively ruled out.
+   *
+   * Off by default: `OUT_OF_SCOPE` means an adjacent trade was identified and
+   * nothing argued for either buyer group, and putting those back in the
+   * working set is what the FUZZ-37 split exists to stop. Naming
+   * `OUT_OF_SCOPE` in `classifications` turns it on implicitly — an explicit
+   * filter is a reviewer asking to audit the exclusions.
+   */
+  readonly includeOutOfScope?: boolean | undefined;
   /** `true` keeps only leads with at least one valid number; `false` only those without. */
   readonly hasPhone?: boolean | undefined;
   /** A `sources.id` that has seen this lead. */

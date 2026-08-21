@@ -75,6 +75,11 @@ export function parseLeadQuery(params: RawSearchParams): LeadListQuery {
     classifications: classifications.length > 0 ? classifications : undefined,
     status,
     minScore: integer(one(params, 'minScore')),
+    minRelevance: integer(one(params, 'minRelevance')),
+    minContactability: integer(one(params, 'minContactability')),
+    // Ruled-out leads are off by default. `?type=OUT_OF_SCOPE` turns them on
+    // implicitly; `?ruledOut=yes` is for auditing the exclusions across labels.
+    includeOutOfScope: one(params, 'ruledOut') === 'yes' ? true : undefined,
     hasPhone: phone === 'yes' ? true : phone === 'no' ? false : undefined,
     sourceId: one(params, 'izvor'),
     sort,
@@ -104,6 +109,13 @@ export function leadQueryToSearch(
   }
   set('status', merged.status);
   if (merged.minScore != null && merged.minScore > 0) set('minScore', merged.minScore);
+  if (merged.minRelevance != null && merged.minRelevance > 0) {
+    set('minRelevance', merged.minRelevance);
+  }
+  if (merged.minContactability != null && merged.minContactability > 0) {
+    set('minContactability', merged.minContactability);
+  }
+  if (merged.includeOutOfScope === true) params.set('ruledOut', 'yes');
   if (merged.hasPhone === true) params.set('phone', 'yes');
   if (merged.hasPhone === false) params.set('phone', 'no');
   set('izvor', merged.sourceId);

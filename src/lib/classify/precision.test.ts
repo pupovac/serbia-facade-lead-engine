@@ -11,7 +11,7 @@
 import { describe, expect, it } from 'vitest';
 import { toCyrillic } from '../text/cyrillic.js';
 import { classifyLead } from './classify.js';
-import { LABELLED_BUSINESSES, evaluateClassifier } from './fixtures.js';
+import { LABELLED_BUSINESSES, evaluateClassifier, toFixtureLabel } from './fixtures.js';
 import type { ClassificationInput } from './types.js';
 
 const report = evaluateClassifier();
@@ -25,6 +25,9 @@ describe('classification precision on the labelled fixture set', () => {
   });
 
   it('covers every label and the adjacent-industry traps', () => {
+    // `UNKNOWN` here is the fixture's vocabulary for "neither buyer group";
+    // the classifier answers `UNCLASSIFIED` or `OUT_OF_SCOPE` and
+    // `toFixtureLabel` folds both back. The split itself is asserted below.
     const counts = report.perLabel;
     expect(counts['FACADE_CONTRACTOR']?.actual).toBeGreaterThanOrEqual(10);
     expect(counts['CONSTRUCTION_MATERIAL_STORE']?.actual).toBeGreaterThanOrEqual(30);
@@ -60,11 +63,11 @@ describe('classification precision on the labelled fixture set', () => {
     expect(leaks.map((b) => b.name)).toStrictEqual([]);
   });
 
-  it('prefers UNKNOWN over a confident wrong label', () => {
+  it('prefers no label at all over a confident wrong one', () => {
     // Every mistake that is not a miss must be a *near* miss: a store called a
     // contractor or the reverse, never a cleaning company called either.
     const wrongIndustry = LABELLED_BUSINESSES.filter((b) => {
-      const got = classifyLead(b.input).label;
+      const got = toFixtureLabel(classifyLead(b.input).label);
       return b.expected === 'UNKNOWN' && got !== 'UNKNOWN';
     });
     expect(wrongIndustry.length).toBeLessThanOrEqual(4);
@@ -77,6 +80,49 @@ describe('classification precision on the labelled fixture set', () => {
     for (const label of ['FACADE_CONTRACTOR', 'CONSTRUCTION_MATERIAL_STORE'] as const) {
       expect(report.perLabel[label]?.recall).toBeGreaterThanOrEqual(0.8);
     }
+  });
+
+  describe('UNKNOWN split into UNCLASSIFIED and OUT_OF_SCOPE', () => {
+    const negatives = LABELLED_BUSINESSES.filter((b) => b.expected === 'UNKNOWN');
+    const decided = negatives.map((b) => ({ business: b, result: classifyLead(b.input) }));
+
+    it('rules out a real share of the adversarial set instead of shrugging at it', () => {
+      // The fixture is two thirds wrong-industry companies by construction, so
+      // a split that never fires would mean the classifier sees the roofing
+      // and joinery evidence and does nothing with it.
+      // 13 today, all facade-*cleaning* companies. The floor sits under that
+      // rather than at it: most of this set publishes `fasada` or
+      // `termoizolacija` somewhere, which is in-scope evidence and keeps a
+      // record `UNCLASSIFIED` on purpose. On the pilot corpus the same rule
+      // ruled out 244 of 3,046 — the share here is the same order.
+      const outOfScope = decided.filter((d) => d.result.label === 'OUT_OF_SCOPE');
+      expect(outOfScope.length).toBeGreaterThanOrEqual(10);
+    });
+
+    it('names the deciding trade on every record it rules out', () => {
+      for (const { business, result } of decided) {
+        if (result.label !== 'OUT_OF_SCOPE') continue;
+        expect(result.industry, business.name).toBeDefined();
+        expect(result.reason, business.name).toContain('Out of scope');
+      }
+    });
+
+    it('never rules out a business that argued for a buyer group at all', () => {
+      // `OUT_OF_SCOPE` is excluded from the list and the export, so it is only
+      // ever allowed on a record with *zero* facade or materials evidence.
+      const wrongly = decided.filter(
+        (d) =>
+          d.result.label === 'OUT_OF_SCOPE' && d.result.evidence.some((e) => e.axis !== 'adjacent'),
+      );
+      expect(wrongly.map((d) => d.business.name)).toStrictEqual([]);
+    });
+
+    it('never rules out a business the fixture says is a buyer', () => {
+      const wrongly = LABELLED_BUSINESSES.filter(
+        (b) => b.expected !== 'UNKNOWN' && classifyLead(b.input).label === 'OUT_OF_SCOPE',
+      );
+      expect(wrongly.map((b) => b.name)).toStrictEqual([]);
+    });
   });
 
   // A source picks a script and a case and never asks us. Measured on this set
@@ -111,7 +157,7 @@ describe('classification precision on the labelled fixture set', () => {
   it('gives every classified record auditable evidence', () => {
     for (const business of LABELLED_BUSINESSES) {
       const result = classifyLead(business.input);
-      if (result.label === 'UNKNOWN') continue;
+      if (toFixtureLabel(result.label) === 'UNKNOWN') continue;
       expect(result.evidence.length, business.name).toBeGreaterThan(0);
       expect(result.reason.length, business.name).toBeGreaterThan(0);
       expect(result.confidence, business.name).toBeGreaterThanOrEqual(0.5);
