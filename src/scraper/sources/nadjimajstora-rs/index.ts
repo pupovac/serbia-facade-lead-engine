@@ -45,7 +45,7 @@
  *
  * These are `preduzetnici` — sole traders listed as `Srdjan Todić`, not as
  * `TERMO FASADE d.o.o.`. There is no facade word in a personal name, so the
- * word-scorer would file most of this source under `UNKNOWN`, which is exactly
+ * word-scorer would file most of this source under `UNCLASSIFIED`, which is exactly
  * the 84% loss FUZZ-38 exists to stop. The category is the evidence, so the
  * adapter sets `assertedType` and the pipeline keeps the scorer's opinion
  * beside it for audit rather than acting on it.

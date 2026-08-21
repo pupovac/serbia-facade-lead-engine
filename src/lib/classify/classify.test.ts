@@ -98,7 +98,10 @@ describe('classifyLead — the named false positives', () => {
         'Kapci, aluminijumske ograde, komarnici, roletne, prozori, ulazna vrata, ' +
         'alubond fasada, kontinualna fasada, strukturalna fasada.',
     });
-    expect(result.label).toBe('UNKNOWN');
+    // Joinery evidence and nothing arguing for either buyer group: the
+    // classifier rules it out rather than shrugging, and says what it is.
+    expect(result.label).toBe('OUT_OF_SCOPE');
+    expect(result.industry).toBe('joinery');
     expect(result.suppressed.some((s) => s.claimedBy === 'adjacent.joinery-fasada')).toBe(true);
   });
 
@@ -117,7 +120,9 @@ describe('classifyLead — the named false positives', () => {
         'Armacell Armaflex, grejanje, kotlovi, rashladni sistemi, klimatizacija i ventilacija, ' +
         'izolacija - termoizolacija.',
     });
-    expect(result.label).toBe('UNKNOWN');
+    // Insulation wording is in-scope evidence, just never decisive on its own,
+    // so this is a thin record rather than a ruled-out one.
+    expect(result.label).toBe('UNCLASSIFIED');
   });
 
   it('does not label electrical insulation as a facade contractor', () => {
@@ -134,7 +139,7 @@ describe('classifyLead — the named false positives', () => {
       categories: ['Čišćenje fasada, skidanje grafita'],
       description: 'Mašinsko pranje svih vrsta fasada, visinski radovi, čišćenje grafita.',
     });
-    expect(result.label).toBe('UNKNOWN');
+    expect(result.label).toBe('UNCLASSIFIED');
     expect(result.suppressed.some((s) => s.claimedBy === 'adjacent.cleaning-fasade')).toBe(true);
     expect(result.reason).toMatch(/another trade|Neither axis/);
   });
@@ -145,7 +150,8 @@ describe('classifyLead — the named false positives', () => {
       description: 'Građevinski okovi za fasadnu stolariju, PVC i aluminijumske konstrukcije.',
     });
     expect(result.contractor.gateOpen).toBe(false);
-    expect(result.label).toBe('UNKNOWN');
+    expect(result.label).toBe('OUT_OF_SCOPE');
+    expect(result.industry).toBe('joinery');
   });
 
   it('reads `fasadni materijal` as something a shop sells, not something a firm installs', () => {
@@ -164,7 +170,7 @@ describe('classifyLead — the named false positives', () => {
       description: 'Termoizolacija, izolacija, termo izolacija, zvučna izolacija, termoizolacija.',
     });
     expect(result.contractor.gateOpen).toBe(false);
-    expect(result.label).toBe('UNKNOWN');
+    expect(result.label).toBe('UNCLASSIFIED');
     expect(result.reason).toContain('No facade term');
   });
 
@@ -173,7 +179,7 @@ describe('classifyLead — the named false positives', () => {
       name: 'Fima — fabrika izolacionih materijala',
       description: 'Fabrika izolacionih materijala i ambalaže, proizvodnja stiropora.',
     });
-    expect(result.label).toBe('UNKNOWN');
+    expect(result.label).toBe('UNCLASSIFIED');
     expect(result.store.vetoed).toBe(true);
   });
 
@@ -279,9 +285,12 @@ describe('classifyLead — mechanics', () => {
     );
   });
 
-  it('returns UNKNOWN with high confidence for an empty record', () => {
+  it('returns UNCLASSIFIED with high confidence for an empty record', () => {
+    // Nothing was found either way — which is not the same as finding another
+    // trade, and `UNCLASSIFIED` is the label that says so.
     const result = classifyLead({});
-    expect(result.label).toBe('UNKNOWN');
+    expect(result.label).toBe('UNCLASSIFIED');
+    expect(result.industry).toBeUndefined();
     expect(result.confidence).toBeGreaterThan(0.9);
     expect(result.evidence).toHaveLength(0);
   });
@@ -304,7 +313,7 @@ describe('classifyLead — mechanics', () => {
     });
     expect(inName.label).toBe('FACADE_CONTRACTOR');
     // A directory's category is a statement about the shelf, not the business.
-    expect(inCategory.label).toBe('UNKNOWN');
+    expect(inCategory.label).toBe('UNCLASSIFIED');
   });
 
   it('gives every signal a unique id', () => {

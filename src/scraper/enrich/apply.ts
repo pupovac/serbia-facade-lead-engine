@@ -60,7 +60,7 @@ import {
   type Provenance,
   type SuggestionKind,
 } from '@/lib/db';
-import { scoreLead, toScoreInput } from '@/lib/score';
+import { scoreLead, toGrading, toScoreInput } from '@/lib/score';
 import { normalizeAddress, normalizeCompanyName, resolveCityDetailed } from '@/lib/normalize';
 import { normalizePhone, toPhoneInput } from '@/lib/phone';
 import { validateRawLead, type RawLeadInput } from '../raw-lead.js';
@@ -253,13 +253,15 @@ export function applyMerge(
   applyGrading(
     db,
     result.leadId,
-    {
-      classification: stored.classification,
-      classificationConfidence: stored.classificationConfidence ?? 0,
-      classificationEvidence: stored.classificationEvidence ?? null,
-      leadScore: rescored.score,
-      scoreBreakdown: JSON.stringify(rescored.components),
-    },
+    toGrading(
+      {
+        label: stored.classification,
+        confidence: stored.classificationConfidence ?? 0,
+        evidence: stored.classificationEvidence,
+        industry: stored.classificationIndustry,
+      },
+      rescored,
+    ),
     now,
   );
 

@@ -86,7 +86,7 @@ for (const record of [...records.values()].sort((a, b) => a.key.localeCompare(b.
     ...(record.website === undefined ? {} : { website: record.website }),
   });
   counts.set(result.label, (counts.get(result.label) ?? 0) + 1);
-  if (result.label === 'UNKNOWN') {
+  if (result.label === 'UNCLASSIFIED' || result.label === 'OUT_OF_SCOPE') {
     unknowns.push(
       `${record.name} — category "${record.category}"\n    ${result.reason}\n    evidence: ${
         result.evidence.map((e) => `${e.signalId}@${e.field}=${e.weight}`).join(', ') || 'none'
@@ -100,12 +100,13 @@ for (const label of [
   'FACADE_CONTRACTOR',
   'CONSTRUCTION_MATERIAL_STORE',
   'BOTH',
-  'UNKNOWN',
+  'UNCLASSIFIED',
+  'OUT_OF_SCOPE',
 ] as const) {
   console.log(`  ${label.padEnd(28)} ${counts.get(label) ?? 0}`);
 }
 
 if (process.argv.includes('--unknown')) {
-  console.log('\nUNKNOWN records');
+  console.log('\nUndecided records');
   for (const line of unknowns) console.log(`  ${line}`);
 }

@@ -7,9 +7,9 @@
  * them into a label — that is what the review UI shows and what a reviewer
  * overrules.
  */
-import type { LeadClassification } from '../db/schema.js';
+import type { AdjacentIndustry, LeadClassification } from '../db/schema.js';
 
-export type { LeadClassification };
+export type { AdjacentIndustry, LeadClassification };
 
 /** Which buyer group a signal argues for. `adjacent` argues against both. */
 export type SignalAxis = 'contractor' | 'store' | 'adjacent';
@@ -27,18 +27,13 @@ export type SignalAxis = 'contractor' | 'store' | 'adjacent';
  */
 export type SignalStrength = 'core' | 'supporting' | 'ambiguous';
 
-/** The trade a disqualifying match actually belongs to. */
-export type AdjacentIndustry =
-  | 'roofing'
-  | 'joinery'
-  | 'waterproofing'
-  | 'industrial_insulation'
-  | 'electrical'
-  | 'cleaning'
-  | 'manufacturing'
-  | 'other_trade'
-  | 'general_construction'
-  | 'technical_goods';
+/**
+ * The trade a disqualifying match actually belongs to.
+ *
+ * Defined in `src/lib/db/schema.ts` — `leads.classification_industry` persists
+ * it, and the schema may not import the classifier.
+ */
+export { ADJACENT_INDUSTRIES } from '../db/schema.js';
 
 /**
  * What has to be true before an axis may produce a label at all.
@@ -80,9 +75,12 @@ export interface Signal {
   /** Counts toward the building-materials assortment test. */
   readonly assortment?: boolean;
   /**
-   * Demoted from `core` to `supporting` when the record shows no building
+   * Demoted from `core` to `supporting` **and discounted to
+   * `NO_ASSORTMENT_DISCOUNT` of its weight** when the record shows no building
    * materials at all. `veleprodaja` says the business sells; it does not say
-   * what, and a cleaning company with a retail arm is not a stovarište.
+   * what, and a cleaning company with a retail arm is not a stovarište. The
+   * discount is the part that matters: without it the demotion only changed
+   * the evidence trail, and a `supporting` 0.95 decides a label on its own.
    */
   readonly needsAssortment?: boolean;
   /** One line explaining what the term means, for the README and the UI. */
@@ -102,6 +100,14 @@ export interface ClassificationEvidence {
   readonly industry?: AdjacentIndustry;
   /** Times the same signal fired in the same field. Only the first is scored. */
   readonly occurrences: number;
+  /**
+   * Why `weight` is below the signal's own. Set on an assortment-dependent
+   * term — `veleprodaja` — in a record that names no building material: the
+   * word says the business sells, not what it sells.
+   */
+  readonly discountedFor?: 'no-assortment';
+  /** The weight the signal would have carried undiscounted. */
+  readonly fullWeight?: number;
 }
 
 /**
@@ -159,6 +165,12 @@ export interface ClassificationResult {
   /** One sentence, safe to render in the review UI. */
   readonly reason: string;
   /**
+   * Set only on `OUT_OF_SCOPE`: the adjacent trade that decided it. Persisted
+   * to `leads.classification_industry` so the exclusion can be audited and
+   * argued with, rather than being a row that quietly vanished.
+   */
+  readonly industry?: AdjacentIndustry;
+  /**
    * Set when the label came from the source rather than from the text.
    *
    * A company listed under `nadjimajstora.rs/gradjevinski-radovi/fasader` is a
@@ -171,14 +183,20 @@ export interface ClassificationResult {
    * mean different things to a reviewer, and because an audit of the
    * classifier's precision has to be able to exclude the labels it did not
    * produce.
+   *
+   * It also changes how the record is *scored*: an asserted result carries no
+   * axis arithmetic, so `decidingNet` reports `null` for it and
+   * `scoreRelevance` falls back to confidence rather than reading a net of
+   * zero. Without that, asserting a label would score the lead as if there
+   * were no evidence for it — see `src/lib/score/score.ts`.
    */
   readonly sourceAsserted?: boolean;
   /**
    * What the word-scorer would have said, kept for exactly that audit.
    *
    * Never used for the label. It is how we find out that a source-asserted
-   * corpus reads as `UNKNOWN` to the classifier — which is the measurement
-   * that says whether the signal list is missing terms.
+   * corpus reads as `UNCLASSIFIED` to the classifier — which is the
+   * measurement that says whether the signal list is missing terms.
    */
   readonly inferred?: ClassificationResult;
 }

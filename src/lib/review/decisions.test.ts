@@ -231,9 +231,11 @@ describe('a human edit survives a subsequent crawl', () => {
       { matching: 'caller' },
     );
     applyGrading(db, leadId, {
-      classification: 'UNKNOWN',
+      classification: 'UNCLASSIFIED',
       classificationConfidence: 0.1,
-      leadScore: 40,
+      relevanceScore: 0,
+      contactabilityScore: 40,
+      leadScore: 0,
     });
 
     const after = getLead(db, leadId);
@@ -255,9 +257,11 @@ describe('a human edit survives a subsequent crawl', () => {
     // `applyGrading` writes `leads.classification` unconditionally and does not
     // read `lead_field_values`. The human's claim survives; the column does not.
     applyGrading(db, leadId, {
-      classification: 'UNKNOWN',
+      classification: 'UNCLASSIFIED',
       classificationConfidence: 0.2,
-      leadScore: 30,
+      relevanceScore: 0,
+      contactabilityScore: 30,
+      leadScore: 0,
     });
 
     const overridden = overriddenHumanEdits(db, leadId);

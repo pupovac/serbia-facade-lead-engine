@@ -42,7 +42,12 @@ import {
   type Provenance,
   type UpsertLeadResult,
 } from '@/lib/db';
-import { assertClassification, classifyLead, type ClassificationResult } from '@/lib/classify';
+import {
+  assertClassification,
+  classifyLead,
+  decidingNet,
+  type ClassificationResult,
+} from '@/lib/classify';
 import {
   extractEmails,
   extractSocials,
@@ -57,7 +62,7 @@ import {
   type CityMatch,
 } from '@/lib/normalize';
 import { extractPhones, normalizePhone, toPhoneInput } from '@/lib/phone';
-import { scoreLead, toScoreInput, type LeadScore } from '@/lib/score';
+import { scoreLead, toGrading, toScoreInput, type LeadScore } from '@/lib/score';
 import { normalizeWhitespace } from '@/lib/text/fold.js';
 import type { RawLead } from './raw-lead.js';
 
@@ -233,7 +238,11 @@ export function normalizeRawLead(
       .filter((c) => c.kind === 'facebook' || c.kind === 'instagram' || c.kind === 'google_maps')
       .map((c) => c.value),
     city,
-    classification: { label: classification.label, confidence: classification.confidence },
+    classification: {
+      label: classification.label,
+      confidence: classification.confidence,
+      evidenceNet: decidingNet(classification),
+    },
     sourceIds: lead.sourceId === undefined ? [] : [lead.sourceId],
     lastSeenAt: now,
     now,
@@ -248,6 +257,7 @@ export function normalizeRawLead(
     classification: classification.label,
     classificationConfidence: classification.confidence,
     classificationEvidence: JSON.stringify(classification),
+    classificationIndustry: classification.industry ?? null,
     cityId: city?.cityId ?? null,
     municipalityId: city?.municipalityId ?? null,
     cityRaw: placeText === '' ? null : placeText,
@@ -260,6 +270,9 @@ export function normalizeRawLead(
     openingHours: trimOrNull(lead.openingHours),
     leadScore: score.score,
     scoreBreakdown: JSON.stringify(score.components),
+    relevanceScore: score.relevance,
+    relevanceBreakdown: JSON.stringify(score.relevanceComponents),
+    contactabilityScore: score.contactability,
     phones,
     contacts,
   };
@@ -330,8 +343,8 @@ export function persistLead(
   /* c8 ignore next -- upsertLead just wrote it; this is a type narrowing, not a case */
   if (stored === undefined) throw new Error(`lead ${result.leadId} vanished after upsert`);
 
-  const rescored = scoreLead(
-    toScoreInput({
+  const rescored = scoreLead({
+    ...toScoreInput({
       lead: stored,
       phones: distinctPhones(db, result.leadId),
       contacts: leadContactClaims(db, result.leadId),
@@ -339,18 +352,25 @@ export function persistLead(
       city: normalized.city,
       now,
     }),
-  );
+    classification: {
+      label: normalized.classification.label,
+      confidence: normalized.classification.confidence,
+      evidenceNet: decidingNet(normalized.classification),
+    },
+  });
 
   applyGrading(
     db,
     result.leadId,
-    {
-      classification: normalized.classification.label,
-      classificationConfidence: normalized.classification.confidence,
-      classificationEvidence: JSON.stringify(normalized.classification),
-      leadScore: rescored.score,
-      scoreBreakdown: JSON.stringify(rescored.components),
-    },
+    toGrading(
+      {
+        label: normalized.classification.label,
+        confidence: normalized.classification.confidence,
+        evidence: JSON.stringify(normalized.classification),
+        industry: normalized.classification.industry ?? null,
+      },
+      rescored,
+    ),
     now,
   );
 

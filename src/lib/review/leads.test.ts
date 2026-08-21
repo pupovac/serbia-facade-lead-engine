@@ -124,7 +124,7 @@ describe('filters', () => {
       cityId: 'nis',
       municipalityId: 'nis',
       cityRaw: 'Niš',
-      classification: 'UNKNOWN',
+      classification: 'UNCLASSIFIED',
       leadScore: 20,
     });
     // A department label the ingest could not parse — it is a row in
@@ -297,14 +297,120 @@ describe('row aggregates', () => {
 
 /* -------------------------------------------------------------------------- */
 
+describe('two scores, sorted and filtered independently', () => {
+  beforeEach(() => {
+    // A documented parking garage against a bare sole trader — the pair the
+    // single folded score got the wrong way round.
+    add('Garaza Banovina', {
+      classification: 'UNCLASSIFIED',
+      relevanceScore: 0,
+      contactabilityScore: 88,
+      leadScore: 0,
+    });
+    add('Fasader Jovanović', {
+      classification: 'FACADE_CONTRACTOR',
+      relevanceScore: 92,
+      contactabilityScore: 48,
+      leadScore: 44,
+    });
+    add('Stovarište Niš', {
+      classification: 'CONSTRUCTION_MATERIAL_STORE',
+      relevanceScore: 74,
+      contactabilityScore: 66,
+      leadScore: 49,
+    });
+  });
+
+  it('sorts by relevance without contact completeness getting a vote', () => {
+    const rows = listLeads(db, { sort: 'relevance' }).rows;
+    expect(rows.map((r) => r.name)).toStrictEqual([
+      'Fasader Jovanović',
+      'Stovarište Niš',
+      'Garaza Banovina',
+    ]);
+  });
+
+  it('sorts by contactability, which puts the garage back on top', () => {
+    const rows = listLeads(db, { sort: 'contactability' }).rows;
+    expect(rows[0]?.name).toBe('Garaza Banovina');
+    expect(rows[0]?.contactabilityScore).toBe(88);
+    expect(rows[0]?.relevanceScore).toBe(0);
+  });
+
+  it('filters on each score on its own', () => {
+    expect(listLeads(db, { minRelevance: 70 }).total).toBe(2);
+    expect(listLeads(db, { minContactability: 70 }).total).toBe(1);
+    expect(listLeads(db, { minRelevance: 70, minContactability: 60 }).total).toBe(1);
+  });
+
+  it('carries both numbers onto the row', () => {
+    const row = listLeads(db, { search: 'Jovanović' }).rows[0];
+    expect(row?.relevanceScore).toBe(92);
+    expect(row?.contactabilityScore).toBe(48);
+    expect(row?.leadScore).toBe(44);
+  });
+});
+
+/* -------------------------------------------------------------------------- */
+
+describe('OUT_OF_SCOPE stays out of the working set', () => {
+  beforeEach(() => {
+    add('Fasader Jovanović', { classification: 'FACADE_CONTRACTOR' });
+    add('Termo Nešto', { classification: 'UNCLASSIFIED' });
+    add('Roletne Marković', {
+      classification: 'OUT_OF_SCOPE',
+      classificationIndustry: 'joinery',
+    });
+    add('Krovovi Petrović', {
+      classification: 'OUT_OF_SCOPE',
+      classificationIndustry: 'roofing',
+    });
+  });
+
+  it('leaves ruled-out leads out of the default list', () => {
+    const page = listLeads(db);
+    expect(page.total).toBe(2);
+    expect(page.rows.map((r) => r.name).sort()).toStrictEqual(['Fasader Jovanović', 'Termo Nešto']);
+  });
+
+  it('keeps UNCLASSIFIED in — it is a lead we have not ruled in yet, not one we ruled out', () => {
+    expect(listLeads(db).rows.some((r) => r.classification === 'UNCLASSIFIED')).toBe(true);
+  });
+
+  it('shows them when a reviewer asks for them by name', () => {
+    const page = listLeads(db, { classifications: ['OUT_OF_SCOPE'] });
+    expect(page.total).toBe(2);
+    expect(page.rows.map((r) => r.classificationIndustry).sort()).toStrictEqual([
+      'joinery',
+      'roofing',
+    ]);
+  });
+
+  it('shows them on an explicit opt-in, filter or no filter', () => {
+    expect(listLeads(db, { includeOutOfScope: true }).total).toBe(4);
+  });
+
+  it('applies to the total, not just to the visible page', () => {
+    // The failure mode a naive slice would hide: a filter that changes which
+    // rows are shown but not how many the pager thinks there are.
+    expect(listLeads(db, { pageSize: 1 }).total).toBe(2);
+    expect(listLeads(db, { pageSize: 1, includeOutOfScope: true }).total).toBe(4);
+  });
+});
+
+/* -------------------------------------------------------------------------- */
+
 describe('facets', () => {
   it('reads the labels present in the data rather than a baked-in list', () => {
     add('A', { classification: 'FACADE_CONTRACTOR', municipalityId: 'novi-sad' });
     add('B', { classification: 'FACADE_CONTRACTOR', municipalityId: 'novi-sad' });
-    add('C', { classification: 'UNKNOWN', municipalityId: 'cacak' });
+    add('C', { classification: 'UNCLASSIFIED', municipalityId: 'cacak' });
 
     const facets = leadFacets(db);
-    expect(facets.classifications.map((f) => f.value)).toEqual(['FACADE_CONTRACTOR', 'UNKNOWN']);
+    expect(facets.classifications.map((f) => f.value)).toEqual([
+      'FACADE_CONTRACTOR',
+      'UNCLASSIFIED',
+    ]);
     expect(facets.classifications[0]?.count).toBe(2);
     expect(facets.municipalities.map((f) => f.label)).toEqual(['Novi Sad', 'Čačak']);
     expect(facets.sources.map((f) => f.label)).toEqual(['Portal Srbija']);

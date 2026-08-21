@@ -6,6 +6,8 @@
  * and `repo.leadContactClaims` already collapse per-source claims, so nothing
  * here re-derives them.
  */
+import { decidingNet } from '../classify/classify.js';
+import type { ClassificationResult } from '../classify/types.js';
 import type { CityMatch } from '../normalize/city.js';
 import type { ContactKind, Lead, LeadContact, LeadSource } from '../db/schema.js';
 import type { DistinctPhone } from '../db/repo.js';
@@ -43,6 +45,27 @@ export interface ScoreSources {
  */
 export const PERSISTED_CITY_CONFIDENCE = 0.8;
 
+/**
+ * The net evidence behind the stored label, recovered from
+ * `leads.classification_evidence`.
+ *
+ * The column is written by the pipeline and by every re-grade, but it is
+ * nullable and predates FUZZ-37 on some rows, so a miss is normal rather than
+ * an error: `scoreRelevance` falls back to the confidence when this returns
+ * `null`. A malformed JSON blob is treated the same way — a parser bug in a
+ * derived column must not stop a lead from being scored.
+ */
+export function storedEvidenceNet(evidence: string | null): number | null {
+  if (evidence === null || evidence === '') return null;
+  try {
+    const parsed = JSON.parse(evidence) as ClassificationResult;
+    if (typeof parsed?.label !== 'string') return null;
+    return decidingNet(parsed);
+  } catch {
+    return null;
+  }
+}
+
 export function toScoreInput({
   lead,
   phones,
@@ -67,6 +90,7 @@ export function toScoreInput({
     classification: {
       label: lead.classification,
       confidence: lead.classificationConfidence,
+      evidenceNet: storedEvidenceNet(lead.classificationEvidence),
     },
     sourceIds,
     lastSeenAt: lead.lastSeenAt,

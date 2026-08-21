@@ -8,10 +8,16 @@
  * how the signal table gets tuned.
  */
 import { classifyLead } from '../src/lib/classify/index.js';
-import type { LeadClassification } from '../src/lib/db/schema.js';
-import { LABELLED_BUSINESSES, evaluateClassifier } from '../src/lib/classify/fixtures.js';
+import {
+  LABELLED_BUSINESSES,
+  evaluateClassifier,
+  toFixtureLabel,
+  type FixtureLabel,
+} from '../src/lib/classify/fixtures.js';
 
-const LABELS: LeadClassification[] = [
+// The fixture's vocabulary: `UNKNOWN` covers both `UNCLASSIFIED` and
+// `OUT_OF_SCOPE`, which the split below reports separately.
+const LABELS: FixtureLabel[] = [
   'FACADE_CONTRACTOR',
   'CONSTRUCTION_MATERIAL_STORE',
   'BOTH',
@@ -48,7 +54,7 @@ if (process.argv.includes('--errors')) {
   console.log('\nMisclassified');
   for (const business of LABELLED_BUSINESSES) {
     const result = classifyLead(business.input);
-    if (result.label === business.expected) continue;
+    if (toFixtureLabel(result.label) === business.expected) continue;
     console.log(`\n${business.name} — expected ${business.expected}, got ${result.label}`);
     console.log(`  ${result.reason}`);
     console.log(

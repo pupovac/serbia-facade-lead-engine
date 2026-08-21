@@ -3,9 +3,10 @@
  * and the evidence for saying so.
  */
 export { assertClassification, type AssertedClassificationInput } from './asserted.js';
-export { classifyLead } from './classify.js';
+export { classifyLead, decidingNet } from './classify.js';
 export {
   ASSORTMENT_BONUS,
+  NO_ASSORTMENT_DISCOUNT,
   ASSORTMENT_GATE,
   DECISION_THRESHOLD,
   FIELD_WEIGHTS,

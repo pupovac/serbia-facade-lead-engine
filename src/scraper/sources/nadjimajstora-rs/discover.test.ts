@@ -200,7 +200,7 @@ describe('extract', () => {
   /**
    * The epic's rule, at the only place it can be enforced. These are sole
    * traders; `Srdjan Todić` carries no facade word, so a record that went
-   * through the word-scorer would land in `UNKNOWN` and leave the export.
+   * through the word-scorer would land in `UNCLASSIFIED` and leave the export.
    */
   it('asserts FACADE_CONTRACTOR from the category rather than from the name', async () => {
     const test = harness();

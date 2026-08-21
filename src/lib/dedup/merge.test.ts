@@ -188,7 +188,7 @@ describe('mergeLeads keeps everything from both sides', () => {
       }),
       NAVIDIKU,
     );
-    expect(getLead(db, a.leadId)?.classification).toBe('UNKNOWN');
+    expect(getLead(db, a.leadId)?.classification).toBe('UNCLASSIFIED');
 
     const outcome = mergeLeads(db, a.leadId, b.leadId, PHONE_REASON);
 

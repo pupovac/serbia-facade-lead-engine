@@ -51,14 +51,78 @@ import {
 /* Enumerations                                                               */
 /* -------------------------------------------------------------------------- */
 
-/** What we think the business is. `UNKNOWN` stays out of the export. */
+/**
+ * What we think the business is.
+ *
+ * The two undecided labels are not one label with two moods. `UNCLASSIFIED`
+ * means the classifier found nothing either way — the record is thin, and a
+ * crawl or an enrichment pass may still turn it into a lead. `OUT_OF_SCOPE`
+ * means it found evidence of a trade we do not sell to and no evidence of one
+ * we do: a blinds workshop, a roofer, an EPS factory. Collapsing the two makes
+ * a reviewer re-triage rows the classifier already ruled out, which is exactly
+ * what `UNKNOWN` did before FUZZ-37 split it.
+ */
 export const LEAD_CLASSIFICATIONS = [
   'FACADE_CONTRACTOR',
   'CONSTRUCTION_MATERIAL_STORE',
   'BOTH',
-  'UNKNOWN',
+  'UNCLASSIFIED',
+  'OUT_OF_SCOPE',
 ] as const;
 export type LeadClassification = (typeof LEAD_CLASSIFICATIONS)[number];
+
+/** The labels that name a buyer group. Everything else is not a lead we can sell to. */
+export const IN_SCOPE_CLASSIFICATIONS = [
+  'FACADE_CONTRACTOR',
+  'CONSTRUCTION_MATERIAL_STORE',
+  'BOTH',
+] as const satisfies readonly LeadClassification[];
+
+/**
+ * What the XLSX export ships. Neither undecided label belongs in a call list:
+ * `OUT_OF_SCOPE` was ruled out and `UNCLASSIFIED` was never ruled in.
+ */
+export const EXPORTABLE_CLASSIFICATIONS = IN_SCOPE_CLASSIFICATIONS;
+
+const IN_SCOPE_SET: ReadonlySet<string> = new Set<string>(IN_SCOPE_CLASSIFICATIONS);
+
+/** True for the three labels that name a buyer group. */
+export function isInScope(classification: LeadClassification): boolean {
+  return IN_SCOPE_SET.has(classification);
+}
+
+/**
+ * True when the classifier has made no positive call at all.
+ *
+ * `upsertLead` and the merge engine treat this as *the absence of a label* and
+ * let an incoming one fill it. `OUT_OF_SCOPE` is deliberately not absence — it
+ * is a decision, and a later source repeating the same thin text must not
+ * quietly overwrite it.
+ */
+export function isUnclassified(classification: LeadClassification): boolean {
+  return classification === 'UNCLASSIFIED';
+}
+
+/**
+ * The trade an out-of-scope business actually belongs to.
+ *
+ * Lives here rather than in `src/lib/classify` because `leads.classification_industry`
+ * stores it and the schema may not import the classifier — the dependency runs
+ * the other way. `classify/types.ts` re-exports it.
+ */
+export const ADJACENT_INDUSTRIES = [
+  'roofing',
+  'joinery',
+  'waterproofing',
+  'industrial_insulation',
+  'electrical',
+  'cleaning',
+  'manufacturing',
+  'other_trade',
+  'general_construction',
+  'technical_goods',
+] as const;
+export type AdjacentIndustry = (typeof ADJACENT_INDUSTRIES)[number];
 
 /** Where a lead is in the human review loop. `new` is what the pipeline writes. */
 export const LEAD_STATUSES = ['new', 'reviewed', 'approved', 'rejected', 'merged'] as const;
@@ -226,9 +290,14 @@ function boolean(name: string) {
  * is a TypeScript-only narrowing; this is the database-side half, and the
  * syntax is the same in Postgres.
  */
-function oneOf(name: string, column: string, values: readonly string[]) {
+function oneOf(name: string, column: string, values: readonly string[], nullable = false) {
   const list = sql.raw(values.map((value) => `'${value}'`).join(', '));
-  return check(name, sql`${sql.raw(`"${column}"`)} in (${list})`);
+  const quoted = sql.raw(`"${column}"`);
+  // A nullable enum column has to say so: `NULL in (…)` is NULL, not true, and
+  // a CHECK that evaluates to NULL passes in SQLite but not in every dialect.
+  return nullable
+    ? check(name, sql`${quoted} is null or ${quoted} in (${list})`)
+    : check(name, sql`${quoted} in (${list})`);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -378,7 +447,7 @@ export const leads = sqliteTable(
     taxId: text('tax_id'),
     classification: text('classification', { enum: LEAD_CLASSIFICATIONS })
       .notNull()
-      .default('UNKNOWN'),
+      .default('UNCLASSIFIED'),
     /** 0–1. How sure the classifier is, not how likely a sale is. */
     classificationConfidence: real('classification_confidence'),
     /**
@@ -388,6 +457,12 @@ export const leads = sqliteTable(
      * rather than recomputed from text that may since have changed.
      */
     classificationEvidence: text('classification_evidence'),
+    /**
+     * Set only on `OUT_OF_SCOPE`: the adjacent trade whose evidence decided it.
+     * Stored so the exclusion is auditable and reversible — a reviewer can ask
+     * for every lead we dropped as `joinery` and disagree with the lot.
+     */
+    classificationIndustry: text('classification_industry', { enum: ADJACENT_INDUSTRIES }),
     cityId: text('city_id'),
     municipalityId: text('municipality_id'),
     /** The place string the source published, before it was matched to a slug. */
@@ -399,10 +474,31 @@ export const leads = sqliteTable(
     longitude: real('longitude'),
     description: text('description'),
     openingHours: text('opening_hours'),
-    /** 0–100 data completeness and relevance. Never a purchase-likelihood guess. */
-    leadScore: integer('lead_score').notNull().default(0),
-    /** JSON: which component contributed how many points. */
+    /**
+     * 0–100. **Is this a lead for us?** — the label, its confidence and the
+     * strength of the evidence behind it, and nothing else. How reachable the
+     * business is contributes zero: a perfectly-documented parking garage
+     * scores 0 here. Independently sortable from `contactability_score`.
+     */
+    relevanceScore: integer('relevance_score').notNull().default(0),
+    /** JSON: which relevance component contributed how many points. */
+    relevanceBreakdown: text('relevance_breakdown'),
+    /**
+     * 0–100. **How much contact data do we hold?** — phones, extra numbers,
+     * mobile vs landline, email, website, social, city, corroboration,
+     * recency. Nothing about relevance. Every lead with a phone outranks every
+     * lead without one; `NO_PHONE_CEILING` guarantees it.
+     */
+    contactabilityScore: integer('contactability_score').notNull().default(0),
+    /** JSON: which contactability component contributed how many points. */
     scoreBreakdown: text('score_breakdown'),
+    /**
+     * 0–100, derived: `relevance × contactability / 100`. One sort key for the
+     * export, where relevance gates and contactability ranks. It is a
+     * convenience column, never the only thing the list can rank by — that was
+     * the FUZZ-37 defect.
+     */
+    leadScore: integer('lead_score').notNull().default(0),
     status: text('status', { enum: LEAD_STATUSES }).notNull().default('new'),
     reviewNote: text('review_note'),
     reviewedAt: timestamp('reviewed_at'),
@@ -426,12 +522,17 @@ export const leads = sqliteTable(
     index('leads_registration_idx').on(t.registrationNumber),
     // The review UI's default listing: relevant leads, best first.
     index('leads_classification_status_idx').on(t.classification, t.status, t.leadScore),
+    // The two scores are sorted on independently, so each gets its own index —
+    // the composite above only helps a query that also pins the label.
+    index('leads_relevance_idx').on(t.relevanceScore),
+    index('leads_contactability_idx').on(t.contactabilityScore),
     index('leads_merged_into_idx').on(t.mergedIntoId),
     // The merge engine's fuzzy pass blocks on the city: a near-duplicate name
     // is only ever compared against the other leads in the same place.
     index('leads_city_idx').on(t.cityId),
     index('leads_last_scraped_idx').on(t.lastScrapedAt),
     oneOf('leads_classification_check', 'classification', LEAD_CLASSIFICATIONS),
+    oneOf('leads_industry_check', 'classification_industry', ADJACENT_INDUSTRIES, true),
     oneOf('leads_status_check', 'status', LEAD_STATUSES),
   ],
 );

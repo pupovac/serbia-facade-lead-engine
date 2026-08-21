@@ -24,6 +24,7 @@ import {
   getCrawlState,
   getLead,
   isPhoneErased,
+  leadCategories,
   leadContactClaims,
   leadPhoneClaims,
   leadSourceRows,
@@ -94,7 +95,7 @@ describe('upsertLead — first sighting', () => {
 
     const stored = getLead(db, result.leadId);
     expect(stored?.name).toBe('Fasade Novak');
-    expect(stored?.classification).toBe('UNKNOWN');
+    expect(stored?.classification).toBe('UNCLASSIFIED');
     expect(stored?.leadScore).toBe(0);
     expect(leadSourceRows(db, result.leadId)).toHaveLength(1);
   });
@@ -713,5 +714,98 @@ describe('erasure (ZZPL)', () => {
     const serialized = JSON.stringify(entries[0]);
     expect(serialized).not.toContain('381641112222');
     expect(serialized).not.toContain('Marko');
+  });
+});
+
+/* -------------------------------------------------------------------------- */
+
+/**
+ * `leadCategories` — the two joins that make a re-grade see what the first
+ * pass saw. Both cases below are real shapes from the FUZZ-22 pilot, and both
+ * were bugs before they were tests.
+ */
+describe('leadCategories', () => {
+  const AUSTROTHERM_URL = 'https://www.austrotherm.rs/distributeri';
+  const AUSTROTHERM: Provenance = {
+    sourceId: 'austrotherm-distributeri',
+    sourceUrl: AUSTROTHERM_URL,
+  };
+
+  beforeEach(() => {
+    upsertSource(db, {
+      id: 'austrotherm-distributeri',
+      name: 'Austrotherm distributeri',
+      url: AUSTROTHERM_URL,
+      category: 'test',
+    });
+    upsertSource(db, {
+      id: 'overture-places',
+      name: 'Overture Maps',
+      url: 'https://overturemaps.org',
+      category: 'test',
+    });
+  });
+
+  const raw = (sourceId: string, sourceUrl: string, name: string, categories: string[]): void => {
+    saveRawRecord(db, {
+      sourceId,
+      sourceUrl,
+      payload: JSON.stringify({ sourceId, sourceUrl, name, categories }),
+    });
+  };
+
+  it('reads the categories the business was filed under', () => {
+    raw('portal-srbija', PORTAL.sourceUrl, 'Stovarište Gradnja', ['Stovarišta', 'Boje i lakovi']);
+    const { leadId } = upsertLead(db, lead('Stovarište Gradnja'), PORTAL);
+    expect(leadCategories(db, leadId)).toStrictEqual(['Stovarišta', 'Boje i lakovi']);
+  });
+
+  it('does not hand one business the categories of everyone else on the same page', () => {
+    // The Austrotherm distributor list is 292 businesses behind one URL. A
+    // join on `(source_id, source_url)` alone gives every one of them every
+    // other one's categories.
+    raw('austrotherm-distributeri', AUSTROTHERM_URL, '21 MAJ', ['Austrotherm distributer']);
+    raw('austrotherm-distributeri', AUSTROTHERM_URL, 'MILJIĆ', ['EPS / stiropor']);
+    const { leadId } = upsertLead(db, lead('21 MAJ'), AUSTROTHERM);
+
+    expect(leadCategories(db, leadId)).toStrictEqual(['Austrotherm distributer']);
+  });
+
+  it('finds the categories a merged-in source published under a different name', () => {
+    // Pilot lead 605: `Miljić TR` on Overture, `MILJIĆ` on Austrotherm — and
+    // Austrotherm is the source that says it sells `građevinski materijal`.
+    // Matching `leads.name` alone loses the label on every re-grade.
+    raw('austrotherm-distributeri', AUSTROTHERM_URL, 'MILJIĆ', ['građevinski materijal']);
+    raw('overture-places', 'https://overturemaps.org/#1', 'Miljić TR', ['building_supply_store']);
+
+    const { leadId } = upsertLead(db, lead('MILJIĆ'), AUSTROTHERM);
+    upsertLead(
+      db,
+      { ...lead('Miljić TR'), leadId },
+      {
+        sourceId: 'overture-places',
+        sourceUrl: 'https://overturemaps.org/#1',
+      },
+    );
+
+    expect(leadCategories(db, leadId).sort()).toStrictEqual([
+      'building_supply_store',
+      'građevinski materijal',
+    ]);
+  });
+
+  it('survives a payload it cannot parse rather than failing the re-grade', () => {
+    saveRawRecord(db, {
+      sourceId: 'portal-srbija',
+      sourceUrl: PORTAL.sourceUrl,
+      payload: 'not json at all',
+    });
+    const { leadId } = upsertLead(db, lead('Neka Firma'), PORTAL);
+    expect(leadCategories(db, leadId)).toStrictEqual([]);
+  });
+
+  it('returns nothing when no raw record backs the lead', () => {
+    const { leadId } = upsertLead(db, lead('Bez Sirovog Zapisa'), PORTAL);
+    expect(leadCategories(db, leadId)).toStrictEqual([]);
   });
 });

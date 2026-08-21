@@ -6,6 +6,12 @@
  * indexed `where`, never a slice of a fetched array. The two aggregates a row
  * shows — how many distinct numbers, how many independent sources — are read
  * for the page's ids only, in two grouped queries, rather than per row.
+ *
+ * Two numbers rank a lead, not one: `relevance_score` answers "is this a lead
+ * for us" and `contactability_score` answers "how much contact data do we
+ * hold". Both are sortable and filterable on their own — see `SORT_COLUMNS`
+ * and `buildWhere` — because the single folded score put `UNKNOWN` rows in a
+ * third of the owner's top 200.
  */
 import {
   and,
@@ -18,6 +24,7 @@ import {
   gte,
   inArray,
   isNull,
+  ne,
   or,
   sql,
 } from 'drizzle-orm';
@@ -121,10 +128,21 @@ function buildWhere(query: LeadListQuery): SQL | undefined {
   if (query.cityId) predicates.push(eq(leads.cityId, query.cityId) as SQL);
   if (query.classifications && query.classifications.length > 0) {
     predicates.push(inArray(leads.classification, [...query.classifications]) as SQL);
+  } else if (query.includeOutOfScope !== true) {
+    // The default working set. A lead the classifier positively ruled out —
+    // joinery, roofing, an EPS factory — is not a row a reviewer should have
+    // to re-triage; asking for it by name is how you audit the exclusions.
+    predicates.push(ne(leads.classification, 'OUT_OF_SCOPE') as SQL);
   }
   if (query.status) predicates.push(eq(leads.status, query.status) as SQL);
   if (query.minScore != null && query.minScore > 0) {
     predicates.push(gte(leads.leadScore, query.minScore) as SQL);
+  }
+  if (query.minRelevance != null && query.minRelevance > 0) {
+    predicates.push(gte(leads.relevanceScore, query.minRelevance) as SQL);
+  }
+  if (query.minContactability != null && query.minContactability > 0) {
+    predicates.push(gte(leads.contactabilityScore, query.minContactability) as SQL);
   }
   if (query.hasPhone != null) {
     // `valid = 1` is not optional: 632 pilot claims hold department labels like
@@ -147,6 +165,8 @@ function buildWhere(query: LeadListQuery): SQL | undefined {
 
 const SORT_COLUMNS = {
   score: leads.leadScore,
+  relevance: leads.relevanceScore,
+  contactability: leads.contactabilityScore,
   name: leads.nameNormalized,
   city: leads.cityRaw,
   lastSeen: leads.lastSeenAt,
@@ -212,6 +232,9 @@ export function listLeads(db: Executor, query: LeadListQuery = {}): LeadListPage
       municipalityId: leads.municipalityId,
       classification: leads.classification,
       classificationConfidence: leads.classificationConfidence,
+      classificationIndustry: leads.classificationIndustry,
+      relevanceScore: leads.relevanceScore,
+      contactabilityScore: leads.contactabilityScore,
       leadScore: leads.leadScore,
       status: leads.status,
       reviewedAt: leads.reviewedAt,

@@ -12,15 +12,16 @@
  * the tradesman picked the trade, the site enforces one trade per profile, and
  * the page never has to say the word "fasada" for that to be true. Running such
  * a record through the word-scorer cannot add information and can only take the
- * label away — `UNKNOWN` on a record the source already identified is a bug, not
- * caution.
+ * label away — an undecided label on a record the source already identified is a
+ * bug, not caution.
  *
  * So an adapter over a pre-filtered source asserts the label, and this is how
  * it says so in the shape the rest of the system already reads. The inferred
  * result rides along under `inferred` so the classifier's own view of these
  * records stays measurable.
  */
-import type { AxisBreakdown, ClassificationResult, LeadClassification } from './types.js';
+import { IN_SCOPE_CLASSIFICATIONS } from '../db/schema.js';
+import type { AxisBreakdown, ClassificationResult } from './types.js';
 
 /** An axis with no evidence on it: nothing was scored, because nothing was read. */
 const EMPTY_AXIS: AxisBreakdown = {
@@ -36,8 +37,12 @@ const EMPTY_AXIS: AxisBreakdown = {
 };
 
 export interface AssertedClassificationInput {
-  /** The label the source's own taxonomy establishes. Never `UNKNOWN`. */
-  readonly label: Exclude<LeadClassification, 'UNKNOWN'>;
+  /**
+   * The label the source's own taxonomy establishes. A buyer group, always —
+   * neither undecided label can be *asserted*, which is what
+   * `IN_SCOPE_CLASSIFICATIONS` is narrowing to here.
+   */
+  readonly label: (typeof IN_SCOPE_CLASSIFICATIONS)[number];
   /**
    * Why the source is entitled to assert it — the category walked, in the
    * source's words. `listed under gradjevinski-radovi/fasader` is the whole
