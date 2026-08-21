@@ -12,7 +12,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { DEFAULTS, type ScraperConfig } from '../config.js';
 import { HttpError, RequestBudgetExceededError, RobotsDisallowedError } from '../errors.js';
 import { silentLogger } from '../logger.js';
-import { PoliteFetcher, parseRetryAfter } from './fetcher.js';
+import { encodeForm, PoliteFetcher, parseRetryAfter } from './fetcher.js';
 
 type Handler = (request: IncomingMessage, response: ServerResponse) => void;
 
@@ -260,6 +260,117 @@ describe('PoliteFetcher', () => {
     const result = await fetcher().text(`${server.url}/firme/x`);
 
     expect(result.robotsRule).toBe('Allow: /firme/');
+  });
+});
+
+describe('form POST', () => {
+  /**
+   * The capability exists for one shape of source: a directory that publishes a
+   * phone number but only renders it when a button asks for it. Replaying that
+   * request is a read, and it has to stay inside every guarantee a GET has.
+   */
+  it('sends a url-encoded POST and returns the body', async () => {
+    const bodies: string[] = [];
+    const methods: string[] = [];
+    const types: string[] = [];
+    const server = await serve(
+      router({
+        '/robots.txt': text(ALLOW_ALL),
+        '/master/show_tel/': (request, response) => {
+          methods.push(request.method ?? '');
+          types.push(request.headers['content-type'] ?? '');
+          let body = '';
+          request.on('data', (chunk) => {
+            body += String(chunk);
+          });
+          request.on('end', () => {
+            bodies.push(body);
+            response.writeHead(200, { 'content-type': 'text/html' });
+            response.end('{"ind":1,"html":"<a href=\\"tel:0645880669\\">x<\\/a>"}');
+          });
+        },
+      }),
+    );
+
+    const result = await fetcher().text(`${server.url}/master/show_tel/`, { form: { id: '2298' } });
+
+    expect(methods).toEqual(['POST']);
+    expect(bodies).toEqual(['id=2298']);
+    expect(types[0]).toContain('application/x-www-form-urlencoded');
+    expect(result.body).toContain('0645880669');
+  });
+
+  it('checks robots.txt for the endpoint like any other request', async () => {
+    const server = await serve(
+      router({
+        '/robots.txt': text('User-agent: *\nDisallow: /master/'),
+        '/master/show_tel/': text('{"ind":1}'),
+      }),
+    );
+
+    await expect(
+      fetcher().text(`${server.url}/master/show_tel/`, { form: { id: '1' } }),
+    ).rejects.toThrow(RobotsDisallowedError);
+    expect(server.requests).toEqual(['/robots.txt']);
+  });
+
+  /**
+   * A `URLSearchParams` body is spent once it is read, so a retried POST has to
+   * build its own. Without that, the second attempt sends an empty body and the
+   * endpoint answers "unknown id" — a phone lost to a transient 503.
+   */
+  it('re-encodes the body on a retry rather than replaying a spent one', async () => {
+    const bodies: string[] = [];
+    let attempt = 0;
+    const server = await serve(
+      router({
+        '/robots.txt': text(ALLOW_ALL),
+        '/master/show_tel/': (request, response) => {
+          let body = '';
+          request.on('data', (chunk) => {
+            body += String(chunk);
+          });
+          request.on('end', () => {
+            bodies.push(body);
+            attempt += 1;
+            if (attempt === 1) {
+              response.writeHead(503);
+              response.end('busy');
+              return;
+            }
+            response.writeHead(200, { 'content-type': 'text/html' });
+            response.end('{"ind":1}');
+          });
+        },
+      }),
+    );
+
+    await fetcher().text(`${server.url}/master/show_tel/`, { form: { id: '2298' } });
+
+    expect(bodies).toEqual(['id=2298', 'id=2298']);
+  });
+
+  it('stays a GET when no form is given', async () => {
+    const methods: string[] = [];
+    const server = await serve(
+      router({
+        '/robots.txt': text(ALLOW_ALL),
+        '/page': (request, response) => {
+          methods.push(request.method ?? '');
+          text('<h1>ok</h1>')(request, response);
+        },
+      }),
+    );
+
+    await fetcher().text(`${server.url}/page`);
+    expect(methods).toEqual(['GET']);
+  });
+});
+
+describe('encodeForm', () => {
+  it('encodes the way a browser does', () => {
+    expect(encodeForm({ id: '2298' })).toBe('id=2298');
+    expect(encodeForm({ q: 'građevinski materijal' })).toBe('q=gra%C4%91evinski+materijal');
   });
 });
 

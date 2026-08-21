@@ -2,6 +2,7 @@
  * Lead classification. Which of the two buyer groups a business belongs to,
  * and the evidence for saying so.
  */
+export { assertClassification, type AssertedClassificationInput } from './asserted.js';
 export { classifyLead, decidingNet } from './classify.js';
 export {
   ASSORTMENT_BONUS,

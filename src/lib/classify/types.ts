@@ -170,6 +170,35 @@ export interface ClassificationResult {
    * argued with, rather than being a row that quietly vanished.
    */
   readonly industry?: AdjacentIndustry;
+  /**
+   * Set when the label came from the source rather than from the text.
+   *
+   * A company listed under `nadjimajstora.rs/gradjevinski-radovi/fasader` is a
+   * fasader because the directory says so, and reading its name for facade
+   * words can only lose it — `Srdjan Todić` contains no evidence of anything.
+   * So a pre-filtered source asserts the label and the word-scorer never gets
+   * a vote.
+   *
+   * It is a distinct flag rather than a high confidence score because the two
+   * mean different things to a reviewer, and because an audit of the
+   * classifier's precision has to be able to exclude the labels it did not
+   * produce.
+   *
+   * It also changes how the record is *scored*: an asserted result carries no
+   * axis arithmetic, so `decidingNet` reports `null` for it and
+   * `scoreRelevance` falls back to confidence rather than reading a net of
+   * zero. Without that, asserting a label would score the lead as if there
+   * were no evidence for it — see `src/lib/score/score.ts`.
+   */
+  readonly sourceAsserted?: boolean;
+  /**
+   * What the word-scorer would have said, kept for exactly that audit.
+   *
+   * Never used for the label. It is how we find out that a source-asserted
+   * corpus reads as `UNCLASSIFIED` to the classifier — which is the
+   * measurement that says whether the signal list is missing terms.
+   */
+  readonly inferred?: ClassificationResult;
 }
 
 export interface ClassificationInput {

@@ -413,8 +413,17 @@ export function classifyLead(input: ClassificationInput): ClassificationResult {
  * the half that nearly failed. For an undecided label it is 0: whatever the
  * axes scored, nothing cleared the gate, and the relevance score must not pay
  * for evidence that did not decide anything.
+ *
+ * For a **source-asserted** label it is `null`, which is not the same as 0. An
+ * asserted result carries no axis arithmetic because no words were read — the
+ * directory's own taxonomy decided it. Reporting 0 would tell `scoreRelevance`
+ * that we looked for evidence and found none, and it would dock every record
+ * from a pre-filtered source the whole evidence component. `null` takes the
+ * documented "evidence not stored — confidence stands in" path instead, which
+ * is exactly the case that path exists for.
  */
-export function decidingNet(result: ClassificationResult): number {
+export function decidingNet(result: ClassificationResult): number | null {
+  if (result.sourceAsserted === true) return null;
   switch (result.label) {
     case 'FACADE_CONTRACTOR':
       return result.contractor.net;

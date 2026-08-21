@@ -72,6 +72,24 @@ export const rawLeadSchema = z.object({
 
   /** Categories the source filed the business under. Feeds classification. */
   categories: z.array(z.string().min(1)).default([]),
+
+  /**
+   * The classification the **source** establishes, for a listing that is
+   * pre-filtered by trade.
+   *
+   * Set this only when being in the listing *is* the evidence — a directory
+   * section that holds facade contractors and nothing else. The pipeline then
+   * takes this label instead of reading the record's words, because a
+   * tradesman called `Srdjan Todić` carries no words to read and scoring him
+   * can only produce `UNKNOWN`.
+   *
+   * `assertedTypeReason` names the category that entitles the claim, in the
+   * source's own terms, so the assertion stays arguable from the `sourceUrl`.
+   * The inferred label is still computed and kept, for auditing the classifier
+   * against a corpus whose answer is known.
+   */
+  assertedType: z.enum(['FACADE_CONTRACTOR', 'CONSTRUCTION_MATERIAL_STORE', 'BOTH']).nullish(),
+  assertedTypeReason: z.string().trim().min(1).nullish(),
   description: z.string().trim().min(1).nullish(),
   openingHours: z.string().trim().min(1).nullish(),
 
