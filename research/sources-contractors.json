@@ -11,11 +11,12 @@
     "robots.txt was fetched directly for every source; the quoted rule is verbatim from the file on 2026-08-19.",
     "Serbian queries were run in both diacritic and ASCII-folded form (fasader/fasaderi, gradjevinski/gradevinski, izrada fasade, termo fasada, demit fasada, termoizolacija, stiropor fasada, molersko fasaderski radovi, zavrsni gradjevinski radovi, majstori za fasadu).",
     "Amended 2026-08-20 (FUZZ-28) to land two corrections measured by FUZZ-8: portal-srbija's city-scoped category pages are not strict subsets of the national page (+80% on the one category measured, with 14 city slugs deterministically 500ing including beograd), and the APR register is available as free open data at openapi.apr.gov.rs rather than only through a commercial licensing conversation. Where FUZZ-4 and FUZZ-8 disagree, the measured FUZZ-8 finding wins; the superseded FUZZ-4 text is kept inline so the change is auditable. Nothing else in this registry was re-measured on that date.",
-    "Amended 2026-08-21 (FUZZ-39): the `daibau` entry was re-measured end to end after FUZZ-39 was opened on the premise that its listing pages carry contractor phone numbers. They do not. The FUZZ-4 verdict (0% phone obtainable, do not scrape, Low) is confirmed; its record count (75), pagination reading (5 pages) and requires_js flag (true) are corrected to 748, walk-to-exhaustion and false respectively. Where FUZZ-4 and FUZZ-39 disagree on those three, the measured FUZZ-39 figure wins."
+    "Amended 2026-08-21 (FUZZ-39): the `daibau` entry was re-measured end to end after FUZZ-39 was opened on the premise that its listing pages carry contractor phone numbers. They do not. The FUZZ-4 verdict (0% phone obtainable, do not scrape, Low) is confirmed; its record count (75), pagination reading (5 pages) and requires_js flag (true) are corrected to 748, walk-to-exhaustion and false respectively. Where FUZZ-4 and FUZZ-39 disagree on those three, the measured FUZZ-39 figure wins.",
+    "Amended 2026-08-21 (FUZZ-45): the kompanije-net entry researched by FUZZ-41 in research/sources-kompanije-net.json was merged into this registry when its adapter was built, and tos_forbids was recorded alongside robots_allows as FUZZ-44 established. FUZZ-41's figures are kept verbatim; everything labelled FUZZ-45 was measured by the adapter itself on a real sample run and is re-derivable with scripts/fuzz45-overlap.ts. Only sources_evaluated and high were changed in the summary block - the other counts are FUZZ-4's and were not re-derived."
   ],
   "summary": {
-    "sources_evaluated": 31,
-    "high": 6,
+    "sources_evaluated": 32,
+    "high": 7,
     "medium": 6,
     "low": 11,
     "rejected": 8,
@@ -890,6 +891,49 @@
         "https://www.stovarista.rs/stovarista-beograd/uc-partizan-stovariste/"
       ],
       "notes": "REJECTED for contractors (out of scope by content), forwarded to the store registry. Unrestricted robots.txt is a point in its favour there."
+    },
+    {
+      "id": "kompanije-net",
+      "name": "Kompanije.net - Srbija (regionalni adresar firmi)",
+      "url": "https://www.kompanije.net/Srbija/",
+      "category": "APR-derived national business directory, indexed by KD-2010 activity code",
+      "has_contractors": true,
+      "has_stores": true,
+      "covers_preduzetnici": true,
+      "estimated_records": 9830,
+      "estimate_method": "One fetch per activity-code category page under /Srbija/, counting unique company detail links in the returned HTML. Core contractor codes: 43.29 l69=652, 43.31 l70=900, 43.34 l73=2619, 43.39 l74=2880, 43.99 l76=2779. Sum 9,830, before cross-category overlap. Store side: 46.73 l548=1486, 47.52 l483=2166, 46.74 l549=925, plus l508 posredovanje=101 -> 4,577. Adjacent codes: 43.32 l71=551, 43.33 l72=2121, 43.91 l75=329, 41.20 l56=5663.",
+      "cross_check": "9,830 all-form records in the five core codes vs 2,290 ACTIVE COMPANIES in the same codes counted in APR's own open data (openapi.apr.gov.rs, cut 2026-07-31). The ~7,540 difference is sole traders. Independently corroborated on the site's legacy /preduzetnici/ index, which counts 8,001 for the same five codes - the two surfaces agree within ~6%.",
+      "fields_available": [
+        "name",
+        "phone",
+        "address",
+        "municipality",
+        "maticni_broj",
+        "pib",
+        "sifra_delatnosti",
+        "naziv_delatnosti",
+        "website_field_present_but_empty"
+      ],
+      "phone_coverage_estimate": "MEASURED 68% (51 of 75) on the modern /Srbija/ surface: 43.31 19/25 (76%), 43.34 20/25 (80%), 43.39 12/25 (48%). A separate 100-record sample on the legacy /preduzetnici/ surface measured 56% (56/100), of which 41 numbers were mobile (06x) and 28 landline - mobiles dominate. Street address present on 23-24 of every 25 sampled on the modern surface. Phones render as +381.(0)64.4320025, comma-separated when multiple; libphonenumber-js parses them after stripping the '.(0)' shim.",
+      "pagination": {
+        "exists": false,
+        "how_addressed": "None. Every record in a category is rendered on one static page - /Srbija/l70_Malterisanje.html is 138,625 bytes with all 900 detail links. Two surfaces exist: modern /Srbija/<slug>/<id> (full street address, 4-digit sifra delatnosti) and legacy /preduzetnici/p<id>_<slug>.htm reached via /preduzetnici/preduzetnici.php?delatnost=<6-digit code> (street name only, 6-digit code). Fetch the category page, then one request per detail page."
+      },
+      "requires_js": false,
+      "robots_allows": "ALLOWED, by absence of any rule. https://www.kompanije.net/robots.txt (HTTP 200) contains ONLY the Cloudflare content-signals comment header - no User-agent line, no Disallow, and no content-signal values set. Nothing is restricted and nothing is granted by signal.",
+      "recommended_approach": "cheerio, no JS. Two requests per record is the floor: one category page (gives every detail URL) plus one detail page each. ~9,830 core contractor records + ~4,577 store records = ~14,400 detail fetches, about 4 hours at 1 req/s. Anchors use SINGLE quotes (href='./slug/12345') - a double-quote-only href regex silently matches nothing. The detail page is a label/value list; read the line after the exact label text 'Telefon:', 'Adresa:', 'Matični broj:', 'PIB:'. Guard against the empty case: when a field is blank the next line is the FOLLOWING LABEL, so reject any value ending in ':'. The 'Sajt:' label is followed by a prose sentence rather than the next label, which makes a naive parser report a website on every record - it reported 67% before the bug was caught, and the true website coverage is near zero.",
+      "duplicate_risk": "HIGH against apr-opendata on the company side (both derive from APR; join on maticni broj, which this source exposes and the open data uses as its record key). LOW-to-MEDIUM against the web directories already harvested (portal-srbija, gradjevinarstvo.rs, navidiku.rs) - those skew to firms with a marketing presence, this one is register-derived and reaches sole traders that have none. Dedup on normalized phone first, then maticni broj.",
+      "priority": "High",
+      "priority_reason": "Under this project's rule - rank by phone-number yield above everything else - ~9,830 core-code records at a measured ~68% phone fill is roughly 6,600 phone-bearing facade records, mobiles included, for 0 RSD. It attacks the preduzetnik gap that the repo calls the project's largest structural coverage gap, and it is the reason FUZZ-41 recommends deferring the APR purchase.",
+      "open_questions_before_relying_on_it": [
+        "FRESHNESS IS UNMEASURED. The footer reads '(c) Kompanije.net 2014'. The legacy /preduzetnici/ index tops out near record id 335903 while the modern /Srbija/ section reaches 382240, so the two surfaces are snapshots of different vintages and neither carries a date. Measure the dead-record rate before exporting anything.",
+        "Validate names and maticni broj against the APR open-data company list; there is no equivalent register-grade check available for the sole traders, which is exactly what an APR purchase would provide.",
+        "The site invites visitors to edit a company's own record ('Izmeni podatke'), so a phone may be user-submitted rather than register-derived. Treat every number as needing first-call verification.",
+        "Phone format +381.(0)NN.NNNNNN suggests a bulk telephone-directory join rather than APR's registered kontakt podaci. Provenance of the phone field is unconfirmed."
+      ],
+      "compliance_notes": "Public business-contact data, no login, no CAPTCHA, no rule in robots.txt to respect or breach. Rate-limit to <=1 req/s and identify the crawler honestly - unlike pretraga.apr.gov.rs, this host does not block an honest User-Agent.",
+      "tos_forbids": "NO - and this was checked rather than assumed. There are no terms of service on the site at all: the footer carries region links (Srbija / Hrvatska / Bosna i Hercegovina / Republika Srpska / Kosovo i Metohija) and a kontakt.php form, and no uslovi, pravila, impressum or privacy page exists anywhere on it. Verified 2026-08-21 by FUZZ-44 during the ToS sweep that closed daibau.rs (Clan 6, non-commercial use only) and companywall.rs (explicit anti-scraping clause). Re-confirmed 2026-08-21 by FUZZ-45 when the adapter was built. With robots.txt carrying no rule and no contract to breach, the remaining constraints are the ordinary ones: politeness, an honest User-Agent, and ZZPL - most records are preduzetnici, so a business phone here is personal data and only business-contact data the business itself published is collected.",
+      "adapter": "src/scraper/sources/kompanije-net (FUZZ-45). Modern surface by default; --query legacy adds the sole-trader index; --query <code|sifra|listId> selects an adjacent activity code."
     }
   ]
 }
