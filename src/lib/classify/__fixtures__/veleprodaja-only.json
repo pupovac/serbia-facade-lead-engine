@@ -1,0 +1,163 @@
+{
+  "_meta": {
+    "issue": "FUZZ-37",
+    "collected_at": "2026-08-21",
+    "source": "data/leads.sqlite from the FUZZ-22 pilot crawl. `leadId` is `leads.id`; name, city, description and categories are copied verbatim from `leads` and from the `raw_records` payload the lead was normalized from. Nothing here is invented.",
+    "wholesalers": "Every lead in the pilot whose CONSTRUCTION_MATERIAL_STORE label rested on `store.veleprodaja` alone. All eight were wrong. `veleprodaja` means \"wholesale\" — it says the business sells, not what it sells, and with no building material named anywhere it is not evidence of a stovariste.",
+    "yards": "Store-labelled leads that carry the same adjacent-joinery evidence EVROMETAL does and are genuine yards. They are here to hold the fix honest: the cure is discounting the assortment-dependent weight, not penalising joinery on the store axis."
+  },
+  "wholesalers_of_something_else": [
+    {
+      "leadId": 3422,
+      "name": "SVET TEPIHA",
+      "city": "BEOGRAD-ZEMUN",
+      "description": "Veleprodaja i maloprodaja tepiha",
+      "categories": ["OBLAGANJE, SREDSTVA ZA ZAVRŠNU OBRADU", "Tepisi", "Ćilimi"],
+      "sells": "carpets"
+    },
+    {
+      "leadId": 2808,
+      "name": "ELEKTRO APARATURA",
+      "city": "NOVI SAD",
+      "description": "Veleprodaja niskonaponskih kompaktnih prekidača i osiguračkih sklopki",
+      "categories": ["ELEKTROOPREMA", "Prekidači, utičnice"],
+      "sells": "low-voltage circuit breakers"
+    },
+    {
+      "leadId": 262,
+      "name": "Vermax alati",
+      "city": "Београд",
+      "description": "Veleprodaja profesionalnog alata",
+      "categories": ["ALAT", "Alat ručni", "Alat električni", "hardware_store"],
+      "sells": "professional tools"
+    },
+    {
+      "leadId": 2840,
+      "name": "ECOMEX",
+      "city": "ČAČAK",
+      "description": "Veleprodaja alata",
+      "categories": ["ALAT", "Alat ručni", "Alat električni"],
+      "sells": "tools"
+    },
+    {
+      "leadId": 3457,
+      "name": "AN PARTS",
+      "city": "BEOGRAD",
+      "description": "Veleprodaja rezervnih delova za građevinske mašine, teretna vozila i traktore",
+      "categories": ["GRAĐEVINSKE MAŠINE I OPREMA", "Delovi za građevinske mašine"],
+      "sells": "spare parts for construction machinery"
+    },
+    {
+      "leadId": 3616,
+      "name": "MATICA",
+      "city": "BEOGRAD-ZEMUN",
+      "description": "Saobraćajni čunjevi Ograde gradilišta Veleprodaja zaštitne opreme (odela, obuća, rukavice, šlemovi i ostala dodatna zaštitna oprema)",
+      "categories": [
+        "PRIBOR OPŠTE NAMENE",
+        "Kanapi, užad i sajle",
+        "SUZBIJANJE POŽARA",
+        "Koturi za creva i ormari",
+        "Sistemi za suzbijanje požara - sprinkler",
+        "Prenosivi uređaji za gašenje požara",
+        "OPREMA ZA ULICU, BAŠTE",
+        "Oznake, mape, znakovi, table",
+        "KAPIJE, OGRADE",
+        "Ograde - okvir i paneli",
+        "ZAŠTITA NA RADU"
+      ],
+      "sells": "traffic cones, site fencing, protective equipment"
+    },
+    {
+      "leadId": 257,
+      "name": "EURO-PROFIL Veleprodaja",
+      "city": "Чукарица",
+      "description": "",
+      "categories": ["building_supply_store"],
+      "sells": "aluminium profiles",
+      "note": "The only one of the eight where `veleprodaja` sits in the company name, at the 2.5x `name` multiplier. It is the placement the discount has to be large enough for."
+    },
+    {
+      "leadId": 1931,
+      "name": "EVROMETAL",
+      "city": "PETROVAC NA MLAVI",
+      "description": "Veleprodaja aluminijumskih profila firme ALUMIL, Grčka Veleprodaja ukrasne bravarije i okova",
+      "categories": [
+        "ZAŠTITA OTVORA, VRATA I PROZORA",
+        "Žaluzine",
+        "VRATA",
+        "Profili i paneli za vrata - aluminijum",
+        "Profili i paneli za vrata - PVC",
+        "Vrata aluminijumska - unutrašnja",
+        "Vrata aluminijumska - ulazna",
+        "Vrata - klizna, sklopiva (harmonika), unutrašnja",
+        "Balkonska, dvorišna vrata",
+        "Garažna vrata",
+        "PROZORI",
+        "Profili za prozore - aluminijum",
+        "Profili za prozore - PVC",
+        "Prozori aluminijumski sa krilima na bočno vešanje",
+        "Prozori aluminijumski klizni",
+        "Prozori aluminijumski koji se okreću oko vertikalne/horizontalne ose",
+        "Prozori aluminijumski krovni",
+        "Prozori - zaobljeni okviri, nepravougaoni, po specijalnoj porudžbini",
+        "OKOV ZA VRATA I PROZORE"
+      ],
+      "sells": "ALUMIL aluminium profiles, doors, windows, decorative ironmongery",
+      "note": "The lead the issue was raised on. Every one of its gradjevinarstvo.rs categories is joinery, and `adjacent.joinery` fired — on the contractor axis, which was not the axis that labelled it."
+    }
+  ],
+  "genuine_yards": [
+    {
+      "leadId": 2532,
+      "name": "Preduzeće Čar",
+      "city": "Kragujevac",
+      "description": "BOJE i LAKOVI AUTO BOJE LEPKOVI FASADE STIROPOR BRAVE, OKOVI, VIJCI ELEKTRIČNI ALATI ELEKTRO MATERIJAL OPREMA ZA KUPATILA ZAŠTITNA OPREMA HTZ NAŠU FACEBOOK STRANICU MOŽETE POGLEDATI JEDNIM KLIKOM OVDE Preduzeće Čar iz Kragujevca bavi se proizvodnjom, veleprodajom, maloprodajom i online prodajom stiropora (fasadnog i podnog), fasadnih maltera i lepkova, boja i lakova za zaštitu metala i drveta, disperzionih boja i drugih proizvoda iz oblasti građevinske i hemijske industrije, kao i industrije boja i lakova. U proizvodnom programu naše fabrike nalazi se preko stotinu proizvoda, a naša distributivna mreža broji više od sto pedeset preduzeća širom Srbije, Makedonije, Bosne i Hercegovine i Crne Gore. Razgranata distributivna mreža omogućava nam da našem i regionalnom tržištu, pored sopstvenih, ponudimo i kvalitetne srodne proizvode renomiranih svetskih proizvođača kao što su turski „Akfix“, grčka „Sidironika“ britanski „U-pol“ i mnogi drugi. U našim maloprodajnim objektima u Kragujevcu i Beogradu možete naći preko deset hiljada proizvoda specijalizovanih za gradnju, opremanje, adaptaciju i održavanje stambenih, poslovnih i drugih objekata, uključujući širok asortiman boja i lakova, građevinskog materijala, elektromaterijala, rasvete, dekorative, opreme za kupatilo, PVC stolarije, alata (ručnog, električnog i baštenskog ), šrafovske robe, htz opreme i dr. Sve proizvode iz ove bogate ponude možete videti, odabrati i naručiti 24 časa dnevno u našoj online prodavnici. Brza i pouzdana isporuka, kvalitet proizvoda i povoljne cene preporučuju da naša online prodavnica bude Vaš prvi izbor. Nakon 24 godine rada, rasta i stalnog razvoja, \"Čar\" planira još intenzivnija ulaganja na polju proizvodnje, tehnologije i marketinga, kako bi i ubuduće na najbolji mogući način izlazio u susret svim zahtevima brojnih kupaca i potrošača.",
+      "categories": [
+        "Proizvodnja stiropora",
+        "Auto boje",
+        "Boje i lakovi, farbare",
+        "Lepkovi, epoksidi, smole",
+        "Električni alati",
+        "Zaštitna oprema - htz oprema",
+        "Proizvodnja, veleprodaja boja i lakova",
+        "Elektro materijal"
+      ],
+      "note": "Paints, lacquers, adhesives, facade EPS — and it says `veleprodajom` itself. It names what it sells, so the discount never applies. Must stay CONSTRUCTION_MATERIAL_STORE."
+    },
+    {
+      "leadId": 630,
+      "name": "Domino",
+      "city": "Нови Сад",
+      "description": "PRAŠKASTI PROIZVODI OPEKE BLOKOVI KROVNI POKRIVAČI PVC STOLARIJA ULAZNA SIGURNOSNA VRATA SOBNA VRATA KROVNI PROZORI PODNE OBLOGE REZANA GRAĐA PLOČASTI MATERIJALI TERMO i HIDRO IZOLACIJA SUVA GRADNjA GVOŽĐARA DIMNjAČKI PROGRAM BOJE i LAKOVI DEKORATIVNI MATERIJALI FERT GREDICE GAŠENI KREČ AKRILNE KADE ALU LAJSNE ZA PLOČICE BATERIJE DOMAĆA i UVOZNA SANITARIJA EMAJL KADE FUG MASE, LEPKOVI ZA PLOČICE GALANTERIJA HIDROMASAŽNE KABINE, SA i BEZ KADE KERAMIČKE PLOČICE KUPATILSKI NAMEŠTAJ OGLEDALA POLIRANI i RUSTIK GRANIT SIFONI, ŠRAFOVI i GUME SPOLjNE PODNE PLOČICE STAKLENI UMIVAONICI STAKLENE KABINE VODOKOTLIĆI GEBERIT WC DASKE",
+      "categories": ["hardware_store"],
+      "note": "Bricks, blocks, roof coverings, thermal and waterproofing membranes. Carries joinery evidence (PVC stolarija, sobna vrata) and is still a yard — which is why a blanket joinery penalty on the store axis would be wrong. Must stay CONSTRUCTION_MATERIAL_STORE."
+    },
+    {
+      "leadId": 1611,
+      "name": "Montel",
+      "city": "Мали Иђош",
+      "description": "OBRADA BETONSKOG GVOŽĐA NADVOJNE GREDE FERT GREDE i ISPUNE DIMLjAČKI i VENTILACIONI ELEMENTI BLOKOVI ZA ZIDANjE BETONSKI STUBOVI i CEVI DIMLjAČKI SISTEMI KOMPLETAN GRAĐEVINSKI MATERIJAL OPEKARSKI PROIZVODI i SIPOREX BLOKOVI BETONSKI BLOKOVI MATERIJAL ZA BETONIRANjE, ZIDANjE, MALTERISANjE BETONSKA GALANTERIJA ŽICE, PLETENE ŽICE FERT GREDICE NADVOJNE GREDE REZANA GRAĐA, ŠTAFLE, LETVE EKSERI PROZORI i VRATA - KLASIČNI i PVC KROVNI POKRIVAČI PROFILI, CEVI, LIMARIJA TERMO i HIDROIZOLACIJA MATERIJAL ZA SUVU GRADNjU MATERIJAL ZA DEMIT FASADU KERAMIČKE PLOČICE, LEPAK, MASA ZA FUGOVANjE SANITARIJE i OPREMA ZA KUPATILA ELEKTROMATERIJAL i RASVETA VODOVOD i KANALIZACIJA PARKET, LAMINAT, BRODSKI POD, LAMPERIJA UNUTRAŠNjE i SPOLjNE FARBE, BOJE, LAKOVI UKRASNE LAJSNE i UKRASNI ZIDNI ELEMENTI OD STIROPORA ALATI, POMOĆNI MATERIJALI i ADITIVI ZA IZVOĐENjE GRAĐEVINSKIH i ZANATSKIH RADOVA",
+      "categories": [
+        "building_supply_store",
+        "Termo izolacija, zvučna izolacija",
+        "Beton, betonska galanterija",
+        "Stovarišta",
+        "Rezana gradja",
+        "Alu i pvc stolarija",
+        "Drvena stolarija - vrata i prozori",
+        "Krovni pokrivači",
+        "Hidroizolacija",
+        "Cevi, limovi, profili, šrafovska roba",
+        "Cevi limovi profili",
+        "Vodovod, kanalizacija",
+        "Keramika, sanitarije",
+        "Brodski pod",
+        "Elektro materijal",
+        "Parket",
+        "Laminat",
+        "Podne obloge"
+      ],
+      "note": "A full building-materials yard that also stocks windows and doors. Its portal-srbija categories include `Alu i pvc stolarija` alongside `Stovarišta`. Must stay CONSTRUCTION_MATERIAL_STORE."
+    }
+  ]
+}

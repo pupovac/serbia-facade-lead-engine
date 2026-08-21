@@ -8,16 +8,37 @@
  * do not sell to — roofers, window fitters, waterproofers, HVAC and pipe
  * insulators, facade *washing* companies, and EPS manufacturers.
  *
- * A classifier that scores well here is one that says `UNKNOWN` a lot.
+ * A classifier that scores well here is one that says "not a lead" a lot.
+ *
+ * The fixture labels the **buyer group**, so its negatives are written
+ * `UNKNOWN` — one bucket meaning "neither". FUZZ-37 split the classifier's
+ * own answer into `UNCLASSIFIED` and `OUT_OF_SCOPE`, which are two ways of
+ * being the same non-lead, so `toFixtureLabel` folds them back before the
+ * comparison. Re-labelling 111 hand-checked records into the sub-bucket a
+ * reviewer *guesses* the classifier should pick would measure the
+ * implementation against itself; the split is measured separately, in
+ * `precision.test.ts`.
  */
 import fixture from './__fixtures__/labelled-businesses.json' with { type: 'json' };
 import { classifyLead } from './classify.js';
 import type { ClassificationInput, LeadClassification } from './types.js';
 
+/**
+ * What the hand-labelled set says a business is. `UNKNOWN` here means "neither
+ * buyer group" — the fixture predates the `UNCLASSIFIED` / `OUT_OF_SCOPE`
+ * split and is deliberately not being re-labelled to match it.
+ */
+export type FixtureLabel = 'FACADE_CONTRACTOR' | 'CONSTRUCTION_MATERIAL_STORE' | 'BOTH' | 'UNKNOWN';
+
+/** Fold a classifier answer down to the vocabulary the fixture was labelled in. */
+export function toFixtureLabel(label: LeadClassification): FixtureLabel {
+  return label === 'UNCLASSIFIED' || label === 'OUT_OF_SCOPE' ? 'UNKNOWN' : label;
+}
+
 export interface LabelledBusiness {
   readonly name: string;
   readonly city: string;
-  readonly expected: LeadClassification;
+  readonly expected: FixtureLabel;
   /** Why this label, for the records where the call is not obvious. */
   readonly note?: string;
   readonly sourceId: string;
@@ -48,7 +69,7 @@ export const LABELLED_BUSINESSES: readonly LabelledBusiness[] = (
 ).map((row) => ({
   name: row.name,
   city: row.city,
-  expected: row.expected as LeadClassification,
+  expected: row.expected as FixtureLabel,
   sourceId: row.sourceId,
   sourceUrl: row.sourceUrl,
   ...(row.note === undefined ? {} : { note: row.note }),
@@ -86,7 +107,7 @@ export interface ClassifierReport {
   readonly perLabel: Readonly<Record<string, LabelMetrics>>;
 }
 
-const ALL_LABELS: readonly LeadClassification[] = [
+const ALL_LABELS: readonly FixtureLabel[] = [
   'FACADE_CONTRACTOR',
   'CONSTRUCTION_MATERIAL_STORE',
   'BOTH',
@@ -104,7 +125,7 @@ export function evaluateClassifier(
 
   let correct = 0;
   for (const business of businesses) {
-    const predicted = classifyLead(business.input).label;
+    const predicted = toFixtureLabel(classifyLead(business.input).label);
     const row = matrix[business.expected];
     if (row !== undefined) row[predicted] = (row[predicted] ?? 0) + 1;
     if (predicted === business.expected) correct += 1;

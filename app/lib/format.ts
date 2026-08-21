@@ -12,7 +12,22 @@ export const CLASSIFICATION_LABELS: Record<LeadClassification, string> = {
   FACADE_CONTRACTOR: 'Fasaderi',
   CONSTRUCTION_MATERIAL_STORE: 'Stovarišta',
   BOTH: 'Oba',
-  UNKNOWN: 'Nepoznato',
+  UNCLASSIFIED: 'Nerazvrstano',
+  OUT_OF_SCOPE: 'Van opsega',
+};
+
+/** Serbian names for the adjacent trade an `OUT_OF_SCOPE` lead was ruled out as. */
+export const INDUSTRY_LABELS: Record<string, string> = {
+  roofing: 'krovopokrivači',
+  joinery: 'stolarija',
+  waterproofing: 'hidroizolacija',
+  industrial_insulation: 'industrijska izolacija',
+  electrical: 'elektroinstalacije',
+  cleaning: 'čišćenje',
+  manufacturing: 'proizvodnja',
+  other_trade: 'drugi zanat',
+  general_construction: 'opšta gradnja',
+  technical_goods: 'tehnička roba',
 };
 
 export const STATUS_LABELS: Record<string, string> = {

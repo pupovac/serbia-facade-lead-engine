@@ -1,6 +1,6 @@
 /**
  * Lead classification: `FACADE_CONTRACTOR` | `CONSTRUCTION_MATERIAL_STORE` |
- * `BOTH` | `UNKNOWN`, with the evidence that produced it.
+ * `BOTH` | `UNCLASSIFIED` | `OUT_OF_SCOPE`, with the evidence that produced it.
  *
  * The matcher does three things, in this order:
  *
@@ -18,6 +18,12 @@
  * `BOTH` is not a tie-break — it is what happens when both axes clear the
  * threshold on their own, which is the normal state of a stovarište that also
  * installs.
+ *
+ * When neither axis clears, the answer is one of two different things and the
+ * label says which: `OUT_OF_SCOPE` when an adjacent trade was positively
+ * identified and nothing argued for either buyer group, `UNCLASSIFIED` when
+ * the record is simply too thin to say. The first is excluded from the review
+ * list and the export; the second is still worth enriching.
  */
 import { foldForComparison } from '../text/fold.js';
 import {
@@ -25,9 +31,11 @@ import {
   ASSORTMENT_GATE,
   DECISION_THRESHOLD,
   FIELD_WEIGHTS,
+  NO_ASSORTMENT_DISCOUNT,
   SIGNALS,
 } from './signals.js';
 import type {
+  AdjacentIndustry,
   AxisBreakdown,
   ClassificationEvidence,
   ClassificationField,
@@ -35,6 +43,7 @@ import type {
   ClassificationResult,
   LeadClassification,
   Signal,
+  SignalAxis,
   SuppressedMatch,
 } from './types.js';
 
@@ -162,10 +171,7 @@ function confidenceFor(net: number): number {
   return Math.min(0.98, 0.5 + 0.45 * Math.min(1, (net - DECISION_THRESHOLD) / DECISION_THRESHOLD));
 }
 
-function describe(
-  evidence: readonly ClassificationEvidence[],
-  axis: 'contractor' | 'store',
-): string {
+function describe(evidence: readonly ClassificationEvidence[], axis: SignalAxis): string {
   const top = evidence
     .filter((e) => e.axis === axis)
     .slice(0, 3)
@@ -188,8 +194,12 @@ export function classifyLead(input: ClassificationInput): ClassificationResult {
   let coreCancel = 0;
   let manufacturerFound = false;
   let retailCoreFound = false;
-  /** Scored last: their strength depends on whether any materials were found. */
-  const pendingAssortmentDependent: { signal: Signal; weight: number }[] = [];
+  /** Scored last: their strength *and their weight* depend on whether any materials were found. */
+  const pendingAssortmentDependent: { signal: Signal; weight: number; slot: number }[] = [];
+  /** Total adjacent weight per trade — the strongest one names an out-of-scope business. */
+  const adjacentWeight = new Map<AdjacentIndustry, number>();
+  /** True as soon as anything at all argues for either buyer group. */
+  let inScopeEvidence = 0;
 
   for (const { field, text } of fieldTexts(input)) {
     const resolved = resolveOverlaps(collect(text), field);
@@ -212,6 +222,7 @@ export function classifyLead(input: ClassificationInput): ClassificationResult {
 
     for (const { signal, first, occurrences } of bySignal.values()) {
       const weight = signal.weight * FIELD_WEIGHTS[field];
+      const slot = evidence.length;
       evidence.push({
         signalId: signal.id,
         axis: signal.axis,
@@ -230,11 +241,16 @@ export function classifyLead(input: ClassificationInput): ClassificationResult {
         }
         if (signal.cancelsCore === true) coreCancel += weight;
         if (signal.industry === 'manufacturing') manufacturerFound = true;
+        if (signal.industry !== undefined) {
+          adjacentWeight.set(signal.industry, (adjacentWeight.get(signal.industry) ?? 0) + weight);
+        }
         continue;
       }
 
+      inScopeEvidence += weight;
       const bucket = signal.axis === 'contractor' ? contractor : store;
-      if (signal.needsAssortment === true) pendingAssortmentDependent.push({ signal, weight });
+      if (signal.needsAssortment === true)
+        pendingAssortmentDependent.push({ signal, weight, slot });
       else if (signal.strength === 'core') bucket.core += weight;
       else if (signal.strength === 'supporting') bucket.supporting += weight;
       else bucket.ambiguous += weight;
@@ -256,14 +272,31 @@ export function classifyLead(input: ClassificationInput): ClassificationResult {
     store.gateOpen = true;
     store.supporting += ASSORTMENT_BONUS;
   }
-  for (const { signal, weight } of pendingAssortmentDependent) {
+  for (const { signal, weight, slot } of pendingAssortmentDependent) {
     const bucket = signal.axis === 'contractor' ? contractor : store;
+    // With no material named anywhere, the strength drops *and so does the
+    // weight*. Demoting one without the other was the EVROMETAL bug: a
+    // `supporting` 0.95 decides the label exactly as a `core` 0.95 would.
     const strength = assortment === 0 ? 'supporting' : signal.strength;
+    const scored = assortment === 0 ? weight * NO_ASSORTMENT_DISCOUNT : weight;
+    inScopeEvidence += scored - weight;
+    const entry = evidence[slot];
+    /* c8 ignore next -- the slot was written two loops ago; this narrows the type */
+    if (entry !== undefined) {
+      evidence[slot] = {
+        ...entry,
+        strength,
+        weight: Math.round(scored * 1000) / 1000,
+        ...(assortment === 0
+          ? { discountedFor: 'no-assortment' as const, fullWeight: entry.weight }
+          : {}),
+      };
+    }
     if (strength === 'core') {
-      bucket.core += weight;
+      bucket.core += scored;
       retailCoreFound = true;
-    } else if (strength === 'supporting') bucket.supporting += weight;
-    else bucket.ambiguous += weight;
+    } else if (strength === 'supporting') bucket.supporting += scored;
+    else bucket.ambiguous += scored;
   }
 
   // `alubond fasada` and `čišćenje fasada` do not sit next to the facade
@@ -312,6 +345,13 @@ export function classifyLead(input: ClassificationInput): ClassificationResult {
 
   const isContractor = contractorFinal.net >= DECISION_THRESHOLD;
   const isStore = storeFinal.net >= DECISION_THRESHOLD;
+  /**
+   * The adjacent trade the record argues for hardest. Ties break on the
+   * industry name so a re-run never renames the same business's industry.
+   */
+  const industry: AdjacentIndustry | null =
+    [...adjacentWeight.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0]?.[0] ??
+    null;
 
   let label: LeadClassification;
   let confidence: number;
@@ -329,13 +369,21 @@ export function classifyLead(input: ClassificationInput): ClassificationResult {
     confidence = confidenceFor(storeFinal.net);
     reason = `Store evidence ${storeFinal.net} from ${describe(evidence, 'store')}; facade evidence ${contractorFinal.net}.`;
   } else {
-    label = 'UNKNOWN';
+    // Not a lead — but "we found nothing" and "we found a blinds workshop" are
+    // different answers, and one label for both made a reviewer re-triage rows
+    // the classifier had already ruled out. `OUT_OF_SCOPE` is the narrow case:
+    // an adjacent trade was positively identified and *nothing at all* argued
+    // for either buyer group. Anything mixed stays `UNCLASSIFIED`, because
+    // mixed evidence is a question, not a verdict.
+    label = industry !== null && inScopeEvidence <= 0 ? 'OUT_OF_SCOPE' : 'UNCLASSIFIED';
     const best = Math.max(contractorFinal.net, storeFinal.net);
     confidence = Math.min(
       0.98,
       0.5 + 0.45 * Math.min(1, (DECISION_THRESHOLD - best) / DECISION_THRESHOLD),
     );
-    if (vetoed) {
+    if (label === 'OUT_OF_SCOPE') {
+      reason = `Out of scope: ${industry?.replace(/_/g, ' ')} evidence (${describe(evidence, 'adjacent')}) and no facade or materials evidence at all.`;
+    } else if (vetoed) {
       reason = 'Manufacturer: the record names production and no counter. A supplier, not a buyer.';
     } else if (coreCancelled > 0) {
       reason = `Facade wording belongs to another trade (${suppressed.map((x) => x.claimedBy).join(', ') || 'curtain wall or facade cleaning'}); ${round(coreCancelled)} of facade evidence cancelled.`;
@@ -354,5 +402,27 @@ export function classifyLead(input: ClassificationInput): ClassificationResult {
     evidence,
     suppressed,
     reason,
+    ...(label === 'OUT_OF_SCOPE' && industry !== null ? { industry } : {}),
   };
+}
+
+/**
+ * The net evidence the label actually rests on.
+ *
+ * For `BOTH` it is the weaker of the two axes — the label is only as good as
+ * the half that nearly failed. For an undecided label it is 0: whatever the
+ * axes scored, nothing cleared the gate, and the relevance score must not pay
+ * for evidence that did not decide anything.
+ */
+export function decidingNet(result: ClassificationResult): number {
+  switch (result.label) {
+    case 'FACADE_CONTRACTOR':
+      return result.contractor.net;
+    case 'CONSTRUCTION_MATERIAL_STORE':
+      return result.store.net;
+    case 'BOTH':
+      return Math.min(result.contractor.net, result.store.net);
+    default:
+      return 0;
+  }
 }
