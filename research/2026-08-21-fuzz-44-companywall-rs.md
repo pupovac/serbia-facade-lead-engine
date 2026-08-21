@@ -267,3 +267,70 @@ the schema. The suggestion, for whoever owns that call: a nullable
 in the registries (this entry already writes one). companywall is the first
 source in either registry where robots and the contract disagree; it will not
 be the last.
+
+## Addendum, same day: the ToS sweep this spike triggered
+
+The lesson above — read the contract, not just `robots.txt` — was applied to the
+two sources on the other end of the proposed join, before committing to either.
+It changed one of them.
+
+### daibau.rs — **closed**, and this is new
+
+<https://www.daibau.rs/uslovi_uporabe>, Član 6 (Autorska prava):
+
+> „Sadržaj i informacije na portalu namenjeni su **ličnoj, nekomercijalnoj
+> upotrebi** korisnika i **ne smeju se preuzimati, kopirati, obrađivati niti
+> distribuirati za komercijalnu upotrebu** …"
+>
+> _(Content and information on the portal are intended for the user's personal,
+> non-commercial use and may not be downloaded, copied, processed or distributed
+> for commercial use …)_
+
+FUZZ-39 rejected daibau on the robots-disallowed phone endpoint and never read
+the ToS, because nothing turned on them — the source was already out. FUZZ-44
+then proposed harvesting the part robots.txt _does_ permit: the 748 names,
+cities and 7-digit phone prefixes, to corroborate a join against a compliant
+source. That plan is closed by Član 6. A commercial lead database is
+`komercijalna upotreba`.
+
+One ambiguity, recorded honestly rather than leaned on: the following sentence
+protects portal content „osim profila preduzeća" — _except company profiles_ —
+which could be read as carving company profiles out of the copyright claim. That
+carve-out sits in the sentence about copyright ownership, not in the
+non-commercial-use sentence, which is unqualified. It is an arguable reading, and
+an arguable reading is not a foundation for a product.
+
+**Consequence for the join:** the daibau prefix corroboration is unavailable.
+This does not cost much — see below.
+
+### kompanije.net — **clean**, verified
+
+- `robots.txt` (HTTP 200, 1,248 B) contains **only** the Cloudflare
+  content-signals comment header. No `User-agent` line, no `Disallow`, and no
+  content-signal values set — so nothing is restricted and nothing is granted by
+  signal. Confirms FUZZ-41.
+- **No terms of service exist.** The homepage footer carries region links and a
+  `kontakt.php` form and nothing else; there is no `uslovi`, `pravila`,
+  `impressum` or privacy page anywhere on the site.
+
+No robots rule, no contract. It is the only one of the three sources with a clean
+compliance position, and it is also the one with the data.
+
+### Where that leaves the join
+
+The daibau half is gone, but the prize never lived there. daibau contributes 748
+**names with zero phones**; kompanije.net contributes ~9,830 records at a
+measured 68% phone fill, enumerable directly by activity code. Any daibau
+contractor that is actually registered is in APR, therefore in kompanije.net, and
+is reached by enumerating activity codes without daibau's involvement at all.
+
+What the daibau list would have added is narrower than it looked:
+
+1. **Classification ground truth** — a pre-filtered "this firm does facades"
+   label to check `src/lib/classify` against. Useful, replaceable.
+2. **Informally-trading contractors** — who are not in kompanije.net either,
+   because they are not in APR. So daibau could not have delivered them with a
+   phone number in any case; FUZZ-39 measured its phone coverage at 0%.
+
+The join was always the garnish. Enumerating kompanije.net by activity code is
+the meal, and nothing in this addendum touches it.
