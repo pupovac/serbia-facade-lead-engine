@@ -16,6 +16,14 @@ data/*.sqlite-journal
 data/*.sqlite-wal
 data/*.sqlite-shm
 data/*.db
+# the pilot database as it is attached to an issue, and any other dump
+data/*.sqlite.gz
+data/*.gz
+
+# Review-UI screenshots. They render real company names and real phone
+# numbers, so they are lead data like any other and are delivered as issue
+# attachments, never committed. Regenerate with scripts/fuzz25-screenshots.ts.
+screenshots/
 
 # generated artifacts
 exports/

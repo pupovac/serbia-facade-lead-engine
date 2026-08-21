@@ -59,16 +59,59 @@ database is written to `DATABASE_PATH` (default `./data/leads.sqlite`).
 
 ## Open the review UI
 
+Three commands from a fresh clone to a working UI, with no migration to run by
+hand, no seed script and no env file to author:
+
 ```bash
-npm run dev     # http://localhost:3000
+npm install
+gunzip -c ~/Downloads/leads.sqlite.gz > data/leads.sqlite   # the pilot database, attached to FUZZ-22
+npm run dev                                                 # http://localhost:3000
 ```
 
-The dashboard lists leads, shows where every field came from, and lets a human
-correct a classification. Production build:
+`npm run dev` applies any pending migrations to that file on the first request,
+so a database taken before a schema change is brought forward rather than
+failing mid-render. If the file is missing or unusable the server says which
+path it looked at and what to do about it, instead of quietly serving an empty
+database. Point `DATABASE_PATH` somewhere else to use a different file.
+
+### The five views
+
+| Route          | What it is for                                                                               |
+| -------------- | -------------------------------------------------------------------------------------------- |
+| `/`            | Dashboard — leads by type, phone coverage, per-source yield, growth, and coverage gaps       |
+| `/leads`       | Lead list — server-side search, filter, sort and pagination over the whole dataset           |
+| `/leads/<id>`  | Lead detail — every phone, channel and source URL with its provenance, evidence and history  |
+| `/merges`      | Merge review queue — the pairs dedup scored as `review`, side by side, with merge and reject |
+| `/suggestions` | Enrichment suggestions — medium-confidence findings awaiting accept or reject                |
+
+Filters live in the URL, so a filtered list is a link worth bookmarking:
+`/leads?opstina=beograd&phone=yes&type=CONSTRUCTION_MATERIAL_STORE&sort=score`.
+
+### A human decision is never overwritten by a crawl
+
+Every action the UI takes — an edit, a merge, a rejection, a status change —
+writes provenance recording that a human made it. A corrected field is stored as
+a claim from the `manual-review` source and promoted onto the lead; the value it
+replaced keeps its own provenance and is shown next to it. Because `upsertLead`
+fills blanks and never clobbers, the next crawl records its differing value as a
+conflict and cannot take the field back. `src/lib/review/decisions.test.ts`
+asserts exactly that, and `scripts/fuzz25-e2e.ts` asserts it again end-to-end
+through the browser against a real database.
+
+Merges are transactional, write `merge_log` with a snapshot, and are reversible
+from the surviving lead's detail page. A rejected pair keeps its status, so the
+next dedup sweep does not re-propose a question a human has already answered.
+
+Production build:
 
 ```bash
 npm run build && npm start
 ```
+
+> `dev` and `build` pass `--webpack`. `src/lib` is written in the NodeNext ESM
+> style — every relative import carries the `.js` extension it will have at
+> runtime — and resolving that in a bundler needs `experimental.extensionAlias`,
+> which Turbopack does not support. See the comment in `next.config.ts`.
 
 ## Generate the XLSX export
 
@@ -99,6 +142,7 @@ nothing may live only in a spreadsheet.**
 
 ```
 src/lib/               shared domain code — schema, normalization, dedup, scoring
+src/lib/review/        the review UI's read models and its human decision layer
 src/scraper/           CLI entrypoint and run orchestration
 src/scraper/sources/   one directory per source adapter
 research/              committed research artifacts
