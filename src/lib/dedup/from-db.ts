@@ -16,8 +16,23 @@ import {
   leadSourceRows,
   type Executor,
 } from '../db/repo.js';
-import { normalizeCompanyName } from '../normalize/index.js';
+import { normalizeAddress, normalizeCompanyName } from '../normalize/index.js';
+import type { NormalizedAddress } from '../normalize/index.js';
 import type { LeadRecord } from './types.js';
+
+/**
+ * Parse whatever the pipeline stored into the key the matcher compares.
+ *
+ * Parsing is idempotent, so a row written before `normalizeAddress` existed —
+ * `address.toLowerCase()`, commas and postal code intact — keys the same way a
+ * freshly written one does, and no backfill stands between an old database and
+ * a correct comparison.
+ */
+function toAddressKey(raw: string | null): NormalizedAddress | null {
+  if (raw === null) return null;
+  const address = normalizeAddress(raw);
+  return address.tokens.length === 0 ? null : address;
+}
 
 /** `lead_contacts.kind` values that are a social profile rather than a channel. */
 const SOCIAL_KINDS: ReadonlySet<ContactKind> = new Set([
@@ -60,6 +75,7 @@ export function toLeadRecord(db: Executor, leadId: number): LeadRecord | undefin
     cityId: lead.cityId,
     municipalityId: lead.municipalityId,
     addressNormalized: lead.addressNormalized ?? lead.address,
+    addressKey: toAddressKey(lead.addressNormalized ?? lead.address),
     registrationNumber: lead.registrationNumber,
     taxId: lead.taxId,
     phones: distinctPhones(db, leadId)
@@ -98,6 +114,7 @@ export function leadRecord(
     cityId: input.cityId ?? null,
     municipalityId: input.municipalityId ?? null,
     addressNormalized: input.addressNormalized ?? null,
+    addressKey: input.addressKey ?? toAddressKey(input.addressNormalized ?? null),
     registrationNumber: input.registrationNumber ?? null,
     taxId: input.taxId ?? null,
     phones: input.phones ?? [],

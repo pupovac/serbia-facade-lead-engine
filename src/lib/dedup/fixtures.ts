@@ -24,7 +24,7 @@
  * next to it, so adding a record here cannot silently invalidate the assertion.
  */
 import type { LeadInput, Provenance } from '../db/repo.js';
-import { normalizeCompanyName } from '../normalize/index.js';
+import { normalizeAddress, normalizeCompanyName } from '../normalize/index.js';
 
 /** The Stage 1 sources these records came off, with their registry priority. */
 export const FIXTURE_SOURCES = [
@@ -178,7 +178,12 @@ export const FIXTURES: readonly FixtureRecord[] = [
     phones: [{ e164: '+381649990011', raw: '064/999-0011' }],
   },
 
-  /* -- 5. One business, one address, no shared contact at all -------------- */
+  /* -- 5. One business, one address, no shared contact at all --------------
+     Nothing links these two rows but the name and the street, and the two
+     sources punctuate the street differently — which is what a directory and a
+     trade register actually do. Before FUZZ-31 that was two addresses to the
+     matcher and this pair stayed in `review`; it is here so the golden set
+     fails if address folding ever regresses. */
   {
     business: 'markovic-kg',
     source: 'portal-srbija',
@@ -198,7 +203,7 @@ export const FIXTURES: readonly FixtureRecord[] = [
     name: 'Termofasade Markovic',
     cityId: 'kragujevac',
     municipalityId: 'kragujevac',
-    address: 'Kralja Petra 12',
+    address: 'Ul. Kralja Petra br. 12, 34000 Kragujevac',
   },
 
   /* -- 6. A near-identical name in the same city — still two businesses ---- */
@@ -696,7 +701,7 @@ export function fixtureInput(record: FixtureRecord): LeadInput {
     municipalityId: record.municipalityId ?? null,
     cityRaw: record.cityRaw ?? null,
     address: record.address ?? null,
-    addressNormalized: record.address?.toLowerCase() ?? null,
+    addressNormalized: record.address == null ? null : normalizeAddress(record.address).ascii,
     description: record.description ?? null,
     registrationNumber: record.registrationNumber ?? null,
     phones: (record.phones ?? []).map((phone) => ({

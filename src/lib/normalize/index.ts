@@ -8,6 +8,13 @@
  * similarity score and the confidence this module reports.
  */
 export {
+  addressSimilarity,
+  normalizeAddress,
+  normalizedAddressSimilarity,
+  RECOMMENDED_ADDRESS_MATCH_THRESHOLD,
+  type NormalizedAddress,
+} from './address.js';
+export {
   characterSimilarity,
   nameSimilarity,
   normalizeCompanyName,

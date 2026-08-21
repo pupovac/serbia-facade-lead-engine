@@ -196,9 +196,10 @@ const POSITIVE: readonly Case[] = [
       name: 'Mika Fasade',
       cityId: 'novi-sad',
       municipalityId: 'novi-sad',
-      // Byte-identical to what the page's JSON-LD produces. See the test below
-      // that pins this down: address corroboration is an exact-string match.
-      addressNormalized: 'temerinska 12, 21000, novi sad',
+      // Not byte-identical to what the page's JSON-LD produces — the comma
+      // before the town is the difference, and it no longer matters. See the
+      // test below.
+      addressNormalized: 'Temerinska 12, 21000 Novi Sad',
     }),
     page: fixture('positive/mika-fasade-kontakt.html', 'https://mikafasade.rs/kontakt'),
     origin: 'discovered',
@@ -409,24 +410,46 @@ describe('confidence bands', () => {
 /* A property worth knowing about                                             */
 /* -------------------------------------------------------------------------- */
 
-describe('address corroboration is an exact string match', () => {
-  it('does not corroborate when the two spellings differ by a comma', () => {
-    // Recorded rather than fixed here: `address_normalized` is
-    // `address.toLowerCase()` on both sides, so `Temerinska 12, 21000 Novi Sad`
-    // and `Temerinska 12, 21000, Novi Sad` are two different addresses to the
-    // matcher. Folding them is `src/lib`'s call, not an adapter's — see the PR.
-    const lead = leadRecord({
-      id: 12,
-      name: 'Mika Fasade',
-      cityId: 'novi-sad',
-      municipalityId: 'novi-sad',
-      addressNormalized: 'temerinska 12, 21000 novi sad',
-    });
-    const verdict = assessCandidate({
-      lead,
-      page: fixture('positive/mika-fasade-kontakt.html', 'https://mikafasade.rs/kontakt'),
+describe('address corroboration survives the way two sources punctuate', () => {
+  // FUZZ-21 pinned the old behaviour here rather than working around it:
+  // `address_normalized` was `address.toLowerCase()` on both sides, so
+  // `Temerinska 12, 21000 Novi Sad` and `Temerinska 12, 21000, Novi Sad` were
+  // two addresses to the matcher and the pair stalled one tier short of a
+  // merge. FUZZ-31 moved the folding into `src/lib/normalize`; this is the same
+  // pair, asserting the outcome it should always have had.
+  const page = (): ReturnType<typeof fixture> =>
+    fixture('positive/mika-fasade-kontakt.html', 'https://mikafasade.rs/kontakt');
+
+  const assess = (addressNormalized: string): ReturnType<typeof assessCandidate> =>
+    assessCandidate({
+      lead: leadRecord({
+        id: 12,
+        name: 'Mika Fasade',
+        cityId: 'novi-sad',
+        municipalityId: 'novi-sad',
+        addressNormalized,
+      }),
+      page: page(),
       origin: 'discovered',
     });
+
+  it('corroborates when the two spellings differ by a comma', () => {
+    const verdict = assess('Temerinska 12, 21000 Novi Sad');
+    expect(verdict.rule).toBe('name_city_corroborated');
+    expect(verdict.tier).toBe('merge');
+  });
+
+  it.each([
+    ['the postal code dropped', 'Temerinska 12, Novi Sad'],
+    ['the street marker written out', 'Ul. Temerinska br. 12, 21000 Novi Sad'],
+    ['the town in Cyrillic', 'Темеринска 12, Нови Сад'],
+    ['the town first', 'Novi Sad, Temerinska 12'],
+  ])('corroborates with %s', (_label, addressNormalized) => {
+    expect(assess(addressNormalized).rule).toBe('name_city_corroborated');
+  });
+
+  it('still refuses to corroborate a different house number', () => {
+    const verdict = assess('Temerinska 12a, 21000 Novi Sad');
     expect(verdict.rule).toBe('name_city_alone');
     expect(verdict.tier).toBe('suggest');
   });

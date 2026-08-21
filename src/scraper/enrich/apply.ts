@@ -61,7 +61,7 @@ import {
   type SuggestionKind,
 } from '@/lib/db';
 import { scoreLead, toScoreInput } from '@/lib/score';
-import { normalizeCompanyName, resolveCityDetailed } from '@/lib/normalize';
+import { normalizeAddress, normalizeCompanyName, resolveCityDetailed } from '@/lib/normalize';
 import { normalizePhone, toPhoneInput } from '@/lib/phone';
 import { validateRawLead, type RawLeadInput } from '../raw-lead.js';
 import type {
@@ -405,7 +405,7 @@ function leadInputFrom(
     nameNormalized: normalizeCompanyName(target.name).ascii,
     ...(address === undefined
       ? {}
-      : { address: address.value, addressNormalized: address.value.toLowerCase() }),
+      : { address: address.value, addressNormalized: normalizeAddress(address.value).ascii }),
     ...(address === undefined || page.postalCode === null ? {} : { postalCode: page.postalCode }),
     ...(city === undefined
       ? {}

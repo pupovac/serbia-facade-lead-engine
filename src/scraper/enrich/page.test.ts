@@ -109,7 +109,10 @@ describe('a structured address', () => {
     const page = read('positive/mika-fasade-kontakt.html', 'https://mikafasade.rs/kontakt');
     expect(page.addressGrade).toBe('structured');
     expect(page.address).toBe('Temerinska 12, 21000, Novi Sad');
-    expect(page.candidateRecord.addressNormalized).toBe('temerinska 12, 21000, novi sad');
+    // The stored key, not the published string: `src/lib/normalize`'s address
+    // key drops the postal code and resolves the town to its municipality id,
+    // so every spelling of this address lands on this one value.
+    expect(page.candidateRecord.addressNormalized).toBe('temerinska 12, novi-sad');
     expect(page.cityId).toBe('novi-sad');
   });
 });

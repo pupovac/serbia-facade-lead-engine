@@ -50,7 +50,12 @@ import {
   toContactInputs,
   type LinkCandidate,
 } from '@/lib/contact';
-import { normalizeCompanyName, resolveCityDetailed, type CityMatch } from '@/lib/normalize';
+import {
+  normalizeAddress,
+  normalizeCompanyName,
+  resolveCityDetailed,
+  type CityMatch,
+} from '@/lib/normalize';
 import { extractPhones, normalizePhone, toPhoneInput } from '@/lib/phone';
 import { scoreLead, toScoreInput, type LeadScore } from '@/lib/score';
 import { normalizeWhitespace } from '@/lib/text/fold.js';
@@ -81,6 +86,17 @@ function trimOrNull(value: string | null | undefined): string | null {
   if (value === null || value === undefined) return null;
   const trimmed = normalizeWhitespace(value);
   return trimmed === '' ? null : trimmed;
+}
+
+/**
+ * The matching key for a published address, or null when the source gave
+ * nothing a matcher can use. `leads.address` keeps the string as published.
+ */
+function addressKey(value: string | null | undefined): string | null {
+  const raw = trimOrNull(value);
+  if (raw === null) return null;
+  const address = normalizeAddress(raw);
+  return address.tokens.length === 0 ? null : address.ascii;
 }
 
 /** Explicit fields, folded into the link list the `src/lib` extractors read. */
@@ -223,7 +239,7 @@ export function normalizeRawLead(
     municipalityId: city?.municipalityId ?? null,
     cityRaw: placeText === '' ? null : placeText,
     address: trimOrNull(lead.address),
-    addressNormalized: trimOrNull(lead.address)?.toLowerCase() ?? null,
+    addressNormalized: addressKey(lead.address),
     postalCode: trimOrNull(lead.postalCode),
     latitude: lead.latitude ?? null,
     longitude: lead.longitude ?? null,
