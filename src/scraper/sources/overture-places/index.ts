@@ -127,7 +127,12 @@ async function* discover(ctx: CrawlContext): AsyncIterable<DiscoveredItem> {
       const assigned = entry.rows[i];
       if (assigned === undefined) continue;
       yield {
-        url: placeUrl(assigned.row.id, release),
+        url: placeUrl(
+          assigned.row.id,
+          assigned.row.latitude === null || assigned.row.longitude === null
+            ? undefined
+            : { latitude: assigned.row.latitude, longitude: assigned.row.longitude },
+        ),
         scopeKey: entry.scopeKey,
         label: assigned.row.name,
         hints: { row: assigned.row, assignment: assigned.assignment, release },

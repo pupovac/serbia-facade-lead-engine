@@ -224,6 +224,26 @@ A new monthly release is a one-line change to `RELEASE` in `dataset.ts` (or
 and re-caches. Item staleness is keyed on the GERS id, not the URL, so a new
 release re-emits only what actually changed rather than the whole country.
 
+## Where a record points back to
+
+`source_url` is a deep link into Overture's own explorer:
+
+```
+https://explore.overturemaps.org/?feature=places.place.<gers-id>&mode=inspect#18/<lat>/<lng>
+```
+
+It used to be the S3 object prefix with the GERS id in the fragment. That was
+honest provenance and unusable: FUZZ-22's spot check could not verify **6 of its
+30 sampled leads** because there was nothing to open, and 607 of this source's
+1,638 leads carry no website either, so those had no reachable page at all. The
+explorer link renders the place, so all 1,638 become reviewable.
+
+Nothing is lost. The GERS id is in the URL, and the release stays on the record
+in `extra.release`. The release is deliberately **not** in the URL: it used to
+be, which meant every monthly release changed every stored `source_url` and an
+incremental re-run could not recognize a page it had already seen. A GERS id is
+stable across releases; the link is too.
+
 ## Known gaps
 
 - **25 small municipalities hold no Overture record at all**, and tier 3 sits at

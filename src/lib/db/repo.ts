@@ -26,6 +26,12 @@
  */
 import { createHash } from 'node:crypto';
 import { and, asc, desc, eq, inArray, isNull, or, sql } from 'drizzle-orm';
+// Two reads, not a second phone model: `src/lib/phone` still owns what a phone
+// number *is*. These answer "which network group is this in" and "does this
+// number ring at this address", and the imports are deliberately from the two
+// specific modules rather than the barrel so the dependency stays visible.
+import { scopePhones } from '../phone/locality.js';
+import { areaCodeFor } from '../phone/serbian-numbering.js';
 import type { Db } from './client.js';
 import {
   type ContactKind,
@@ -54,6 +60,7 @@ import {
   type NewSource,
   type QuarantineReason,
   type SharedIdentifier,
+  type PhoneScope,
   type PhoneType,
   type ProvenanceField,
   type RawRecord,
@@ -96,6 +103,15 @@ export interface PhoneInput {
   readonly raw: string;
   readonly nationalFormat?: string | null | undefined;
   readonly type?: PhoneType | undefined;
+  /**
+   * `business` (this address's own line) or `branch` (another location of the
+   * same company, published on the same page). Defaults to `business`.
+   * A `branch` number is stored and delivered like any other, but it never
+   * matches two leads together — see `src/lib/phone/locality.ts`.
+   */
+  readonly scope?: PhoneScope | undefined;
+  /** The department printed next to it — `PRODAJA`, `CENTRALA BEČEJ`. */
+  readonly label?: string | null | undefined;
   readonly isPrimary?: boolean | undefined;
   /** `false` keeps an unparseable number for auditing instead of dropping it. */
   readonly valid?: boolean | undefined;
@@ -247,12 +263,17 @@ export function resolveLead(db: Executor, leadId: number): Lead | undefined {
  * Dedup path 1 — the strongest signal. `e164` must already be canonical; this
  * function does not normalize, because normalization lives in `src/lib/phone`
  * and must not be duplicated here.
+ *
+ * Only `business`-scoped claims are matched. A number a listing published as
+ * *another branch's* line is still stored and still delivered — it is simply
+ * not this lead's identity, and letting it match here is what merged four real
+ * `GDC S.R.M.A` branches into the Belgrade one.
  */
 export function findByPhone(db: Executor, e164: string): Lead | undefined {
   const hit = db
     .select({ leadId: leadPhones.leadId })
     .from(leadPhones)
-    .where(eq(leadPhones.e164, e164))
+    .where(and(eq(leadPhones.e164, e164), eq(leadPhones.scope, 'business')))
     .get();
   return hit ? resolveLead(db, hit.leadId) : undefined;
 }
@@ -325,6 +346,10 @@ export function leadFieldClaims(db: Executor, leadId: number): LeadFieldValue[] 
 export interface DistinctPhone {
   readonly e164: string;
   readonly type: PhoneType;
+  /** `branch` when every source that published it said it rings elsewhere. */
+  readonly scope: PhoneScope;
+  /** The department or branch label, when a source printed one. */
+  readonly label: string | null;
   readonly isPrimary: boolean;
   readonly valid: boolean;
   /** Every raw spelling seen, in first-seen order. */
@@ -360,6 +385,8 @@ export function distinctPhones(db: Executor, leadId: number): DistinctPhone[] {
       byNumber.set(claim.e164, {
         e164: claim.e164,
         type: claim.type,
+        scope: claim.scope,
+        label: claim.label,
         isPrimary: claim.isPrimary,
         valid: claim.valid,
         rawVariants: [claim.raw],
@@ -375,6 +402,9 @@ export function distinctPhones(db: Executor, leadId: number): DistinctPhone[] {
       ...existing,
       // A `mobile` verdict from one source beats `unknown` from another.
       type: existing.type === 'unknown' ? claim.type : existing.type,
+      // One source calling it this business's own line settles it.
+      scope: existing.scope === 'business' || claim.scope === 'business' ? 'business' : 'branch',
+      label: existing.label ?? claim.label,
       isPrimary: existing.isPrimary || claim.isPrimary,
       valid: existing.valid || claim.valid,
       firstSeenAt:
@@ -789,7 +819,7 @@ function upsertPhoneClaim(
   at: Date,
 ): boolean {
   const existing = tx
-    .select({ id: leadPhones.id })
+    .select({ id: leadPhones.id, scope: leadPhones.scope })
     .from(leadPhones)
     .where(
       and(
@@ -801,8 +831,17 @@ function upsertPhoneClaim(
     .get();
 
   if (existing) {
+    // A number that any source calls this address's own line is one: a later
+    // sighting may promote `branch` to `business`, never the reverse. One page
+    // listing a switchboard must not demote a number another page published as
+    // the business's own.
+    const promote = (phone.scope ?? 'business') === 'business' && existing.scope === 'branch';
     tx.update(leadPhones)
-      .set({ lastSeenAt: at, sourceUrl: provenance.sourceUrl })
+      .set({
+        lastSeenAt: at,
+        sourceUrl: provenance.sourceUrl,
+        ...(promote ? { scope: 'business' as const } : {}),
+      })
       .where(eq(leadPhones.id, existing.id))
       .run();
     return false;
@@ -815,6 +854,8 @@ function upsertPhoneClaim(
       raw: phone.raw,
       nationalFormat: phone.nationalFormat ?? null,
       type: phone.type ?? 'unknown',
+      scope: phone.scope ?? 'business',
+      label: phone.label ?? null,
       isPrimary: phone.isPrimary ?? false,
       valid: phone.valid ?? true,
       confidence: phone.confidence ?? null,
@@ -1055,11 +1096,13 @@ export function startRun(
   sourceId: string,
   options: { trigger?: string; scope?: string | null; startedAt?: Date } = {},
 ): number {
+  const startedAt = options.startedAt ?? new Date();
   const row = db
     .insert(crawlRuns)
     .values({
       sourceId,
-      startedAt: options.startedAt ?? new Date(),
+      startedAt,
+      heartbeatAt: startedAt,
       status: 'running',
       trigger: options.trigger ?? 'manual',
       scope: options.scope ?? null,
@@ -1067,6 +1110,88 @@ export function startRun(
     .returning({ id: crawlRuns.id })
     .get();
   return row.id;
+}
+
+/**
+ * How long a `running` row may go without a heartbeat before the next startup
+ * writes it off.
+ *
+ * Ten minutes is far longer than the 30-second heartbeat interval and far
+ * longer than any pause a live crawler takes — the politeness delay is one
+ * second and the longest retry backoff is well under a minute — so a run that
+ * has been silent this long is a process that is gone. It is deliberately
+ * generous in the direction that costs nothing: writing off a live run would
+ * corrupt exactly the statistics this is meant to protect.
+ */
+export const RUN_HEARTBEAT_STALE_MS = 10 * 60 * 1000;
+
+/** How often a running crawler should call `heartbeatRun`. */
+export const RUN_HEARTBEAT_INTERVAL_MS = 30 * 1000;
+
+/** "Still here." One indexed update; cheap enough to call on every record. */
+export function heartbeatRun(db: Executor, runId: number, at: Date = new Date()): void {
+  db.update(crawlRuns).set({ heartbeatAt: at }).where(eq(crawlRuns.id, runId)).run();
+}
+
+export interface ReconciledRun {
+  readonly id: number;
+  readonly sourceId: string;
+  /** Last sign of life — the heartbeat, or the start for a run that predates them. */
+  readonly lastSeenAt: Date;
+}
+
+/**
+ * Write off `running` rows whose process is gone.
+ *
+ * A killed crawler leaves its row `running` forever and nothing reconciles it,
+ * so every later run-statistics report silently includes a row that never
+ * finished — two of the pilot's eight rows were stuck exactly that way. This
+ * runs at startup, before a new run is recorded.
+ *
+ * A run is only written off once it has been silent for `RUN_HEARTBEAT_STALE_MS`,
+ * which is what makes this safe to call while another crawler is working: a
+ * live run heartbeats every 30 seconds and is never in scope. Rows written
+ * before heartbeats existed have `heartbeat_at IS NULL` and are judged on
+ * `started_at`, which is the best evidence they carry.
+ *
+ * The row is marked `failed` with a note rather than deleted — `merge, never
+ * delete` applies to bookkeeping too, and "this run was abandoned" is a fact
+ * the statistics should show rather than hide.
+ */
+export function reconcileAbandonedRuns(
+  db: Executor,
+  options: { now?: Date; staleAfterMs?: number } = {},
+): readonly ReconciledRun[] {
+  const now = options.now ?? new Date();
+  const staleAfterMs = options.staleAfterMs ?? RUN_HEARTBEAT_STALE_MS;
+  const cutoff = new Date(now.getTime() - staleAfterMs);
+
+  const stale = db
+    .select({
+      id: crawlRuns.id,
+      sourceId: crawlRuns.sourceId,
+      startedAt: crawlRuns.startedAt,
+      heartbeatAt: crawlRuns.heartbeatAt,
+    })
+    .from(crawlRuns)
+    .where(eq(crawlRuns.status, 'running'))
+    .all()
+    .map((row) => ({ ...row, lastSeenAt: row.heartbeatAt ?? row.startedAt }))
+    .filter((row) => row.lastSeenAt.getTime() <= cutoff.getTime());
+
+  for (const row of stale) {
+    const minutes = Math.round((now.getTime() - row.lastSeenAt.getTime()) / 60000);
+    db.update(crawlRuns)
+      .set({
+        status: 'failed',
+        finishedAt: row.lastSeenAt,
+        error: `abandoned: no heartbeat for ${minutes} minutes, reconciled at startup`,
+      })
+      .where(eq(crawlRuns.id, row.id))
+      .run();
+  }
+
+  return stale.map(({ id, sourceId, lastSeenAt }) => ({ id, sourceId, lastSeenAt }));
 }
 
 export interface RunStats {
@@ -1157,6 +1282,64 @@ export function saveCrawlState(
 }
 
 /* -------------------------------------------------------------------------- */
+/* Phone scope                                                                */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Re-read a lead's phone numbers against the municipality it is now filed under.
+ *
+ * The per-record rule in `src/scraper/pipeline.ts` handles the case where one
+ * *page* prints a whole switchboard. It cannot handle the other half of the
+ * same problem: `overture-places` files each branch of a chain as its own
+ * record with its own single phone, and the dedup sweep then merges those
+ * records into one lead. Each record was correctly scoped on its own; the
+ * survivor still ends up carrying a dozen numbers that all claim to be its own
+ * line, and each of them is an identity that can pull another business in.
+ *
+ * So after a merge the survivor's whole phone list is scored again, by the same
+ * pure rule, against the survivor's own municipality. Returns the rows it
+ * changed together with the scope they had, so the merge can be reverted
+ * exactly.
+ *
+ * Nothing is deleted and nothing is deleted-by-another-name: a demoted number
+ * is still on the lead, still valid, still in the export.
+ */
+export function rescopeLeadPhones(
+  db: Executor,
+  leadId: number,
+): { id: number; scope: PhoneScope }[] {
+  const lead = getLead(db, leadId);
+  if (!lead) return [];
+
+  const claims = db
+    .select()
+    .from(leadPhones)
+    .where(eq(leadPhones.leadId, leadId))
+    .orderBy(leadPhones.firstSeenAt, leadPhones.id)
+    .all();
+  if (claims.length === 0) return [];
+
+  const scopes = scopePhones(
+    claims.map((claim) => ({
+      type: claim.type,
+      valid: claim.valid,
+      areaCode: areaCodeFor(claim.e164.replace(/^\+381/, '')),
+      label: claim.label ?? undefined,
+    })),
+    { municipalityId: lead.municipalityId },
+  );
+
+  const changed: { id: number; scope: PhoneScope }[] = [];
+  claims.forEach((claim, index) => {
+    const scope = scopes[index] ?? 'business';
+    if (scope === claim.scope) return;
+    changed.push({ id: claim.id, scope: claim.scope });
+    db.update(leadPhones).set({ scope }).where(eq(leadPhones.id, claim.id)).run();
+  });
+  return changed;
+}
+
+/* -------------------------------------------------------------------------- */
 /* Merging                                                                    */
 /* -------------------------------------------------------------------------- */
 
@@ -1188,6 +1371,15 @@ export interface MergeResult {
 interface MergeSnapshot {
   readonly mergedLead: Lead;
   readonly survivorBefore: Lead;
+  /**
+   * Every phone scope the merge changed, as it was before.
+   *
+   * A merge moves branch numbers onto the survivor, and `rescopeLeadPhones`
+   * then re-reads them against the survivor's municipality. Without this, a
+   * reverted merge would put the rows back on their old lead carrying the new
+   * lead's verdict.
+   */
+  readonly phoneScopesBefore?: { id: number; scope: PhoneScope }[];
   readonly movedPhoneIds: number[];
   readonly movedContactIds: number[];
   readonly movedFieldValueIds: number[];
@@ -1408,6 +1600,14 @@ export function recordMerge(db: Db, input: MergeInput): MergeResult {
       .where(eq(leads.id, merged.id))
       .run();
 
+    // The survivor now holds the merged lead's numbers, and "does this number
+    // ring at this address" has a different answer than it did on the old lead.
+    // Overture files each branch of a chain as its own record with its own
+    // single phone, so before this the survivor of a twelve-branch merge came
+    // out carrying twelve numbers all claiming to be its own line.
+    const rescoped = rescopeLeadPhones(tx, survivor.id);
+    const snapshotWithScopes: MergeSnapshot = { ...snapshot, phoneScopesBefore: rescoped };
+
     const logRow = tx
       .insert(mergeLog)
       .values({
@@ -1419,7 +1619,7 @@ export function recordMerge(db: Db, input: MergeInput): MergeResult {
         signals: input.signals ?? null,
         actor: input.actor ?? 'pipeline',
         runId: input.runId ?? null,
-        snapshot: JSON.stringify(snapshot),
+        snapshot: JSON.stringify(snapshotWithScopes),
         mergedAt: at,
       })
       .returning({ id: mergeLog.id })
@@ -1506,6 +1706,9 @@ export function revertMerge(db: Db, mergeLogId: number, note?: string): void {
     const snapshot = JSON.parse(entry.snapshot) as MergeSnapshot;
     const mergedId = entry.mergedLeadId;
 
+    for (const before of snapshot.phoneScopesBefore ?? []) {
+      tx.update(leadPhones).set({ scope: before.scope }).where(eq(leadPhones.id, before.id)).run();
+    }
     if (snapshot.movedPhoneIds.length > 0) {
       tx.update(leadPhones)
         .set({ leadId: mergedId })
@@ -1635,11 +1838,12 @@ function resolveAll(db: Executor, leadIds: readonly number[]): Lead[] {
   return [...seen.values()];
 }
 
+/** Every lead that claims this number **as its own**. See `findByPhone`. */
 export function findAllByPhone(db: Executor, e164: string): Lead[] {
   const rows = db
     .selectDistinct({ leadId: leadPhones.leadId })
     .from(leadPhones)
-    .where(eq(leadPhones.e164, e164))
+    .where(and(eq(leadPhones.e164, e164), eq(leadPhones.scope, 'business')))
     .all();
   return resolveAll(
     db,
@@ -1789,18 +1993,30 @@ export interface IdentifierOccurrence {
  */
 export function identifierOccurrences(db: Executor, kind: IdentifierKind): IdentifierOccurrence[] {
   if (kind === 'phone') {
-    return db
-      .selectDistinct({
-        value: leadPhones.e164,
-        leadId: leads.id,
-        name: leads.name,
-        nameNormalized: leads.nameNormalized,
-      })
-      .from(leadPhones)
-      .innerJoin(leads, eq(leads.id, leadPhones.leadId))
-      .where(and(eq(leadPhones.valid, true), isNull(leads.mergedIntoId)))
-      .all()
-      .map((row) => ({ kind, ...row }));
+    return (
+      db
+        .selectDistinct({
+          value: leadPhones.e164,
+          leadId: leads.id,
+          name: leads.name,
+          nameNormalized: leads.nameNormalized,
+        })
+        .from(leadPhones)
+        .innerJoin(leads, eq(leads.id, leadPhones.leadId))
+        // `business` scope only, for the same reason `findByPhone` filters on
+        // it: a head office's number legitimately appears as a *branch* line on
+        // every one of its branch leads, and counting those would quarantine a
+        // perfectly good identity for being shared with itself.
+        .where(
+          and(
+            eq(leadPhones.valid, true),
+            eq(leadPhones.scope, 'business'),
+            isNull(leads.mergedIntoId),
+          ),
+        )
+        .all()
+        .map((row) => ({ kind, ...row }))
+    );
   }
 
   const column = kind === 'website_domain' ? leadContacts.domain : leadContacts.value;

@@ -9,7 +9,12 @@
 import { closeDatabase, openDatabase, type Db } from '@/lib/db';
 import { ScraperError } from '../errors.js';
 import { createLogger, parseLogLevel, type LogLevel } from '../logger.js';
-import { runEnrichment, type EnrichmentPath, type EnrichSummary } from './run.js';
+import {
+  DEFAULT_ENRICHMENT_PATH,
+  runEnrichment,
+  type EnrichmentPath,
+  type EnrichSummary,
+} from './run.js';
 import type { ConfigOverrides } from '../config.js';
 
 const USAGE = `serbia-facade-lead-engine — contact enrichment
@@ -21,9 +26,14 @@ Takes leads that are missing high-value contact details and goes looking for
 them, ordered by how much filling the blanks would improve the lead score.
 
 Options:
-  --path <which>         own-site | search | both. Default: both.
+  --path <which>         own-site | search | both. Default: own-site.
                          own-site  crawls the contact pages of a lead's own website.
                          search    looks for a lead that has no website at all.
+                                   OFF BY DEFAULT: the only search provider whose
+                                   robots.txt permits us answers every query with a
+                                   403 or an anti-bot challenge, so the path made 111
+                                   attempts and returned 0 candidates in the pilot.
+                                   Asking for it logs why and runs it anyway.
   --lead <id>            Enrich one lead (repeatable). Default: every lead that would gain.
   --limit <n>            Stop after n leads.
   --stale-days <n>       Skip a lead enrichment visited inside the last n days. Default: 30.
@@ -58,7 +68,7 @@ const PATHS: readonly EnrichmentPath[] = ['own-site', 'search', 'both'];
 /** Exported for the unit test — parsing is pure and worth pinning down. */
 export function parseArgs(argv: readonly string[]): EnrichCliArgs {
   const leadIds: number[] = [];
-  let path: EnrichmentPath = 'both';
+  let path: EnrichmentPath = DEFAULT_ENRICHMENT_PATH;
   let limit: number | null = null;
   let staleDays: number | null = null;
   let budget: number | null = null;

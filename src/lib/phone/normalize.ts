@@ -7,11 +7,15 @@
  * validation report can print, so nothing is dropped silently.
  *
  * It expects a phone-shaped string — a number pulled out of prose is
- * `extractPhones`' job, not this one.
+ * `extractPhones`' job, not this one. The one concession is the department
+ * label Serbian directories print next to a number (`034 xxx xxx, PRODAJA`):
+ * `splitPhoneLabel` takes it off before parsing and hands it back on the
+ * result, because the alternative was rejecting the number entirely.
  */
 import { parsePhoneNumberFromString } from 'libphonenumber-js/max';
 import type { NumberType } from 'libphonenumber-js/max';
 import { normalizeWhitespace } from '../text/fold.js';
+import { splitPhoneLabel } from './label.js';
 import { areaCodeFor, inferCityFromAreaCode } from './serbian-numbering.js';
 import type { NormalizedPhone, PhoneError, PhoneErrorCode, PhoneType } from './types.js';
 
@@ -83,7 +87,11 @@ type NumberForm = 'international' | 'country-code' | 'national';
  * `foreign` with its own E.164 form intact, never bent into `+381`.
  */
 export function normalizePhone(raw: string): NormalizedPhone | { error: PhoneError } {
-  const cleaned = normalizeWhitespace(raw).replace(SCHEME, '').trim();
+  const scheme = normalizeWhitespace(raw).replace(SCHEME, '').trim();
+  // The label comes off before anything else looks at the string, so every
+  // rule below — the date shape, the character set, the digit counts — reads
+  // the number the source published rather than the number plus a department.
+  const { number: cleaned, label } = splitPhoneLabel(scheme);
   const digits = cleaned.replace(/\D/g, '');
 
   if (digits.length === 0) return fail(raw, 'empty', 'no digits in the input');
@@ -177,6 +185,7 @@ export function normalizePhone(raw: string): NormalizedPhone | { error: PhoneErr
     type,
     areaCode,
     inferredCityId,
+    label: label ?? undefined,
     confidence: confidenceOf(form, type, inferredCityId, national),
   };
 }

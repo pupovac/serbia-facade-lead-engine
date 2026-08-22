@@ -42,6 +42,13 @@ export interface NormalizedPhone {
    * geographic dataset.
    */
   readonly inferredCityId?: string | undefined;
+  /**
+   * The department or branch label printed next to the number, as published —
+   * `PRODAJA`, `CENTRALA BEČEJ`. Undefined when the source printed none. See
+   * `label.ts`; when it names a place, `locality.ts` reads it as branch
+   * evidence.
+   */
+  readonly label?: string | undefined;
   /** 0–1. How much the parse should be trusted; see `normalizePhone` for the exact ladder. */
   readonly confidence: number;
 }

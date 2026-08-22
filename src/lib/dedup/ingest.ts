@@ -165,7 +165,7 @@ function toRecord(input: LeadInput) {
     registrationNumber: input.registrationNumber ?? null,
     taxId: input.taxId ?? null,
     phones: (input.phones ?? [])
-      .filter((phone) => phone.valid !== false)
+      .filter((phone) => phone.valid !== false && (phone.scope ?? 'business') === 'business')
       .map((phone) => phone.e164),
     websiteDomains: (input.contacts ?? [])
       .filter((contact) => contact.kind === 'website' && contact.domain)

@@ -46,8 +46,9 @@ const SOCIAL_KINDS: ReadonlySet<ContactKind> = new Set([
 /**
  * Read one stored lead and everything hanging off it into a comparable record.
  *
- * Only valid phones are carried: an unparseable string stays on the lead for
- * auditing, and it must never be the thing two businesses are merged on.
+ * Only valid, `business`-scoped phones are carried. An unparseable string
+ * stays on the lead for auditing and a branch's switchboard number stays on it
+ * as a deliverable, but neither may be the thing two businesses are merged on.
  */
 export function toLeadRecord(db: Executor, leadId: number): LeadRecord | undefined {
   const lead = getLead(db, leadId);
@@ -79,7 +80,7 @@ export function toLeadRecord(db: Executor, leadId: number): LeadRecord | undefin
     registrationNumber: lead.registrationNumber,
     taxId: lead.taxId,
     phones: distinctPhones(db, leadId)
-      .filter((phone) => phone.valid)
+      .filter((phone) => phone.valid && phone.scope === 'business')
       .map((phone) => phone.e164),
     websiteDomains: [...websiteDomains],
     emails: [...emails],

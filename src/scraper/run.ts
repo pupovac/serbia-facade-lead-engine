@@ -23,7 +23,16 @@
  * - **The budget is gone** — the run stops cleanly, `completed`, with the
  *   reason in `notes`. The fuse blew; nothing is broken.
  */
-import { finishRun, getSource, startRun, upsertSource, type Db } from '@/lib/db';
+import {
+  RUN_HEARTBEAT_INTERVAL_MS,
+  finishRun,
+  getSource,
+  heartbeatRun,
+  reconcileAbandonedRuns,
+  startRun,
+  upsertSource,
+  type Db,
+} from '@/lib/db';
 import {
   configFromEnv,
   resolveConfig,
@@ -218,6 +227,19 @@ export async function runSource(options: RunOptions): Promise<RunSummary> {
   const startedAt = now();
   if (db !== null) ensureSourceRow(db, adapter, log);
 
+  // Before this run is recorded, write off the ones whose process is gone.
+  // A killed crawler leaves `running` behind forever and every later report
+  // then counts a run that never finished.
+  if (db !== null) {
+    for (const abandoned of reconcileAbandonedRuns(db, { now: startedAt })) {
+      log.warn('reconciled an abandoned run', {
+        runId: abandoned.id,
+        source: abandoned.sourceId,
+        lastSeenAt: abandoned.lastSeenAt.toISOString(),
+      });
+    }
+  }
+
   const runId =
     db === null
       ? null
@@ -236,6 +258,16 @@ export async function runSource(options: RunOptions): Promise<RunSummary> {
 
   const state: CrawlStateStore =
     db === null ? new MemoryCrawlStateStore() : new DbCrawlStateStore(db, adapter.id, runId);
+
+  // "Still here." Throttled, because a heartbeat on every record would be one
+  // extra write per second for no extra information.
+  let lastBeatAt = startedAt.getTime();
+  const beat = (at: Date): void => {
+    if (db === null || runId === null) return;
+    if (at.getTime() - lastBeatAt < RUN_HEARTBEAT_INTERVAL_MS) return;
+    lastBeatAt = at.getTime();
+    heartbeatRun(db, runId, at);
+  };
 
   const controller = new AbortController();
   const onOuterAbort = (): void => controller.abort();
@@ -352,6 +384,7 @@ export async function runSource(options: RunOptions): Promise<RunSummary> {
             if (persisted.created) leadsCreated += 1;
             else leadsUpdated += 1;
             phonesAdded += persisted.phonesAdded;
+            beat(now());
           }
 
           if (scope.limit !== null && recordsEmitted >= scope.limit) break;

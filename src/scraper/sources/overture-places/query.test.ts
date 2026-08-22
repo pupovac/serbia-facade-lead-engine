@@ -58,9 +58,15 @@ describe('the release listing', () => {
     );
   });
 
-  it('points a record at its release and its GERS id', () => {
-    expect(placeUrl('abc-123', '2026-08-19.0')).toBe(
-      'https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com/release/2026-08-19.0/theme=places/type=place/#abc-123',
+  it('points a record at a map view a reviewer can open', () => {
+    expect(placeUrl('abc-123', { latitude: 44.8125, longitude: 20.4612 })).toBe(
+      'https://explore.overturemaps.org/?feature=places.place.abc-123&mode=inspect#18/44.8125/20.4612',
+    );
+  });
+
+  it('drops the map centre rather than inventing one when a row has no point', () => {
+    expect(placeUrl('abc-123')).toBe(
+      'https://explore.overturemaps.org/?feature=places.place.abc-123&mode=inspect',
     );
   });
 });

@@ -5,10 +5,17 @@ and a website and no phone at all. Enrichment goes back to the business and
 finds the rest.
 
 ```bash
-npm run enrich -- --path own-site --limit 50
-npm run enrich -- --path search --limit 20
+npm run enrich -- --limit 50               # the own-site path, which is the default
+npm run enrich -- --path search --limit 20 # gated off; see below before you run it
 npm run enrich -- --help
 ```
+
+> **`--path search` is off by default.** It made 111 attempts and returned **0**
+> candidates in the FUZZ-22 pilot, and the 2026-08-21 re-probe in
+> `research/2026-08-21-fuzz33-search-providers.md` found no general search
+> provider that both permits us in `robots.txt` and answers. Asking for it still
+> runs it, after logging why it is off. `--path own-site` is unaffected: it
+> converted 447 of 600 requests in the pilot and stays the default.
 
 It is deliberately **not** a `SourceAdapter`. An adapter discovers businesses;
 this starts from businesses already in the database. It shares the scraper's

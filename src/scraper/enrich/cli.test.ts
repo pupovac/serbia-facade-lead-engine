@@ -11,9 +11,11 @@ import { formatSummary, parseArgs } from './cli.js';
 import type { EnrichSummary } from './run.js';
 
 describe('parseArgs', () => {
-  it('defaults to both paths and no limit', () => {
+  it('defaults to the own-site path only, and to no limit', () => {
+    // The search path is gated off: it returned 0 candidates in 111 attempts
+    // during the pilot, and a nationwide run must not spend its budget there.
     const args = parseArgs([]);
-    expect(args.path).toBe('both');
+    expect(args.path).toBe('own-site');
     expect(args.limit).toBeNull();
     expect(args.leadIds).toEqual([]);
     expect(args.help).toBe(false);

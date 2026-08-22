@@ -25,7 +25,15 @@
  * identical. So every candidate page ends in exactly one bucket — merged,
  * suggested, or rejected with a named reason — and the totals are printed.
  */
-import { finishRun, saveCrawlState, startRun, type Db } from '@/lib/db';
+import {
+  RUN_HEARTBEAT_INTERVAL_MS,
+  finishRun,
+  heartbeatRun,
+  reconcileAbandonedRuns,
+  saveCrawlState,
+  startRun,
+  type Db,
+} from '@/lib/db';
 import { loadQuarantine, type Quarantine } from '@/lib/dedup';
 import { HttpError, RequestBudgetExceededError, RobotsDisallowedError } from '../errors.js';
 import {
@@ -60,6 +68,22 @@ import type {
 
 /** Which paths a run is allowed to take. */
 export type EnrichmentPath = 'own-site' | 'search' | 'both';
+
+/**
+ * `own-site`, not `both`.
+ *
+ * FUZZ-22 measured the search path across a full pilot: **111 attempts, zero
+ * candidates.** `html.duckduckgo.com` answers 403 or an anti-bot challenge and
+ * `lite.duckduckgo.com` does not answer at all, so every one of those requests
+ * bought nothing — and they were requests the own-site path, which converted
+ * 447 of 600, could have spent. A nationwide run must not repeat that, so the
+ * path a permitted provider does not exist for is off unless somebody asks for
+ * it by name.
+ *
+ * `own-site` stays on and stays the default. Re-check
+ * `research/2026-08-21-fuzz33-search-providers.md` before turning this back on.
+ */
+export const DEFAULT_ENRICHMENT_PATH: EnrichmentPath = 'own-site';
 
 export interface EnrichRunOptions {
   /** `null` under `--dry-run`: nothing is opened and nothing is written. */
@@ -155,13 +179,25 @@ export async function runEnrichment(options: EnrichRunOptions): Promise<EnrichSu
   const startedAt = now();
   if (db !== null) ensureEnrichmentSources(db, startedAt);
 
+  // Same startup reconciliation as `src/scraper/run.ts`: a killed enrichment
+  // process leaves `running` behind exactly as a killed crawler does.
+  if (db !== null) {
+    for (const abandoned of reconcileAbandonedRuns(db, { now: startedAt })) {
+      log.warn('reconciled an abandoned run', {
+        runId: abandoned.id,
+        source: abandoned.sourceId,
+        lastSeenAt: abandoned.lastSeenAt.toISOString(),
+      });
+    }
+  }
+
   const runId =
     db === null
       ? null
       : startRun(db, OWN_SITE_SOURCE, {
           trigger: options.trigger ?? 'manual',
           scope: JSON.stringify({
-            path: options.path ?? 'both',
+            path: options.path ?? DEFAULT_ENRICHMENT_PATH,
             limit: options.limit ?? null,
             select: options.select ?? {},
           }),
@@ -182,8 +218,18 @@ export async function runEnrichment(options: EnrichRunOptions): Promise<EnrichSu
     signal: controller.signal,
   });
 
-  const path = options.path ?? 'both';
+  const path = options.path ?? DEFAULT_ENRICHMENT_PATH;
   const finder = options.finder ?? new DuckDuckGoHtmlFinder(MAX_SEARCH_CANDIDATES);
+  // Asking for the blocked path is allowed — it is how the next person
+  // re-measures it — but it never happens silently.
+  if (path !== 'own-site' && options.finder === undefined) {
+    log.warn(
+      `--path ${path} will use ${finder.id}, which returned 0 candidates in 111 attempts ` +
+        'during the FUZZ-22 pilot (HTTP 403 or an anti-bot challenge on every query). ' +
+        'It is off by default for that reason. Pass a permitted provider to re-enable it; ' +
+        'see research/2026-08-21-fuzz33-search-providers.md.',
+    );
+  }
   const tally = new Tally();
   let stoppedBecause: string | null = null;
 
@@ -208,8 +254,18 @@ export async function runEnrichment(options: EnrichRunOptions): Promise<EnrichSu
 
   const quarantine = db === null ? undefined : loadQuarantine(db);
 
+  // Throttled, for the same reason as in `src/scraper/run.ts`.
+  let lastBeatAt = startedAt.getTime();
+  const beat = (at: Date): void => {
+    if (db === null || runId === null) return;
+    if (at.getTime() - lastBeatAt < RUN_HEARTBEAT_INTERVAL_MS) return;
+    lastBeatAt = at.getTime();
+    heartbeatRun(db, runId, at);
+  };
+
   try {
     for (const target of targets) {
+      beat(now());
       if (controller.signal.aborted) {
         stoppedBecause = 'run cancelled';
         break;

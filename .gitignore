@@ -48,3 +48,7 @@ data/cache/
 
 # Pilot run artefacts — fetched pages and reports containing lead data.
 runlogs/
+
+# Scratch: replay databases and downloaded corpora. Lead data, never committed.
+tmp/
+data/*.gz

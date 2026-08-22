@@ -131,7 +131,12 @@ export function toRawLead(row: PlaceRow, options: ToRawLeadOptions): RawLeadInpu
   );
 
   return {
-    sourceUrl: placeUrl(row.id, options.release),
+    sourceUrl: placeUrl(
+      row.id,
+      row.latitude === null || row.longitude === null
+        ? undefined
+        : { latitude: row.latitude, longitude: row.longitude },
+    ),
     name: row.name,
     phones: list(row.phones),
     emails: list(row.emails),

@@ -25,10 +25,17 @@
  *   "this is the number", and an unparseable one is evidence worth storing with
  *   `valid: false`. A regex hit inside a paragraph is a guess, and a bad guess
  *   is noise.
+ * - **A number that rings in another town is a branch line, not an identity.**
+ *   One listing page routinely prints a company's whole switchboard, and every
+ *   one of those numbers used to become an identity for whichever branch the
+ *   page was filed under. `scopePhones` marks the ones that contradict the
+ *   record's own address; they are stored and delivered exactly as before, and
+ *   they stop matching leads together. See `src/lib/phone/locality.ts`.
  */
 import {
   applyGrading,
   attachSource,
+  withWriteRetry,
   distinctPhones,
   leadContactClaims,
   leadSourceRows,
@@ -56,7 +63,15 @@ import {
   resolveCityDetailed,
   type CityMatch,
 } from '@/lib/normalize';
-import { extractPhones, normalizePhone, toPhoneInput } from '@/lib/phone';
+import {
+  extractPhones,
+  isPhoneError,
+  normalizePhone,
+  scopePhones,
+  toPhoneInput,
+  type NormalizedPhone,
+  type PhoneError,
+} from '@/lib/phone';
 import { scoreLead, toScoreInput, type LeadScore } from '@/lib/score';
 import { normalizeWhitespace } from '@/lib/text/fold.js';
 import type { RawLead } from './raw-lead.js';
@@ -120,9 +135,12 @@ function linkCandidates(lead: RawLead): LinkCandidate[] {
  * Ordering matters beyond tidiness: the first entry is marked primary, and a
  * salesperson calling down the export dials that one.
  */
-function phoneInputs(lead: RawLead): PhoneInput[] {
-  const byE164 = new Map<string, PhoneInput>();
-  const add = (input: PhoneInput): void => {
+function phoneInputs(lead: RawLead): ScopablePhoneInput[] {
+  const byE164 = new Map<string, ScopablePhoneInput>();
+  const add = (parsed: NormalizedPhone | { error: PhoneError }): void => {
+    const input: ScopablePhoneInput = isPhoneError(parsed)
+      ? toPhoneInput(parsed)
+      : { ...toPhoneInput(parsed), areaCode: parsed.areaCode, label: parsed.label ?? null };
     const existing = byE164.get(input.e164);
     // A valid reading of a number always beats an invalid one of the same string.
     if (existing === undefined || (existing.valid === false && input.valid !== false)) {
@@ -130,11 +148,11 @@ function phoneInputs(lead: RawLead): PhoneInput[] {
     }
   };
 
-  for (const raw of lead.phones) add(toPhoneInput(normalizePhone(raw)));
+  for (const raw of lead.phones) add(normalizePhone(raw));
 
   for (const link of lead.links) {
     if (!/^tel:/i.test(link.href)) continue;
-    add(toPhoneInput(normalizePhone(decodeURIComponent(link.href.slice(4)))));
+    add(normalizePhone(decodeURIComponent(link.href.slice(4))));
   }
 
   const text = lead.text;
@@ -142,12 +160,51 @@ function phoneInputs(lead: RawLead): PhoneInput[] {
     for (const found of extractPhones(text)) {
       // Prose is a guess. Only a number that actually parsed is worth keeping.
       if (found.phone === null) continue;
-      add(toPhoneInput(found.phone));
+      add(found.phone);
     }
   }
 
-  const inputs = [...byE164.values()];
-  return inputs.map((input, index) => ({ ...input, isPrimary: index === 0 }));
+  return [...byE164.values()];
+}
+
+/**
+ * A `PhoneInput` that still remembers what `scopePhones` needs to judge it.
+ *
+ * `areaCode` never reaches the database — `lead_phones` stores the E.164 form
+ * and the area code is derivable from it — so it is dropped again as soon as
+ * the scope is decided.
+ */
+type ScopablePhoneInput = PhoneInput & { readonly areaCode?: string | undefined };
+
+/**
+ * Mark each number as this address's own line or another branch's, and make the
+ * first surviving business line the primary one.
+ *
+ * Primary matters beyond tidiness: a salesperson calling down the export dials
+ * it, and before this it could be the Vranje branch's number on a Belgrade row.
+ */
+function scopedPhoneInputs(
+  phones: readonly ScopablePhoneInput[],
+  municipalityId: string | null,
+): PhoneInput[] {
+  const scopes = scopePhones(
+    phones.map((phone) => ({
+      type: phone.type ?? 'unknown',
+      valid: phone.valid,
+      areaCode: phone.areaCode,
+      label: phone.label ?? undefined,
+    })),
+    { municipalityId },
+  );
+
+  let primaryTaken = false;
+  return phones.map((phone, index) => {
+    const scope = scopes[index] ?? 'business';
+    const isPrimary = !primaryTaken && scope === 'business' && phone.valid !== false;
+    if (isPrimary) primaryTaken = true;
+    const { areaCode: _areaCode, ...rest } = phone;
+    return { ...rest, scope, isPrimary };
+  });
 }
 
 function contactInputs(lead: RawLead, options: NormalizeOptions): ContactInput[] {
@@ -187,18 +244,22 @@ export function normalizeRawLead(
 ): NormalizedLead {
   const name = normalizeWhitespace(lead.name);
   const normalizedName = normalizeCompanyName(name);
-  const phones = phoneInputs(lead);
+  const parsedPhones = phoneInputs(lead);
   const contacts = contactInputs(lead, options);
 
   // The address is a fallback for the city, not a second field to resolve: a
   // directory that prints `Bulevar oslobođenja 12, Novi Sad` and nothing in a
   // city column still knows where the business is.
   const placeText = trimOrNull(lead.city) ?? trimOrNull(lead.address) ?? '';
-  const firstValidPhone = phones.find((phone) => phone.valid !== false);
+  const firstValidPhone = parsedPhones.find((phone) => phone.valid !== false);
   const cityResolution = resolveCityDetailed(placeText, {
     ...(firstValidPhone === undefined ? {} : { phone: firstValidPhone.e164 }),
   });
   const city = cityResolution.ok ? cityResolution.match : null;
+
+  // Scoping runs after the city, because "does this number contradict the
+  // record" has no answer until the record has a municipality.
+  const phones = scopedPhoneInputs(parsedPhones, city?.municipalityId ?? null);
 
   const classification = classifyLead({
     name,
@@ -256,7 +317,8 @@ export function normalizeRawLead(
     city,
     cityFailure: cityResolution.ok ? null : `${cityResolution.reason}: ${cityResolution.detail}`,
     classification,
-    phoneCount: phones.filter((phone) => phone.valid !== false).length,
+    phoneCount: phones.filter((phone) => phone.valid !== false && phone.scope === 'business')
+      .length,
     score,
   };
 }
@@ -293,14 +355,19 @@ export function persistLead(
   const runId = options.runId ?? null;
   const sourceId = lead.sourceId ?? '';
 
-  const raw = saveRawRecord(db, {
-    sourceId,
-    sourceUrl: lead.sourceUrl,
-    payload: JSON.stringify(lead),
-    runId,
-    status: 'normalized',
-    seenAt: now,
-  });
+  // Every write below goes through `withWriteRetry`: a record that has already
+  // been fetched, parsed and validated is far too expensive to lose to another
+  // crawler holding the write lock, which is exactly how the pilot lost four.
+  const raw = withWriteRetry(() =>
+    saveRawRecord(db, {
+      sourceId,
+      sourceUrl: lead.sourceUrl,
+      payload: JSON.stringify(lead),
+      runId,
+      status: 'normalized',
+      seenAt: now,
+    }),
+  );
 
   const provenance: Provenance = {
     sourceId,
@@ -310,8 +377,8 @@ export function persistLead(
     rawRecordId: raw.id,
   };
 
-  const result = upsertLead(db, normalized.input, provenance);
-  attachSource(db, result.leadId, provenance);
+  const result = withWriteRetry(() => upsertLead(db, normalized.input, provenance));
+  withWriteRetry(() => attachSource(db, result.leadId, provenance));
 
   const stored = getLead(db, result.leadId);
   /* c8 ignore next -- upsertLead just wrote it; this is a type narrowing, not a case */
@@ -328,17 +395,19 @@ export function persistLead(
     }),
   );
 
-  applyGrading(
-    db,
-    result.leadId,
-    {
-      classification: normalized.classification.label,
-      classificationConfidence: normalized.classification.confidence,
-      classificationEvidence: JSON.stringify(normalized.classification),
-      leadScore: rescored.score,
-      scoreBreakdown: JSON.stringify(rescored.components),
-    },
-    now,
+  withWriteRetry(() =>
+    applyGrading(
+      db,
+      result.leadId,
+      {
+        classification: normalized.classification.label,
+        classificationConfidence: normalized.classification.confidence,
+        classificationEvidence: JSON.stringify(normalized.classification),
+        leadScore: rescored.score,
+        scoreBreakdown: JSON.stringify(rescored.components),
+      },
+      now,
+    ),
   );
 
   return {
@@ -368,12 +437,14 @@ export function persistRejected(
   error: string,
   now: Date = new Date(),
 ): void {
-  saveRawRecord(db, {
-    sourceId,
-    sourceUrl,
-    payload: JSON.stringify(payload ?? null),
-    status: 'rejected',
-    validationError: error,
-    seenAt: now,
-  });
+  withWriteRetry(() =>
+    saveRawRecord(db, {
+      sourceId,
+      sourceUrl,
+      payload: JSON.stringify(payload ?? null),
+      status: 'rejected',
+      validationError: error,
+      seenAt: now,
+    }),
+  );
 }

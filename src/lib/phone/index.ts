@@ -8,6 +8,10 @@
 export { extractPhones, acceptedPhones, rejectedPhones } from './extract.js';
 export type { ExtractOptions } from './extract.js';
 export { normalizePhone } from './normalize.js';
+export { splitPhoneLabel } from './label.js';
+export type { SplitPhone } from './label.js';
+export { areaCodeCovers, labelNamesAnotherPlace, scopePhones } from './locality.js';
+export type { PhoneScope, ScopablePhone, ScopeContext } from './locality.js';
 export { toPhoneInput } from './to-phone-input.js';
 export { areaCodeFor, inferCityFromAreaCode, isDatasetAreaCode } from './serbian-numbering.js';
 export { isPhoneError } from './types.js';

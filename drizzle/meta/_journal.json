@@ -29,6 +29,13 @@
       "when": 1787254069762,
       "tag": "0003_enrichment_suggestions",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1787315869522,
+      "tag": "0004_phone_scope_and_run_heartbeat",
+      "breakpoints": true
     }
   ]
 }

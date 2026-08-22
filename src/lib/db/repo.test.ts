@@ -22,12 +22,15 @@ import {
   findByPhone,
   finishRun,
   getCrawlState,
+  heartbeatRun,
   getLead,
   isPhoneErased,
   leadContactClaims,
   leadPhoneClaims,
   leadSourceRows,
   promoteFieldValue,
+  reconcileAbandonedRuns,
+  rescopeLeadPhones,
   recordMerge,
   resolveLead,
   revertMerge,
@@ -157,6 +160,64 @@ describe('upsertLead — attaching a second sighting', () => {
     expect(phone?.rawVariants).toEqual(['064/123-4567', '+381 64 123 4567']);
     expect(phone?.sourceIds).toEqual(['portal-srbija', 'navidiku-rs']);
     expect(distinctSourceCount(db, first.leadId)).toBe(2);
+  });
+
+  it('does not attach on a number a listing published as another branch', () => {
+    // The `GDC S.R.M.A` case. The Belgrade listing prints the Kraljevo
+    // branch's number; the Kraljevo branch is a different business at a
+    // different address, and attaching it here would be irreversible.
+    const belgrade = upsertLead(
+      db,
+      lead('Srma group', {
+        cityId: 'beograd-zemun',
+        phones: [
+          { e164: '+381111234567', raw: '011 1234567', type: 'landline' },
+          { e164: '+381362345678', raw: '+381 36 2345678', type: 'landline', scope: 'branch' },
+        ],
+      }),
+      PORTAL,
+    );
+
+    const kraljevo = upsertLead(
+      db,
+      lead('GDC S.R.M.A', {
+        cityId: 'kraljevo',
+        phones: [{ e164: '+381362345678', raw: '+381 (0)36 234 5678', type: 'landline' }],
+      }),
+      {
+        sourceId: 'austrotherm-distributeri',
+        sourceUrl: 'https://www.austrotherm.rs/distributeri',
+      },
+    );
+
+    expect(kraljevo.created).toBe(true);
+    expect(kraljevo.leadId).not.toBe(belgrade.leadId);
+    // Nothing was thrown away: the Belgrade lead still carries the number.
+    expect(distinctPhones(db, belgrade.leadId).map((phone) => phone.e164)).toContain(
+      '+381362345678',
+    );
+    // It is simply not an identity any more.
+    expect(findByPhone(db, '+381362345678')?.id).toBe(kraljevo.leadId);
+  });
+
+  it("lets a later source promote a branch number to the business's own", () => {
+    const first = upsertLead(
+      db,
+      lead('Srma group', {
+        cityId: 'beograd-zemun',
+        phones: [{ e164: '+381362345678', raw: '+381 36 2345678', scope: 'branch' }],
+      }),
+      PORTAL,
+    );
+    upsertLead(
+      db,
+      lead('Srma group', {
+        leadId: first.leadId,
+        phones: [{ e164: '+381362345678', raw: '036 2345678', scope: 'business' }],
+      }),
+      PORTAL,
+    );
+    expect(distinctPhones(db, first.leadId)[0]?.scope).toBe('business');
   });
 
   it('matches on the website domain when no phone is shared', () => {
@@ -458,6 +519,44 @@ describe('crawl bookkeeping', () => {
     expect(run?.finishedAt).toBeInstanceOf(Date);
   });
 
+  it('writes off a run whose process is gone, and leaves a live one alone', () => {
+    // The pilot left two of eight rows stuck at `running` because those
+    // processes were killed. Nothing reconciled them, so every later
+    // run-statistics report counted a run that never finished.
+    const at = new Date('2026-08-21T10:00:00Z');
+    const abandoned = startRun(db, 'portal-srbija', { startedAt: at });
+    const live = startRun(db, 'navidiku-rs', { startedAt: at });
+
+    const later = new Date(at.getTime() + 60 * 60 * 1000);
+    heartbeatRun(db, live, new Date(later.getTime() - 5_000));
+
+    const reconciled = reconcileAbandonedRuns(db, { now: later });
+    expect(reconciled.map((run) => run.id)).toEqual([abandoned]);
+
+    const [dead] = db.select().from(crawlRuns).where(eq(crawlRuns.id, abandoned)).all();
+    expect(dead?.status).toBe('failed');
+    expect(dead?.error).toMatch(/abandoned/);
+    // Written off as of its last sign of life, not as of the reconciliation.
+    expect(dead?.finishedAt?.getTime()).toBe(at.getTime());
+
+    const [alive] = db.select().from(crawlRuns).where(eq(crawlRuns.id, live)).all();
+    expect(alive?.status).toBe('running');
+  });
+
+  it('is idempotent — a reconciled run is not reconciled again', () => {
+    const at = new Date('2026-08-21T10:00:00Z');
+    startRun(db, 'portal-srbija', { startedAt: at });
+    const later = new Date(at.getTime() + 60 * 60 * 1000);
+    expect(reconcileAbandonedRuns(db, { now: later })).toHaveLength(1);
+    expect(reconcileAbandonedRuns(db, { now: later })).toHaveLength(0);
+  });
+
+  it('never touches a run that finished', () => {
+    const runId = startRun(db, 'portal-srbija', { startedAt: new Date('2020-01-01T00:00:00Z') });
+    finishRun(db, runId, 'completed');
+    expect(reconcileAbandonedRuns(db)).toHaveLength(0);
+  });
+
   it('remembers where a scope got to so the next run resumes', () => {
     saveCrawlState(db, 'portal-srbija', 'category:termo-izolacija|city:novi-sad', {
       cursor: 'page=3',
@@ -662,6 +761,107 @@ describe('merge', () => {
     });
     revertMerge(db, mergeLogId);
     expect(() => revertMerge(db, mergeLogId)).toThrow(/already reverted/);
+  });
+});
+
+/* -------------------------------------------------------------------------- */
+
+describe('phone scope after a merge', () => {
+  /**
+   * `overture-places` files each branch of a chain as its own record with its
+   * own single phone, and the sweep then merges them. `ENMON` came out of the
+   * pilot as one Belgrade lead carrying twelve numbers — Valjevo, Šabac, Užice,
+   * Zaječar, Novi Sad, Kragujevac, Kraljevo — every one of them an identity
+   * that could pull another business in.
+   */
+  function belgradeHqAndOneBranch() {
+    const hq = upsertLead(
+      db,
+      lead('Enmon', {
+        cityId: 'beograd',
+        municipalityId: 'beograd',
+        phones: [{ e164: '+381111234567', raw: '011 1234567', type: 'landline' }],
+      }),
+      PORTAL,
+    );
+    const branch = upsertLead(
+      db,
+      lead('Enmon Kraljevo', {
+        cityId: 'kraljevo',
+        municipalityId: 'kraljevo',
+        phones: [{ e164: '+381362345678', raw: '036 2345678', type: 'landline' }],
+      }),
+      NAVIDIKU,
+    );
+    return { hq: hq.leadId, branch: branch.leadId };
+  }
+
+  it("demotes the branch's number once it lands on the Belgrade survivor", () => {
+    const { hq, branch } = belgradeHqAndOneBranch();
+    // Both are correct on their own leads: each is that address's own line.
+    expect(distinctPhones(db, branch).map((phone) => phone.scope)).toEqual(['business']);
+
+    recordMerge(db, {
+      survivingLeadId: hq,
+      mergedLeadId: branch,
+      signal: 'name_city',
+      signalValue: 'enmon',
+    });
+
+    const scopes = new Map(distinctPhones(db, hq).map((phone) => [phone.e164, phone.scope]));
+    expect(scopes.get('+381111234567')).toBe('business');
+    expect(scopes.get('+381362345678')).toBe('branch');
+    // Demoted, not dropped. The phone is the deliverable.
+    expect(scopes.size).toBe(2);
+  });
+
+  it('puts the scope back when the merge is reverted', () => {
+    const { hq, branch } = belgradeHqAndOneBranch();
+    const merge = recordMerge(db, {
+      survivingLeadId: hq,
+      mergedLeadId: branch,
+      signal: 'name_city',
+      signalValue: 'enmon',
+    });
+    revertMerge(db, merge.mergeLogId, 'test');
+    expect(distinctPhones(db, branch).map((phone) => phone.scope)).toEqual(['business']);
+  });
+
+  it('leaves an ordinary same-city merge entirely alone', () => {
+    const first = upsertLead(
+      db,
+      lead('Fasade Novak', {
+        cityId: 'novi-sad',
+        municipalityId: 'novi-sad',
+        phones: [{ e164: '+381214567890', raw: '021/456-7890', type: 'landline' }],
+      }),
+      PORTAL,
+    );
+    const second = upsertLead(
+      db,
+      lead('Fasade Novak doo', {
+        cityId: 'novi-sad',
+        municipalityId: 'novi-sad',
+        phones: [{ e164: '+381219876543', raw: '021/987-6543', type: 'landline' }],
+      }),
+      NAVIDIKU,
+    );
+    recordMerge(db, {
+      survivingLeadId: first.leadId,
+      mergedLeadId: second.leadId,
+      signal: 'name_city',
+      signalValue: 'fasade novak',
+    });
+    expect(distinctPhones(db, first.leadId).map((phone) => phone.scope)).toEqual([
+      'business',
+      'business',
+    ]);
+  });
+
+  it('is a no-op on a lead that has no phones, or none to change', () => {
+    const empty = upsertLead(db, lead('Bez telefona', { cityId: 'nis' }), PORTAL);
+    expect(rescopeLeadPhones(db, empty.leadId)).toEqual([]);
+    expect(rescopeLeadPhones(db, 99_999)).toEqual([]);
   });
 });
 

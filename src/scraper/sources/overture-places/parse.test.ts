@@ -61,12 +61,22 @@ describe('toRawLead', () => {
     expect(record.city).toBe('Нови Сад');
   });
 
-  it('points every record at its release and its GERS id', () => {
+  it('points every record at a browsable map view of its GERS id', () => {
     const row = byName('Merkur Impex');
     const record = lead(row);
-    expect(record.sourceUrl).toBe(placeUrl(row.id, RELEASE));
-    expect(record.sourceUrl).toContain(RELEASE);
-    expect(record.sourceUrl.endsWith(row.id)).toBe(true);
+    expect(record.sourceUrl).toBe(
+      placeUrl(
+        row.id,
+        row.latitude === null || row.longitude === null
+          ? undefined
+          : { latitude: row.latitude, longitude: row.longitude },
+      ),
+    );
+    expect(new URL(record.sourceUrl).searchParams.get('feature')).toBe(`places.place.${row.id}`);
+    // The release is provenance and stays on the record — but not in the URL,
+    // so a monthly release does not invalidate every stored `source_url`.
+    expect(record.sourceUrl).not.toContain(RELEASE);
+    expect(record.extra?.release).toBe(RELEASE);
     expect(record.extra?.gersId).toBe(row.id);
   });
 

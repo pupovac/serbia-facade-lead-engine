@@ -68,6 +68,19 @@ export type LeadStatus = (typeof LEAD_STATUSES)[number];
 export const PHONE_TYPES = ['mobile', 'landline', 'toll_free', 'voip', 'unknown'] as const;
 export type PhoneType = (typeof PHONE_TYPES)[number];
 
+/**
+ * Whose line this is: the business at this address, or another branch of it.
+ *
+ * One directory listing routinely prints a company's whole switchboard —
+ * `021 xxxx xxx, CENTRALA BEČEJ` next to a Belgrade address. Both numbers are
+ * real and both are kept, but only a `business` number is an **identity**: a
+ * `branch` number never matches two leads together, which is what stopped four
+ * genuine `GDC S.R.M.A` branch leads from being merged into the Belgrade one.
+ * See `src/lib/phone/locality.ts`.
+ */
+export const PHONE_SCOPES = ['business', 'branch'] as const;
+export type PhoneScope = (typeof PHONE_SCOPES)[number];
+
 /** Everything reachable that is not a phone number. */
 export const CONTACT_KINDS = [
   'email',
@@ -291,6 +304,16 @@ export const crawlRuns = sqliteTable(
       .references(() => sources.id),
     startedAt: timestamp('started_at').notNull(),
     finishedAt: timestamp('finished_at'),
+    /**
+     * Last sign of life from the process that owns this run.
+     *
+     * A killed crawler leaves `status = 'running'` behind forever, and run
+     * statistics then silently include a row that never finished — two of the
+     * pilot's eight rows were stuck that way. The heartbeat is what lets the
+     * next startup tell an abandoned run from a live concurrent one. See
+     * `reconcileAbandonedRuns`.
+     */
+    heartbeatAt: timestamp('heartbeat_at'),
     status: text('status', { enum: RUN_STATUSES }).notNull().default('running'),
     /** `manual` | `scheduled` | `backfill` — free text, the orchestrator owns the vocabulary. */
     trigger: text('trigger').notNull().default('manual'),
@@ -467,6 +490,10 @@ export const leadPhones = sqliteTable(
     /** `064 123 4567` — the form a Serbian salesperson dials. */
     nationalFormat: text('national_format'),
     type: text('type', { enum: PHONE_TYPES }).notNull().default('unknown'),
+    /** `business` (this address's line) or `branch` (another location's). */
+    scope: text('scope', { enum: PHONE_SCOPES }).notNull().default('business'),
+    /** The department or branch printed next to it — `PRODAJA`, `CENTRALA BEČEJ`. */
+    label: text('label'),
     isPrimary: boolean('is_primary').notNull().default(false),
     valid: boolean('valid').notNull().default(true),
     confidence: real('confidence'),
@@ -483,6 +510,7 @@ export const leadPhones = sqliteTable(
     index('lead_phones_lead_idx').on(t.leadId),
     uniqueIndex('lead_phones_claim_idx').on(t.leadId, t.e164, t.sourceId),
     oneOf('lead_phones_type_check', 'type', PHONE_TYPES),
+    oneOf('lead_phones_scope_check', 'scope', PHONE_SCOPES),
   ],
 );
 

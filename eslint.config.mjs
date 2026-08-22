@@ -5,7 +5,7 @@ import prettier from 'eslint-config-prettier';
 
 export default tseslint.config(
   {
-    ignores: ['node_modules/**', '.next/**', 'dist/**', 'coverage/**', 'next-env.d.ts'],
+    ignores: ['node_modules/**', '.next/**', 'dist/**', 'coverage/**', 'tmp/**', 'next-env.d.ts'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

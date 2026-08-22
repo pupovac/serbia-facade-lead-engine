@@ -46,6 +46,7 @@ export {
 } from './finder.js';
 export { countBusinesses, readPage, stripPageLabel, type ReadPageOptions } from './page.js';
 export { runEnrichment, SUGGESTION_SAMPLE } from './run.js';
+export { DEFAULT_ENRICHMENT_PATH } from './run.js';
 export type { EnrichmentPath, EnrichRunOptions, EnrichSummary, SuggestionSample } from './run.js';
 export {
   ENRICHMENT_SOURCE_IDS,

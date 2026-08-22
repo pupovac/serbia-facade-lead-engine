@@ -229,6 +229,78 @@ describe('normalizeRawLead', () => {
   });
 });
 
+describe('normalizeRawLead — a listing that prints a whole switchboard', () => {
+  /**
+   * `portal-srbija`'s `Srma group` record, as it sits in the pilot's
+   * `raw_records`: one Belgrade Zemun address, six numbers, five of them
+   * reaching branches in other cities. Stored flat, every one of them became an
+   * identity for the Belgrade lead, and the sweep then merged the four genuine
+   * branch leads into it.
+   */
+  const SRMA = raw({
+    name: 'Srma group',
+    city: 'Beograd Zemun',
+    address: 'Vojni put 165 c/II',
+    phones: [
+      '011 1234567',
+      '+381 36 2345678',
+      '+381 15 2345678',
+      '+381 18 2345678',
+      '+381 17 2345678',
+    ],
+  });
+
+  it('keeps every number — the phone is the deliverable', () => {
+    const normalized = normalizeRawLead(SRMA, {}, NOW);
+    expect(normalized.input.phones).toHaveLength(5);
+    expect(normalized.input.phones?.every((phone) => phone.valid !== false)).toBe(true);
+  });
+
+  it("scopes the four other branches out of this lead's identity", () => {
+    const normalized = normalizeRawLead(SRMA, {}, NOW);
+    const scopes = (normalized.input.phones ?? []).map((phone) => `${phone.e164} ${phone.scope}`);
+    expect(scopes).toEqual([
+      '+381111234567 business',
+      '+381362345678 branch',
+      '+381152345678 branch',
+      '+381182345678 branch',
+      '+381172345678 branch',
+    ]);
+    // Counted as one line the business answers, not five.
+    expect(normalized.phoneCount).toBe(1);
+  });
+
+  it('makes the local number primary, so the export dials Belgrade', () => {
+    const normalized = normalizeRawLead(SRMA, {}, NOW);
+    expect(normalized.input.phones?.filter((phone) => phone.isPrimary)).toHaveLength(1);
+    expect(normalized.input.phones?.find((phone) => phone.isPrimary)?.e164).toBe('+381111234567');
+  });
+
+  it('reads a labelled branch number even when it is the only one on the record', () => {
+    const normalized = normalizeRawLead(
+      raw({ name: 'Rapid', city: 'Beograd', phones: ['021 2345678, CENTRALA BEČEJ'] }),
+      {},
+      NOW,
+    );
+    const [phone] = normalized.input.phones ?? [];
+    expect(phone?.e164).toBe('+381212345678');
+    expect(phone?.label).toBe('CENTRALA BEČEJ');
+    expect(phone?.scope).toBe('branch');
+  });
+
+  it('leaves an ordinary single-branch record entirely alone', () => {
+    const normalized = normalizeRawLead(
+      raw({ city: 'Novi Sad', phones: ['021/456-789', '064 123 4567'] }),
+      {},
+      NOW,
+    );
+    expect((normalized.input.phones ?? []).map((phone) => phone.scope)).toEqual([
+      'business',
+      'business',
+    ]);
+  });
+});
+
 describe('persistLead', () => {
   it('writes the lead, the raw record and the provenance', () => {
     const lead = raw({ city: 'Novi Sad', phones: ['021/456-789'] });

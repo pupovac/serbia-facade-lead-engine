@@ -69,15 +69,49 @@ export function partUrl(key: string): string {
   return `${BUCKET_URL}${key}`;
 }
 
+/** Overture's own map viewer — the one place a GERS id renders as a business. */
+export const EXPLORER_URL = 'https://explore.overturemaps.org/';
+
+/**
+ * The zoom a deep link opens at. High enough that the places layer is on (it
+ * has `minzoom: 14`) and the pin is unambiguous on a city street.
+ */
+const EXPLORER_ZOOM = 18;
+
 /**
  * Where a record points back to.
  *
- * A bulk dataset has no per-record web page, and inventing one would be worse
- * than admitting that: the honest provenance of an Overture record is the
- * release it came from plus its GERS id, which is exactly what this encodes.
- * Re-query that release for that id and you get the row this lead was built
- * from — which is what `sourceUrl` is for.
+ * This used to be the S3 prefix with the GERS id in the fragment. It was
+ * honest provenance and completely unusable: FUZZ-22's spot check could not
+ * verify **6 of its 30 sampled leads** because there was nothing to open, and
+ * 607 of this source's 1,638 leads carry no website either, so for those there
+ * was no page a reviewer could reach at all.
+ *
+ * So a record now points at Overture's own explorer, deep-linked to the
+ * feature. The `feature` parameter is `<source>.<sourceLayer>.<gersId>`, which
+ * is what the viewer reads to select and inspect a place; the hash is
+ * `#zoom/lat/lng`, which is what it reads to centre the map. Provenance is not
+ * lost — the GERS id is right there in the URL, and the release stays on the
+ * record in `extra.release`.
+ *
+ * The release is deliberately **not** in the URL any more. It used to be, via
+ * the S3 path, which meant every monthly release changed every `source_url` and
+ * an incremental re-run could not recognize a page it had already seen. A GERS
+ * id is stable across releases; the link now is too.
  */
-export function placeUrl(gersId: string, release: string = RELEASE): string {
-  return `${BUCKET_URL}${placesPrefix(release)}#${gersId}`;
+export function placeUrl(
+  gersId: string,
+  coordinates?: { readonly latitude: number; readonly longitude: number } | undefined,
+): string {
+  const params = new URLSearchParams({ feature: `places.place.${gersId}`, mode: 'inspect' });
+  const hash =
+    coordinates === undefined
+      ? ''
+      : `#${EXPLORER_ZOOM}/${round(coordinates.latitude)}/${round(coordinates.longitude)}`;
+  return `${EXPLORER_URL}?${params.toString()}${hash}`;
+}
+
+/** Six decimals is ~10 cm — more than a map link can use, and it keeps URLs stable. */
+function round(value: number): number {
+  return Math.round(value * 1e6) / 1e6;
 }
