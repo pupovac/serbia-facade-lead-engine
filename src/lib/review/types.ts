@@ -110,6 +110,12 @@ export interface LeadListQuery {
    * `UNCLASSIFIED`, because their names say nothing — the code is the only
    * thing that separates an architect from a builder from a fasader, so the
    * list has to be able to ask for one.
+   *
+   * Naming a code **includes the ruled-out leads**, the same way naming
+   * `OUT_OF_SCOPE` in `classifications` does. The classifier reads
+   * `71.11 Arhitektonska delatnost` as `general_construction` and rules out
+   * roughly a quarter of it, so a code filter that kept the default exclusion
+   * would silently truncate exactly the segment the filter exists to show.
    */
   readonly activityCode?: string | undefined;
   readonly sort?: LeadSortKey | undefined;

@@ -122,9 +122,59 @@ npm run scrape -- --source kompanije-net --query core widened --budget 25000
 npm run scrape -- --source kompanije-net --query 71.12             # one code
 ```
 
+**Run it in chunks, not as one long process.** FUZZ-46 measured a fresh process
+doing 1.6 s per record — the politeness delay and nothing else — and the _same_
+process doing 20–40 s per record a few hundred records in. The host is not the
+cause: `curl` against it stayed at 0.16 s throughout, and the run summary
+attributes the lost time to the fetch rather than to the rate limiter. It has
+not been diagnosed and it is not this adapter's code, so it is written down here
+rather than guessed at. The mitigation is free, because the scope cursor already
+makes a run resumable:
+
+```bash
+for i in $(seq 1 60); do
+  npm run scrape -- --source kompanije-net --query widened --limit 250 --budget 300
+done
+```
+
 An unrecognised `--query` **raises** rather than falling back to the core five:
 a run asked for `43.21` and given `43.31` would report numbers for a category
 nobody asked about.
+
+#### What the widened six actually yield — measured
+
+FUZZ-46 crawled a sample of each through the adapter and measured it. `23.64` is
+its whole population; the rest are the first N records in index order, which is
+alphabetical by registered name, so treat them as fill rates and not as a
+census. Re-derive with `scripts/fuzz46-per-code.ts`.
+
+| Code    | Sampled     | Phone     | Matični broj | Municipality | Sole traders | Dead (company subset) |
+| ------- | ----------- | --------- | ------------ | ------------ | ------------ | --------------------- |
+| `23.64` | 40 of 40    | **47.5%** | 100.0%       | 90.0%        | 37.5%        | 48.0% (12 of 25)      |
+| `41.20` | 432 of 5663 | **54.6%** | 99.3%        | 96.1%        | 48.3%        | 55.9% (124 of 222)    |
+| `43.33` | 255 of 2121 | **74.9%** | 98.8%        | 92.2%        | 86.1%        | 51.4% (18 of 35)      |
+| `46.73` | 350 of 1486 | **22.6%** | 98.6%        | 93.7%        | 6.1%         | 47.2% (153 of 324)    |
+| `71.11` | 252 of 499  | **58.3%** | 98.4%        | 96.4%        | 54.8%        | 52.7% (59 of 112)     |
+| `71.12` | 254 of 3286 | **65.0%** | 99.2%        | 98.4%        | 73.8%        | 54.5% (36 of 66)      |
+
+Three things in that table are worth reading twice.
+
+**`46.73` is the weakest code for phones and the strongest for company data.**
+22.6% phone fill against 63.9% on the core five — a builders' merchant is a
+company (94% of them), and this source is far better at reaching sole traders
+than at reaching companies. It is still the only code here that is a buyer group
+by definition, so its 1,486 records are worth having; expect ~340 phones from
+them, not ~950.
+
+**Dead-record rates run 47–56%, in line with FUZZ-45's 54.3%** — and they are
+computed over a much larger share of each code, because these codes are
+company-heavy. `41.20` is the worst at 55.9% of 222 company numbers. Same two
+limits as ever: it covers only records carrying a company registration number,
+and "dead" means deregistered, not unreachable.
+
+**The overlap against everything already crawled is ~0.** 5 of 255 in `43.33`,
+all decided on matični broj, and nothing at all in the other five. These codes
+do not restate the contractor corpus.
 
 #### Why `widened` is not name-filtered, and why FUZZ-45's yield metric is gone
 
@@ -155,6 +205,19 @@ through `src/lib/classify` on their name like any general directory record, and
 `23.64`, `71.11` and `71.12` are neither buyer group — they are a distinct
 segment, and `leads.activity_code` is what identifies them. **`UNCLASSIFIED` is
 not a failure for these records.**
+
+What that produces, measured on the same sample: `46.73` is 100%
+`CONSTRUCTION_MATERIAL_STORE` (the assertion), `41.20` and `43.33` are ~94%
+`UNCLASSIFIED` with a handful classified either way from their names, and
+`71.11` / `71.12` split between `UNCLASSIFIED` and `OUT_OF_SCOPE` —
+**69 of 252 and 113 of 254 respectively, all `general_construction`**. That is
+the classifier working as designed on a segment it was never meant to label, and
+it is why naming an activity code in the review UI overrides the default
+`OUT_OF_SCOPE` exclusion: a filter for `7111` that quietly dropped a quarter of
+`7111` would be showing a truncated version of the exact segment it exists for.
+`23.64` goes further — 27 of 40 read as `manufacturing`, which for a mortar
+producer is correct and not a problem: they are a partner list, not a buyer
+group.
 
 One extra guard, on the widened codes only: when the detail page prints a šifra
 that contradicts the index the record was found on, the assertion is **withdrawn**

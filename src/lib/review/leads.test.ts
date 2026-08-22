@@ -480,6 +480,22 @@ describe('the APR activity code', () => {
     expect(facets.activityCodes.reduce((sum, f) => sum + f.count, 0)).toBe(4);
   });
 
+  it('shows the leads the classifier ruled out, because the code was asked for', () => {
+    // `71.11 Arhitektonska delatnost` reads as `general_construction` to the
+    // classifier, which rules out about a quarter of the code. Hiding those
+    // from a filter whose whole job is to show that segment would be a
+    // silently truncated list.
+    add('BIRO ZA PROJEKTOVANJE', {
+      activityCode: '7111',
+      activityName: 'Arhitektonska delatnost',
+      classification: 'OUT_OF_SCOPE',
+      classificationIndustry: 'general_construction',
+    });
+    expect(listLeads(db, { activityCode: '7111' }).total).toBe(2);
+    // The default working set still hides it.
+    expect(listLeads(db, {}).rows.some((row) => row.name === 'BIRO ZA PROJEKTOVANJE')).toBe(false);
+  });
+
   it('offers one option per code even when two sources name it differently', () => {
     // A duplicated `value` would be a filter that offers the same thing twice
     // and two React keys that collide.

@@ -134,10 +134,17 @@ function buildWhere(query: LeadListQuery): SQL | undefined {
   if (query.cityId) predicates.push(eq(leads.cityId, query.cityId) as SQL);
   if (query.classifications && query.classifications.length > 0) {
     predicates.push(inArray(leads.classification, [...query.classifications]) as SQL);
-  } else if (query.includeOutOfScope !== true) {
+  } else if (query.includeOutOfScope !== true && query.activityCode == null) {
     // The default working set. A lead the classifier positively ruled out —
     // joinery, roofing, an EPS factory — is not a row a reviewer should have
     // to re-triage; asking for it by name is how you audit the exclusions.
+    //
+    // Naming an activity code is one of those explicit asks. It has to be: the
+    // classifier reads `71.11 Arhitektonska delatnost` as `general_construction`
+    // and rules out 69 of 252 sampled records, so a reviewer who filtered to
+    // `7111` and got the other 183 with no sign the rest existed would be
+    // reading a silently truncated list of exactly the segment they asked to
+    // see. `71.12` is worse — 113 of 254.
     predicates.push(ne(leads.classification, 'OUT_OF_SCOPE') as SQL);
   }
   if (query.status) predicates.push(eq(leads.status, query.status) as SQL);
