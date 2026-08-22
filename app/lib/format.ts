@@ -51,6 +51,8 @@ export const FIELD_LABELS: Record<string, string> = {
   registration_number: 'Matični broj',
   tax_id: 'PIB',
   coordinates: 'Koordinate',
+  activity_code: 'Šifra delatnosti',
+  activity_name: 'Naziv delatnosti',
 };
 
 export const CONTACT_LABELS: Record<string, string> = {

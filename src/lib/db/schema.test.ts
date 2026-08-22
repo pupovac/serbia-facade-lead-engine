@@ -83,6 +83,65 @@ describe('migration', () => {
     expect(names).toContain('lead_contacts_kind_value_idx');
     expect(names).toContain('leads_name_city_idx');
   });
+
+  it('indexes the activity code the review UI filters and groups on', () => {
+    expect(indexNames(open())).toContain('leads_activity_code_idx');
+  });
+
+  it('accepts the two activity provenance fields the CHECK had to be rebuilt for', () => {
+    const database = open();
+    database
+      .insert(sources)
+      .values({
+        id: 'kompanije-net',
+        name: 'Kompanije.net',
+        url: 'https://www.kompanije.net',
+        category: 'register',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .run();
+    const at = new Date('2026-08-22T10:00:00.000Z');
+    const leadId = database
+      .insert(leads)
+      .values({
+        name: 'Fasade Test',
+        nameNormalized: 'fasade test',
+        activityCode: '4331',
+        activityName: 'Malterisanje',
+        firstSeenAt: at,
+        lastSeenAt: at,
+        createdAt: at,
+        updatedAt: at,
+      })
+      .returning({ id: leads.id })
+      .get().id;
+
+    for (const [field, value] of [
+      ['activity_code', '4331'],
+      ['activity_name', 'Malterisanje'],
+    ] as const) {
+      expect(() =>
+        database.$client
+          .prepare(
+            `insert into lead_field_values
+               (lead_id, field, value, is_current, source_id, source_url, first_seen_at, last_seen_at)
+             values (?, ?, ?, 1, 'kompanije-net', 'https://www.kompanije.net/Srbija/x/1', 1, 1)`,
+          )
+          .run(leadId, field, value),
+      ).not.toThrow();
+    }
+    // And the CHECK is still a CHECK.
+    expect(() =>
+      database.$client
+        .prepare(
+          `insert into lead_field_values
+             (lead_id, field, value, is_current, source_id, source_url, first_seen_at, last_seen_at)
+           values (?, 'activity_sector', 'x', 1, 'kompanije-net', 'https://www.kompanije.net/Srbija/x/1', 1, 1)`,
+        )
+        .run(leadId),
+    ).toThrow(/CHECK constraint failed/i);
+  });
 });
 
 describe('constraints', () => {

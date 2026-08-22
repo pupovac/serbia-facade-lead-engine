@@ -260,6 +260,35 @@ describe('normalizeRawLead', () => {
  * contractor-only listing must not be scored on their name — the pilot's 84%
  * `UNCLASSIFIED` rate is what that produces.
  */
+describe('the APR activity category', () => {
+  it('carries both halves through untouched', () => {
+    const normalized = normalizeRawLead(
+      raw({ activityCode: '4331', activityName: 'Malterisanje' }),
+      {},
+      NOW,
+    );
+    expect(normalized.input.activityCode).toBe('4331');
+    expect(normalized.input.activityName).toBe('Malterisanje');
+  });
+
+  it('is null for every source that does not publish one', () => {
+    const normalized = normalizeRawLead(raw({}), {}, NOW);
+    expect(normalized.input.activityCode).toBeNull();
+    expect(normalized.input.activityName).toBeNull();
+  });
+
+  it('does not reconcile a code against the category the record was filed under', () => {
+    // `categories` says one thing, the code says another, and the pipeline is
+    // not the place that decides. Both survive to the database.
+    const normalized = normalizeRawLead(
+      raw({ activityCode: '3832', categories: ['Proizvodnja maltera'] }),
+      {},
+      NOW,
+    );
+    expect(normalized.input.activityCode).toBe('3832');
+  });
+});
+
 describe('source-asserted classification', () => {
   it('takes the source’s label instead of scoring a personal name', () => {
     const lead = raw({

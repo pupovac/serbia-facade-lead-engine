@@ -62,7 +62,9 @@ import {
   type Surface,
 } from './categories.js';
 import {
+  assertionFor,
   parseCompany,
+  parseCountryIndex,
   parseLegacyCategory,
   parseModernCategory,
   parseSectionIndex,
@@ -76,13 +78,16 @@ const BASE_URL = 'https://www.kompanije.net';
 const CATEGORY_BY_CODE = new Map(CATEGORIES.map((category) => [category.code, category]));
 
 /**
- * The `GRAĐEVINARSTVO` section index, which is where the category slugs live.
+ * The country index, which is where the *section* slugs live.
  *
- * The slugs carry diacritics and have changed shape before, so they are read
- * off this page rather than hard-coded — the stable half is the `l<id>_` prefix
- * and that is what the lookup keys on.
+ * FUZZ-45 addressed one section directly — `d4_GRA%C4%90EVINARSTVO.html`, every
+ * construction trade in one page. FUZZ-46's six codes sit in four different
+ * sections (`d4`, `d6 INDUSTRIJA`, `d20 TRGOVINA-NA-VELIKO`, `d24 USLUŽNE-
+ * DELATNOSTI`), and their slugs carry `Đ`, `Ž` and a Serbian digraph. Reading
+ * them off this page costs one request per run and removes four hard-coded
+ * strings that could each 404 a five-hour crawl.
  */
-const SECTION_INDEX_URL = `${BASE_URL}/Srbija/d4_GRA%C4%90EVINARSTVO.html`;
+const COUNTRY_INDEX_URL = `${BASE_URL}/Srbija/`;
 
 /** The legacy sole-trader index, addressed by the six-digit activity code. */
 const legacyIndexUrl = (code: string): string =>
@@ -91,33 +96,68 @@ const legacyIndexUrl = (code: string): string =>
 /** How often a category walk writes down where it got to. */
 const CURSOR_EVERY = 100;
 
+/**
+ * What a run counted, per activity code.
+ *
+ * Per code and not just per run, because that is the shape the question is
+ * asked in: `41.20` and `46.73` are company-heavy and their phone fill and dead
+ * -record rate are not the crawl's average. A single total would hide exactly
+ * the difference the numbers are being collected to see.
+ */
 interface Tally {
   emitted: number;
   withPhone: number;
   withRegistrationNumber: number;
   withTaxId: number;
   withWebsite: number;
+  withActivityCode: number;
   outOfScopeCity: number;
+  /** The page states a different code than the index filed the record under. */
   codeMismatch: number;
+  /** The category asserts a type and the page's own code withdrew the evidence. */
+  assertionSuppressed: number;
 }
 
-const tallies = new WeakMap<CrawlContext, Tally>();
+function emptyTally(): Tally {
+  return {
+    emitted: 0,
+    withPhone: 0,
+    withRegistrationNumber: 0,
+    withTaxId: 0,
+    withWebsite: 0,
+    withActivityCode: 0,
+    outOfScopeCity: 0,
+    codeMismatch: 0,
+    assertionSuppressed: 0,
+  };
+}
 
-function tallyOf(ctx: CrawlContext): Tally {
-  let tally = tallies.get(ctx);
+const tallies = new WeakMap<CrawlContext, Map<string, Tally>>();
+
+function tallyOf(ctx: CrawlContext, code: string): Tally {
+  let byCode = tallies.get(ctx);
+  if (byCode === undefined) {
+    byCode = new Map<string, Tally>();
+    tallies.set(ctx, byCode);
+  }
+  let tally = byCode.get(code);
   if (tally === undefined) {
-    tally = {
-      emitted: 0,
-      withPhone: 0,
-      withRegistrationNumber: 0,
-      withTaxId: 0,
-      withWebsite: 0,
-      outOfScopeCity: 0,
-      codeMismatch: 0,
-    };
-    tallies.set(ctx, tally);
+    tally = emptyTally();
+    byCode.set(code, tally);
   }
   return tally;
+}
+
+/** Every per-code tally plus the run total, for the closing log line. */
+function tallyReport(ctx: CrawlContext): Record<string, unknown> {
+  const byCode = tallies.get(ctx) ?? new Map<string, Tally>();
+  const total = emptyTally();
+  const perCode: Record<string, Tally> = {};
+  for (const [code, tally] of byCode) {
+    perCode[code] = tally;
+    for (const key of Object.keys(total) as (keyof Tally)[]) total[key] += tally[key];
+  }
+  return { total, perCode };
 }
 
 /**
@@ -179,34 +219,70 @@ function toItem(
   };
 }
 
-/** Fetch the section index once per run and resolve every wanted category URL. */
+/**
+ * Resolve every wanted category's page URL: country index, then one section
+ * index per section the run actually needs.
+ *
+ * Two requests for a core-five run, five for the widened six — against 13,095
+ * detail fetches. Both hops assert loudly, and the second one names the codes
+ * that went missing: a crawl that quietly skipped `71.12` would report a
+ * healthy run 3,286 records short and nothing in the log would say which.
+ */
 async function modernCategoryUrls(
   ctx: CrawlContext,
   categories: readonly ActivityCategory[],
 ): Promise<Map<string, string>> {
-  const { $, finalUrl } = await ctx.http.html(SECTION_INDEX_URL);
-  const byListId = parseSectionIndex($, finalUrl);
+  const country = await ctx.http.html(COUNTRY_INDEX_URL);
+  const sectionUrls = parseCountryIndex(country.$, country.finalUrl);
   ctx.expect(
-    byListId.size === 0 ? null : [...byListId.keys()],
-    'a.cat-list[href*="/l<id>_"]',
-    finalUrl,
-    'the GRAĐEVINARSTVO activity-code index',
+    sectionUrls.size === 0 ? null : [...sectionUrls.keys()],
+    'a.cat-link[href*="/d<id>_"]',
+    country.finalUrl,
+    'the country index of activity sections',
   );
+
+  const sectionIds = [...new Set(categories.map((category) => category.sectionId))];
+  const missingSections = sectionIds.filter((id) => !sectionUrls.has(id));
+  if (missingSections.length > 0) {
+    ctx.expect(
+      null,
+      `section links ${missingSections.join(', ')}`,
+      country.finalUrl,
+      'a section link for every activity code this run crawls',
+    );
+  }
+
+  const byListId = new Map<string, string>();
+  for (const sectionId of sectionIds) {
+    const sectionUrl = sectionUrls.get(sectionId) as string;
+    const { $, finalUrl } = await ctx.http.html(sectionUrl);
+    const inSection = parseSectionIndex($, finalUrl);
+    ctx.expect(
+      inSection.size === 0 ? null : [...inSection.keys()],
+      'a.cat-list[href*="/l<id>_"]',
+      finalUrl,
+      `the ${sectionId} activity-code index`,
+    );
+    for (const [listId, url] of inSection) if (!byListId.has(listId)) byListId.set(listId, url);
+    ctx.log.info('activity-code index read', {
+      url: finalUrl,
+      section: sectionId,
+      categoriesOnPage: inSection.size,
+      crawling: categories
+        .filter((category) => category.sectionId === sectionId)
+        .map((category) => `${category.listId}=${category.code}`),
+    });
+  }
 
   const missing = categories.filter((category) => !byListId.has(category.listId));
   if (missing.length > 0) {
     ctx.expect(
       null,
       missing.map((category) => `${category.listId} (${category.code})`).join(', '),
-      finalUrl,
+      country.finalUrl,
       'a category link for every activity code this adapter crawls',
     );
   }
-  ctx.log.info('activity-code index read', {
-    url: finalUrl,
-    categoriesOnPage: byListId.size,
-    crawling: categories.map((category) => `${category.listId}=${category.code}`),
-  });
   return byListId;
 }
 
@@ -289,18 +365,19 @@ async function* discover(ctx: CrawlContext): AsyncIterable<DiscoveredItem> {
   const categories = selectCategories(ctx.scope.queries);
   const surfaces = selectSurfaces(ctx.scope.queries);
 
-  // The section index is only worth fetching if some modern category is
-  // actually due a walk. A second run the same afternoon should cost zero
-  // requests, not one — the difference matters because a run that finds
-  // nothing to do is exactly the run that happens most often.
-  const needsSectionIndex =
-    surfaces.includes('modern') &&
-    categories.some(
-      (category) => !ctx.state.resume(scopeKeyOf(category, 'modern'), ctx.scope, ctx.now()).skip,
-    );
-  const modernUrls: Map<string, string> = needsSectionIndex
-    ? await modernCategoryUrls(ctx, categories)
-    : new Map();
+  // The index chain is only worth fetching for the modern categories actually
+  // due a walk — and if there are none, not at all. A second run the same
+  // afternoon should cost zero requests, not two, and a resumed run that has
+  // three of six codes left should not re-read the other three's section index.
+  // The difference matters because a run that finds nothing to do is exactly
+  // the run that happens most often.
+  const dueAWalk = surfaces.includes('modern')
+    ? categories.filter(
+        (category) => !ctx.state.resume(scopeKeyOf(category, 'modern'), ctx.scope, ctx.now()).skip,
+      )
+    : [];
+  const modernUrls: Map<string, string> =
+    dueAWalk.length === 0 ? new Map() : await modernCategoryUrls(ctx, dueAWalk);
 
   try {
     for (const category of categories) {
@@ -318,16 +395,7 @@ async function* discover(ctx: CrawlContext): AsyncIterable<DiscoveredItem> {
       }
     }
   } finally {
-    const tally = tallyOf(ctx);
-    ctx.log.info('kompanije-net walk stopped', {
-      recordsEmitted: tally.emitted,
-      withPhone: tally.withPhone,
-      withRegistrationNumber: tally.withRegistrationNumber,
-      withTaxId: tally.withTaxId,
-      withWebsite: tally.withWebsite,
-      skippedOutOfScopeCity: tally.outOfScopeCity,
-      activityCodeMismatches: tally.codeMismatch,
-    });
+    ctx.log.info('kompanije-net walk stopped', tallyReport(ctx));
   }
 }
 
@@ -348,7 +416,7 @@ async function extract(item: DiscoveredItem, ctx: CrawlContext): Promise<readonl
 
   const { $, finalUrl } = await ctx.http.html(item.url);
   const page = parseCompany($, finalUrl, ctx.expect);
-  const tally = tallyOf(ctx);
+  const tally = tallyOf(ctx, category.code);
 
   if (!inScope(page.place, page.municipality, ctx.scope.municipalities)) {
     tally.outOfScopeCity += 1;
@@ -361,11 +429,15 @@ async function extract(item: DiscoveredItem, ctx: CrawlContext): Promise<readonl
   }
 
   // The index filed this record under one code and the page prints another.
-  // Not a reason to drop it — the page's own code is the one that reaches the
-  // record — but a count worth seeing, because a steady rate of these means the
-  // index and the detail pages are different vintages of the same register.
+  // Not a reason to drop it — both are kept, the page's on the lead and the
+  // index's in `extra` — but a count worth seeing, because a steady rate of
+  // these means the index and the detail pages are different vintages of the
+  // same register. It is also what withdraws an assertion; see `assertionFor`.
   if (page.activityCode !== null && page.activityCode !== category.sifra) {
     tally.codeMismatch += 1;
+    if (category.assertedType !== null && assertionFor(page, category) === null) {
+      tally.assertionSuppressed += 1;
+    }
     ctx.log.debug('record activity code differs from the category it was found in', {
       url: finalUrl,
       category: category.sifra,
@@ -378,6 +450,7 @@ async function extract(item: DiscoveredItem, ctx: CrawlContext): Promise<readonl
   if (page.registrationNumber !== null) tally.withRegistrationNumber += 1;
   if (page.taxId !== null) tally.withTaxId += 1;
   if (page.website !== null) tally.withWebsite += 1;
+  if (page.activityCode !== null) tally.withActivityCode += 1;
 
   return [
     toRawLead(page, finalUrl, {
@@ -392,23 +465,27 @@ const adapter: SourceAdapter = {
   id: 'kompanije-net',
   name: 'Kompanije.net — Srbija',
   baseUrl: BASE_URL,
-  // The five core codes are contractor trades. The store-side codes (46.73,
-  // 47.52, 46.74) are the same adapter shape and a separate issue, which is why
-  // only one type is declared here.
-  leadTypes: ['FACADE_CONTRACTOR'],
+  // The five core codes are contractor trades; `46.73 Trgovina na veliko drvetom
+  // i građevinskim materijalom` is buyer group 2 by definition of the code, so
+  // this adapter now yields both. The other two store codes (`47.52` l483,
+  // 2,166 records; `46.74` l549, 925) stay parked — nobody has asked for them.
+  leadTypes: ['FACADE_CONTRACTOR', 'CONSTRUCTION_MATERIAL_STORE'],
   category: 'APR-derived national business directory, indexed by KD-2010 activity code',
   requiresJs: false,
-  // The ceiling this adapter will accept, sized for ~9,830 core-code detail
-  // pages plus five index fetches. It does *not* raise anything on its own:
+  // The ceiling this adapter will accept, sized for one complete walk of every
+  // code in the table: ~9,830 core + 13,095 widened + 880 adjacent detail
+  // pages, plus the index chain and headroom. It does *not* raise anything on
+  // its own:
   // `resolveConfig` takes the **smaller** of adapter and environment, so the
-  // 5,000 default still wins and a full crawl needs `--budget 12000` on the
-  // command line. What this line does is refuse a budget larger than one full
-  // walk — a fuse for a discovery loop that stops terminating.
+  // 5,000 default still wins and a full core+widened crawl needs
+  // `--budget 25000` on the command line. What this line does is refuse a
+  // budget larger than one full walk — a fuse for a discovery loop that stops
+  // terminating.
   //
   // `requestDelayMs` is deliberately left alone: the framework default of 1.5 s
   // is already gentler than the ≤1 req/s this source was cleared for, and an
   // adapter may only ask for gentler, never faster.
-  config: { requestBudget: 12_000 },
+  config: { requestBudget: 26_000 },
   // The site publishes no email of its own — its footer carries region links
   // and a `kontakt.php` form — and the record block holds no anchors at all,
   // so there is nothing here for a lead to inherit.

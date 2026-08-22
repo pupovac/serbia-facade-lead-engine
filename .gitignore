@@ -12,6 +12,13 @@ build/
 
 # database — SQLite is the system of record but the file itself is local
 data/*.sqlite
+data/**/*.sqlite
+# baseline snapshots taken before a measured crawl (scripts/fuzz46-per-code.ts)
+data/fuzz46/
+# throwaway measurement drivers; the reproducible commands live in the script
+# they drive, not at the repo root
+run-*.sh
+shots-*.ts
 data/*.sqlite-journal
 data/*.sqlite-wal
 data/*.sqlite-shm

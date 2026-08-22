@@ -12,6 +12,12 @@
  * hold". Both are sortable and filterable on their own — see `SORT_COLUMNS`
  * and `buildWhere` — because the single folded score put `UNKNOWN` rows in a
  * third of the owner's top 200.
+ *
+ * `activity_code` is filterable for the same reason one step further out. Most
+ * of what `kompanije-net`'s widened codes publish is a registered name and a
+ * phone, and a name like `GRADNJA DOO` classifies as nothing; the code the
+ * state filed the business under is the only thing that tells an architect from
+ * a general builder from a fasader, so it is a `where`, not a display column.
  */
 import {
   and,
@@ -128,10 +134,17 @@ function buildWhere(query: LeadListQuery): SQL | undefined {
   if (query.cityId) predicates.push(eq(leads.cityId, query.cityId) as SQL);
   if (query.classifications && query.classifications.length > 0) {
     predicates.push(inArray(leads.classification, [...query.classifications]) as SQL);
-  } else if (query.includeOutOfScope !== true) {
+  } else if (query.includeOutOfScope !== true && query.activityCode == null) {
     // The default working set. A lead the classifier positively ruled out —
     // joinery, roofing, an EPS factory — is not a row a reviewer should have
     // to re-triage; asking for it by name is how you audit the exclusions.
+    //
+    // Naming an activity code is one of those explicit asks. It has to be: the
+    // classifier reads `71.11 Arhitektonska delatnost` as `general_construction`
+    // and rules out 69 of 252 sampled records, so a reviewer who filtered to
+    // `7111` and got the other 183 with no sign the rest existed would be
+    // reading a silently truncated list of exactly the segment they asked to
+    // see. `71.12` is worse — 113 of 254.
     predicates.push(ne(leads.classification, 'OUT_OF_SCOPE') as SQL);
   }
   if (query.status) predicates.push(eq(leads.status, query.status) as SQL);
@@ -153,6 +166,7 @@ function buildWhere(query: LeadListQuery): SQL | undefined {
     );
     predicates.push((query.hasPhone ? hasValidPhone : sql`not ${hasValidPhone}`) as SQL);
   }
+  if (query.activityCode) predicates.push(eq(leads.activityCode, query.activityCode) as SQL);
   if (query.sourceId) {
     predicates.push(
       exists(
@@ -237,6 +251,8 @@ export function listLeads(db: Executor, query: LeadListQuery = {}): LeadListPage
       contactabilityScore: leads.contactabilityScore,
       leadScore: leads.leadScore,
       status: leads.status,
+      activityCode: leads.activityCode,
+      activityName: leads.activityName,
       reviewedAt: leads.reviewedAt,
       lastSeenAt: leads.lastSeenAt,
     })
@@ -396,6 +412,36 @@ export function leadFacets(db: Executor): LeadFacets {
     )
     .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, 'sr'));
 
+  // `4331 — Malterisanje`, ordered by how many leads carry the code. Read from
+  // the data like every other facet: the vocabulary is whatever the crawls
+  // actually filed, not a list of KD-2010 codes baked into a component.
+  const activityCodes = db
+    // Grouped by the **code** alone, with the name picked by aggregate. Two
+    // sources filing one code under slightly different names would otherwise
+    // produce two options carrying the same value — a filter that offers the
+    // same thing twice and two React keys that collide.
+    .select({
+      value: leads.activityCode,
+      name: sql<string | null>`max(${leads.activityName})`,
+      count: count(),
+    })
+    .from(leads)
+    .where(ACTIVE)
+    .groupBy(leads.activityCode)
+    .orderBy(desc(count()))
+    .all()
+    .flatMap((row) =>
+      row.value == null
+        ? []
+        : [
+            toFacet(
+              row.value,
+              row.name == null ? row.value : `${row.value} — ${row.name}`,
+              row.count,
+            ),
+          ],
+    );
+
   const sourceRows = db
     .select({
       value: leadSources.sourceId,
@@ -411,7 +457,7 @@ export function leadFacets(db: Executor): LeadFacets {
     .all()
     .map((row) => toFacet(row.value, row.name, row.count));
 
-  return { classifications, statuses, municipalities, sources: sourceRows };
+  return { classifications, statuses, municipalities, sources: sourceRows, activityCodes };
 }
 
 /** Resolve a lead id to the row it lives on today, following a merge tombstone. */

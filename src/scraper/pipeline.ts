@@ -268,6 +268,11 @@ export function normalizeRawLead(
     longitude: lead.longitude ?? null,
     description: trimOrNull(lead.description),
     openingHours: trimOrNull(lead.openingHours),
+    // Carried through untouched. There is no rule to apply: the code is the
+    // source's own statement about the business, and reconciling it against
+    // another register is a later pass's decision, not this one's.
+    activityCode: trimOrNull(lead.activityCode),
+    activityName: trimOrNull(lead.activityName),
     leadScore: score.score,
     scoreBreakdown: JSON.stringify(score.components),
     relevanceScore: score.relevance,

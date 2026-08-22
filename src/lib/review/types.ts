@@ -49,6 +49,10 @@ export interface LeadListRow {
   readonly sourceCount: number;
   readonly hasWebsite: boolean;
   readonly hasEmail: boolean;
+  /** APR activity code, `4331`. Null for every source that does not publish one. */
+  readonly activityCode: string | null;
+  /** The source's own name for that code, `Malterisanje`. What the column shows. */
+  readonly activityName: string | null;
   readonly reviewedAt: Date | null;
   readonly lastSeenAt: Date;
 }
@@ -98,6 +102,22 @@ export interface LeadListQuery {
   readonly hasPhone?: boolean | undefined;
   /** A `sources.id` that has seen this lead. */
   readonly sourceId?: string | undefined;
+  /**
+   * APR activity code, exactly as stored: `4331`.
+   *
+   * The whole reason FUZZ-46 carried the field to the database. `71.11
+   * Arhitektonska delatnost` and `41.20 Izgradnja zgrada` mostly land
+   * `UNCLASSIFIED`, because their names say nothing — the code is the only
+   * thing that separates an architect from a builder from a fasader, so the
+   * list has to be able to ask for one.
+   *
+   * Naming a code **includes the ruled-out leads**, the same way naming
+   * `OUT_OF_SCOPE` in `classifications` does. The classifier reads
+   * `71.11 Arhitektonska delatnost` as `general_construction` and rules out
+   * roughly a quarter of it, so a code filter that kept the default exclusion
+   * would silently truncate exactly the segment the filter exists to show.
+   */
+  readonly activityCode?: string | undefined;
   readonly sort?: LeadSortKey | undefined;
   readonly direction?: SortDirection | undefined;
   /** 1-based. Out-of-range pages clamp to the last one. */
@@ -133,6 +153,13 @@ export interface LeadFacets {
   readonly statuses: readonly Facet[];
   readonly municipalities: readonly Facet[];
   readonly sources: readonly Facet[];
+  /**
+   * Activity codes present in the data, labelled `4331 — Malterisanje`.
+   *
+   * Empty until a register-derived source has run, which is the honest state:
+   * an empty filter is a filter with nothing to offer, not a broken one.
+   */
+  readonly activityCodes: readonly Facet[];
 }
 
 /** One source URL a business was seen at, with whether it is worth linking to. */

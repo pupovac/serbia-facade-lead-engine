@@ -74,6 +74,26 @@ export const rawLeadSchema = z.object({
   categories: z.array(z.string().min(1)).default([]),
 
   /**
+   * The APR (KD-2010) activity code the page printed, four digits, no dot.
+   *
+   * Only a register-derived source has one; every other adapter leaves both of
+   * these unset and the columns stay null. Store **what the page said** — a
+   * code that disagrees with the category the record was discovered under, or
+   * with APR's own open data, is a fact worth keeping, not one to reconcile at
+   * write time.
+   *
+   * Deliberately typed as a string rather than a four-digit pattern. The shape
+   * is the adapter's business, because only the adapter knows how its source
+   * prints one, and a record whose activity code came out malformed must still
+   * reach the database: it carries a phone number, and the phone number is the
+   * deliverable. `kompanije-net` emits this field only when the page's value is
+   * digits, and logs the ones it drops.
+   */
+  activityCode: z.string().trim().min(1).nullish(),
+  /** The source's own name for that code: `Malterisanje`. */
+  activityName: z.string().trim().min(1).nullish(),
+
+  /**
    * The classification the **source** establishes, for a listing that is
    * pre-filtered by trade.
    *
