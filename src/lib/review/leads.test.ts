@@ -480,6 +480,16 @@ describe('the APR activity code', () => {
     expect(facets.activityCodes.reduce((sum, f) => sum + f.count, 0)).toBe(4);
   });
 
+  it('offers one option per code even when two sources name it differently', () => {
+    // A duplicated `value` would be a filter that offers the same thing twice
+    // and two React keys that collide.
+    add('MALTER 1', { activityCode: '2364', activityName: 'Proizvodnja maltera' });
+    add('MALTER 2', { activityCode: '2364', activityName: 'Proizvodnja maltera i betona' });
+    const codes = leadFacets(db).activityCodes.filter((f) => f.value === '2364');
+    expect(codes).toHaveLength(1);
+    expect(codes[0]?.count).toBe(2);
+  });
+
   it('has an empty facet when nothing in the database carries a code', () => {
     const empty = openTestDatabase();
     try {

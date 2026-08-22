@@ -18,6 +18,7 @@ data/fuzz46/
 # throwaway measurement drivers; the reproducible commands live in the script
 # they drive, not at the repo root
 run-*.sh
+shots-*.ts
 data/*.sqlite-journal
 data/*.sqlite-wal
 data/*.sqlite-shm

@@ -409,10 +409,18 @@ export function leadFacets(db: Executor): LeadFacets {
   // the data like every other facet: the vocabulary is whatever the crawls
   // actually filed, not a list of KD-2010 codes baked into a component.
   const activityCodes = db
-    .select({ value: leads.activityCode, name: leads.activityName, count: count() })
+    // Grouped by the **code** alone, with the name picked by aggregate. Two
+    // sources filing one code under slightly different names would otherwise
+    // produce two options carrying the same value — a filter that offers the
+    // same thing twice and two React keys that collide.
+    .select({
+      value: leads.activityCode,
+      name: sql<string | null>`max(${leads.activityName})`,
+      count: count(),
+    })
     .from(leads)
     .where(ACTIVE)
-    .groupBy(leads.activityCode, leads.activityName)
+    .groupBy(leads.activityCode)
     .orderBy(desc(count()))
     .all()
     .flatMap((row) =>
