@@ -26,6 +26,27 @@ companies in the same codes in APR's own open data**. The ~7,540 difference is
 preduzetnici, the population APR open data does not cover and this project calls
 its largest structural coverage gap.
 
+FUZZ-45 sampled 2,000 of those records — 400 per core code — and measured it:
+
+| Measured on 2,000 core-code records | Fill                  |
+| ----------------------------------- | --------------------- |
+| a phone number                      | 1,278 — **63.9%**     |
+| matični broj                        | 1,985 — 99.3%         |
+| PIB                                 | 1,492 — 74.6%         |
+| resolved to a municipality          | 94.4%                 |
+| a website                           | 4 of 2,320 — **0.2%** |
+| sole traders (`preduzetnik`)        | 1,439 — **71.9%**     |
+
+Extrapolated to the full 9,830, that is **~6,280 phone-bearing contractor
+records for 0 RSD**, roughly three in four of them businesses no marketing-led
+directory can reach. Against a 3,024-lead reconstruction of the pilot corpus,
+**95.3% of what this source publishes was new** — 1.2% merged, 3.5% landed in
+the review band.
+
+The 0.2% website fill is not a defect: it is what the source is. The `Sajt:`
+field is genuinely empty on almost every record, and a parser that reported
+otherwise would be reading the prose underneath it (see _Parsing_).
+
 ## Compliance
 
 | Check            | Verdict                                                                                                                                                                                                                                                                                            |
@@ -69,19 +90,38 @@ same as a national one.
 ### Activity codes
 
 The default crawl is the five core contractor codes. The adjacent four are
-opt-in with `--query`, by code (`43.33`), šifra (`4333`) or list id (`l72`).
+opt-in with `--query`, by code (`43.91`), šifra (`4391`) or list id (`l75`).
 
-| Code    | List | Category                                        | Records | Tier     |
-| ------- | ---- | ----------------------------------------------- | ------- | -------- |
-| `43.31` | l70  | Malterisanje                                    | 900     | core     |
-| `43.39` | l74  | Ostali završni radovi                           | 2,880   | core     |
-| `43.99` | l76  | Ostali nepomenuti specifični građevinski radovi | 2,779   | core     |
-| `43.34` | l73  | Bojenje i zastakljivanje                        | 2,619   | core     |
-| `43.29` | l69  | Ostali instalacioni radovi u građevinarstvu     | 652     | core     |
-| `43.33` | l72  | Postavljanje podnih i zidnih obloga             | 2,121   | adjacent |
-| `43.32` | l71  | Ugradnja stolarije                              | 551     | adjacent |
-| `43.91` | l75  | Krovni radovi                                   | 329     | adjacent |
-| `41.20` | l56  | Izgradnja stambenih i nestambenih zgrada        | 5,663   | adjacent |
+`phone` and `facade-named` are FUZZ-45's measurements: 400 records sampled per
+core code, 80 per adjacent one. **facade-named** is the share whose _registered
+name_ names a facade trade (`fasad`, `termoizolac`, `stiropor`, `demit`,
+`izolacij`, `malteris`). It is a floor rather than a rate — a sole trader called
+`SZR MILAN` reveals nothing and counts against every code equally — but it is
+measured the same way for all nine, so the codes are comparable.
+
+| Code    | List | Category                                        | Records | Phone | Facade-named | Tier     |
+| ------- | ---- | ----------------------------------------------- | ------- | ----- | ------------ | -------- |
+| `43.31` | l70  | Malterisanje                                    | 900     | 75%   | 13%          | core     |
+| `43.34` | l73  | Bojenje i zastakljivanje                        | 2,619   | 73%   | 10%          | core     |
+| `43.29` | l69  | Ostali instalacioni radovi u građevinarstvu     | 652     | 51%   | 5%           | core     |
+| `43.39` | l74  | Ostali završni radovi                           | 2,880   | 65%   | 2%           | core     |
+| `43.99` | l76  | Ostali nepomenuti specifični građevinski radovi | 2,779   | 56%   | 2%           | core     |
+| `43.91` | l75  | Krovni radovi                                   | 329     | 57%   | 8%           | adjacent |
+| `43.32` | l71  | Ugradnja stolarije                              | 551     | 79%   | 1%           | adjacent |
+| `43.33` | l72  | Postavljanje podnih i zidnih obloga             | 2,121   | 81%   | 0%           | adjacent |
+| `41.20` | l56  | Izgradnja stambenih i nestambenih zgrada        | 5,663   | 51%   | 0%           | adjacent |
+
+**The adjacent verdict, on that evidence: crawl `43.91`, skip the other three.**
+Krovni radovi scores above two of the five core codes and costs 329 records —
+about eight minutes. `41.20` is 5,663 records at 51% phone fill with not one
+facade-named business in 80, exactly as FUZZ-45 predicted, and `43.32` / `43.33`
+are barely better. `43.91` is still not promoted to `core`, because `core` also
+means claiming `assertedType: FACADE_CONTRACTOR` and 92% of it is roofing — it
+is a category worth reading and letting `src/lib/classify` judge:
+
+```bash
+npm run scrape -- --source kompanije-net --query 43.91
+```
 
 An unrecognised `--query` **raises** rather than falling back to the core five:
 a run asked for `43.21` and given `43.31` would report numbers for a category
@@ -184,20 +224,51 @@ Resolving it is still `src/lib`'s job.
 
 ## Data quality — carry these downstream
 
-- **Freshness is unmeasured for sole traders and the footer reads
-  "© Kompanije.net 2014".** Neither surface carries a date. The company subset
-  can be checked against APR open data on matični broj
-  (`scripts/fuzz45-apr-crosscheck.ts`); there is no free equivalent for
-  preduzetnici, which is exactly what an APR purchase would buy.
+- **The source is stale, and now there is a number for it: 54% of the company
+  records are dead.** The footer reads "© Kompanije.net 2014" and neither
+  surface carries a date, so FUZZ-45 measured it against APR open data on
+  matični broj. Of the 650 sampled records carrying a **company** registration
+  number, 297 are still trading, 32 are in liquidation or bankruptcy, and 321
+  have been struck off the register entirely — **54.3% dead or dying**.
+  `AGMAX DOO BEOGRAD (ČUKARICA)` is listed here as `Aktivno privredno društvo`
+  and does not appear in APR's register at all.
+
+  Two limits on that number, both load-bearing. It covers the 28% of records
+  that are companies, because APR open data is privredna društva only; the 72%
+  that are sole traders **cannot be checked against any free register**, and
+  that is precisely what an APR purchase would buy. And "dead" here means
+  deregistered, not unreachable — a struck-off company's owner often still
+  answers the phone as a preduzetnik. Treat the 54% as a warning about export
+  quality, not as a discard rule.
+
+  Re-derive it with `npx tsx scripts/fuzz45-overlap.ts <crawl.sqlite>
+<baseline.sqlite> <apr-companies.json>`.
+
+  **The company/sole-trader split is read off the registration number, not off
+  the page.** All 133,634 matični brojevi in APR open data begin 0, 1 or 2; a
+  preduzetnik's begins 5 or 6. The page's own `Forma:` field is not a
+  substitute — only 92 of the 650 company-number records printed one.
+
 - **A phone may be user-submitted.** The site invites visitors to edit a
   company's record (`Izmeni podatke`), and the `+381.(0)NN.NNNNNN` shape
   suggests a bulk telephone-directory join rather than APR's registered kontakt
   podaci. Treat every number as needing first-call verification; do not score
   these as registrar-grade.
-- **Dedup risk is HIGH against `apr-opendata`** — both are APR-derived. Join on
-  matični broj, which this source exposes on ~100% of records and the open data
-  uses as its record key. `src/lib/dedup` already weights
-  `registrationNumber` at 0.98, so this happens without special-casing.
+- **Dedup risk against `apr-opendata` is real but bounded: 14.3% measured.**
+  Both are APR-derived, and 329 of the 2,302 distinct matični brojevi sampled
+  are in APR open data — the ceiling is the 28% of records that are companies at
+  all. `src/lib/dedup` already weights `registrationNumber` at 0.98, so the join
+  happens without special-casing. It costs nothing either way: `apr-opendata`
+  carries no phone, so a match adds a registered name and municipality to a lead
+  this source already brought a number for. On 52 of those 329, APR's registered
+  activity code disagrees with the category the record was found in.
+
+- **Overlap with the directories already harvested is near zero: 1.2%.**
+  Measured with `findCandidates` + `scoreMatch` against a 3,024-lead corpus of
+  `overture-places`, `gradjevinarstvo-rs`, `portal-srbija` and
+  `austrotherm-distributeri`. 27 of 2,320 merged (13 decided on phone, 14 on
+  name + city), 82 landed in the review band, 2,211 were new. That is the
+  register-versus-marketing split showing up as a number.
 
 ## Fixtures
 
@@ -213,6 +284,7 @@ Real pages saved 2026-08-21, byte for byte:
 | `detail-matis-nis-blank-pib.html`    | A preduzetnik with a blank `PIB:` — the fall-through trap.                                             |
 | `detail-multi-phone.html`            | Two comma-separated numbers in one field.                                                              |
 | `detail-legacy-prizma.html`          | The legacy surface, proving the markup is the same.                                                    |
+| `detail-sajt-populated.html`         | The other half of trap 4 — a record that really does publish `www.abode.rs`.                           |
 
 Two are **derived**, and say so in their names: `category-redesigned.html` and
 `detail-redesigned.html` are the real pages with one thing broken, and they

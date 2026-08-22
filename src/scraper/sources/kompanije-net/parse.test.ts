@@ -197,6 +197,19 @@ describe('parseCompany — the preduzetnik layout', () => {
     expect(company.labels).toContain(LABELS.website);
   });
 
+  it('does report the website when the record actually publishes one', () => {
+    // The other half of trap 4, and the reason `looksLikeWebsite` is a filter
+    // rather than a blanket refusal to read the field. Four records in the
+    // 2,320-record FUZZ-45 sample published a real domain; this is one.
+    const company = parseCompany(
+      fixture('detail-sajt-populated.html'),
+      `${BASE}/Srbija/abode-engineering/34264`,
+      assert,
+    );
+    expect(company.website).toBe('www.abode.rs');
+    expect(company.websiteRaw).toBe('www.abode.rs');
+  });
+
   it('keeps the page advertising out of the record text', () => {
     // `cheerio.text()` walks into `<script>`, and the field block holds an
     // AdSense unit. The classifier and `raw_records` must see the company's

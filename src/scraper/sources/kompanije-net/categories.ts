@@ -36,15 +36,31 @@ export interface ActivityCategory {
   /** The site's own category name, as the index prints it. */
   readonly name: string;
   /**
-   * `core` is the five codes FUZZ-45 scoped in and the default crawl.
-   * `adjacent` is crawled only when named with `--query`; see the README for
-   * the measured overlap that decision waits on.
+   * `core` is the five codes FUZZ-45 scoped in and the default crawl. It is
+   * also the only tier that claims `assertedType` — being in a core category
+   * *is* the evidence a fasader is a fasader.
+   *
+   * `adjacent` is crawled only when named with `--query`, and asserts nothing.
+   * See `measuredFacadeNamedShare` for what the sample says about each.
    */
   readonly tier: 'core' | 'adjacent';
   /** Detail links on the modern category page when FUZZ-41 counted them. */
   readonly measuredRecords: number;
   /** Detail links on the legacy index for the same code, counted 2026-08-21. */
   readonly measuredLegacyRecords: number;
+  /**
+   * Share of sampled records whose *registered name* names a facade trade —
+   * `fasad`, `termoizolac`, `stiropor`, `demit`, `izolacij`, `malteris`.
+   *
+   * Measured by FUZZ-45 on 400 records per core code and 80 per adjacent one.
+   * It is a floor, not a rate: a sole trader called `SZR MILAN` reveals nothing
+   * and counts against every code equally, so the numbers are comparable across
+   * codes even though none of them is the true facade share. This is the
+   * evidence the adjacent-code decision rests on — see the README.
+   */
+  readonly measuredFacadeNamedShare: number;
+  /** Records with a phone in the same sample, as a share. */
+  readonly measuredPhoneFill: number;
 }
 
 /**
@@ -62,6 +78,8 @@ export const CATEGORIES: readonly ActivityCategory[] = [
     tier: 'core',
     measuredRecords: 900,
     measuredLegacyRecords: 852,
+    measuredFacadeNamedShare: 0.13,
+    measuredPhoneFill: 0.75,
   },
   {
     code: '43.39',
@@ -72,6 +90,8 @@ export const CATEGORIES: readonly ActivityCategory[] = [
     tier: 'core',
     measuredRecords: 2880,
     measuredLegacyRecords: 2340,
+    measuredFacadeNamedShare: 0.02,
+    measuredPhoneFill: 0.65,
   },
   {
     code: '43.99',
@@ -82,6 +102,8 @@ export const CATEGORIES: readonly ActivityCategory[] = [
     tier: 'core',
     measuredRecords: 2779,
     measuredLegacyRecords: 1757,
+    measuredFacadeNamedShare: 0.02,
+    measuredPhoneFill: 0.56,
   },
   {
     code: '43.34',
@@ -92,6 +114,8 @@ export const CATEGORIES: readonly ActivityCategory[] = [
     tier: 'core',
     measuredRecords: 2619,
     measuredLegacyRecords: 2558,
+    measuredFacadeNamedShare: 0.1,
+    measuredPhoneFill: 0.73,
   },
   {
     code: '43.29',
@@ -102,11 +126,26 @@ export const CATEGORIES: readonly ActivityCategory[] = [
     tier: 'core',
     measuredRecords: 652,
     measuredLegacyRecords: 494,
+    measuredFacadeNamedShare: 0.05,
+    measuredPhoneFill: 0.51,
   },
-  // Adjacent. Opt-in with `--query 43.33` / `--query l72`, because none of them
-  // is a facade trade by name and `41.20` is general building construction —
-  // the issue's instruction is to decide these on measured overlap, not on the
-  // assumption that a roofer sometimes renders a wall.
+  // Adjacent, opt-in with `--query 43.91` / `--query l75`, and now decided on
+  // evidence rather than on the assumption that a roofer sometimes renders a
+  // wall. FUZZ-45 sampled 80 records from each:
+  //
+  //   43.91 Krovni radovi                8% facade-named — WORTH CRAWLING
+  //   43.32 Ugradnja stolarije            1%
+  //   43.33 Postavljanje podnih obloga    0%
+  //   41.20 Izgradnja zgrada              0% — and 5,663 records of it
+  //
+  // `43.91` scores above two of the five core codes (43.39 and 43.99 both come
+  // in at 2%) and costs 329 records, about eight minutes. The other three earn
+  // nothing: `41.20` in particular is 5,663 records at 51% phone fill and not
+  // one facade-named business in 80, exactly as the issue predicted.
+  //
+  // None of them is promoted to `core`, because `core` also means claiming
+  // `assertedType: FACADE_CONTRACTOR`, and 92% of `43.91` is roofing. It is a
+  // category worth reading and letting `src/lib/classify` judge.
   {
     code: '43.33',
     sifra: '4333',
@@ -116,6 +155,8 @@ export const CATEGORIES: readonly ActivityCategory[] = [
     tier: 'adjacent',
     measuredRecords: 2121,
     measuredLegacyRecords: 0,
+    measuredFacadeNamedShare: 0.0,
+    measuredPhoneFill: 0.81,
   },
   {
     code: '43.32',
@@ -126,6 +167,8 @@ export const CATEGORIES: readonly ActivityCategory[] = [
     tier: 'adjacent',
     measuredRecords: 551,
     measuredLegacyRecords: 0,
+    measuredFacadeNamedShare: 0.01,
+    measuredPhoneFill: 0.79,
   },
   {
     code: '43.91',
@@ -136,6 +179,8 @@ export const CATEGORIES: readonly ActivityCategory[] = [
     tier: 'adjacent',
     measuredRecords: 329,
     measuredLegacyRecords: 0,
+    measuredFacadeNamedShare: 0.08,
+    measuredPhoneFill: 0.57,
   },
   {
     code: '41.20',
@@ -146,6 +191,8 @@ export const CATEGORIES: readonly ActivityCategory[] = [
     tier: 'adjacent',
     measuredRecords: 5663,
     measuredLegacyRecords: 0,
+    measuredFacadeNamedShare: 0.0,
+    measuredPhoneFill: 0.51,
   },
 ];
 
