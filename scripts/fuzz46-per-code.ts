@@ -14,9 +14,21 @@
  * Nothing is quoted from a run log.
  *
  * ```bash
- * # one baseline snapshot per code, taken before that code was crawled
+ * # crawl each code on its own, snapshotting the database before each one
+ * for entry in 23.64:40 46.73:350 41.20:350 43.33:250 71.11:250 71.12:250; do
+ *   code=${entry%%:*}; limit=${entry##*:}
+ *   cp data/leads.sqlite data/fuzz46/baseline-$code.sqlite
+ *   npm run scrape -- --source kompanije-net --query $code --limit $limit --budget 1000
+ * done
+ *
+ * curl -o data/cache/apr-companies.json https://openapi.apr.gov.rs/api/opendata/companies
  * npx tsx scripts/fuzz46-per-code.ts data/leads.sqlite data/fuzz46 data/cache/apr-companies.json
  * ```
+ *
+ * Drop `--limit` for the real thing: 13,095 records, about 5h30m at the crawl's
+ * 1.5 s spacing. With `--limit` the sample is the first N records in index
+ * order, which is alphabetical by registered name — good enough for a fill
+ * rate, and stated as a sample wherever it is reported.
  *
  * The baseline directory holds `baseline-<code>.sqlite`. Overlap for a code is
  * scored against the database **as it stood when that code was crawled**, so a
