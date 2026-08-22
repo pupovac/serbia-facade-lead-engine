@@ -365,27 +365,19 @@ async function* discover(ctx: CrawlContext): AsyncIterable<DiscoveredItem> {
   const categories = selectCategories(ctx.scope.queries);
   const surfaces = selectSurfaces(ctx.scope.queries);
 
-  // The index chain is only worth fetching if some modern category is
-  // actually due a walk. A second run the same afternoon should cost zero
-  // requests, not two — the difference matters because a run that finds
-  // nothing to do is exactly the run that happens most often.
-  const needsSectionIndex =
-    surfaces.includes('modern') &&
-    categories.some(
-      (category) => !ctx.state.resume(scopeKeyOf(category, 'modern'), ctx.scope, ctx.now()).skip,
-    );
-  const modernUrls: Map<string, string> = needsSectionIndex
-    ? await modernCategoryUrls(
-        ctx,
-        // Only the categories that still need walking decide which sections are
-        // fetched. A resumed run that has three of six codes left should not
-        // re-read the other three's section index.
-        categories.filter(
-          (category) =>
-            !ctx.state.resume(scopeKeyOf(category, 'modern'), ctx.scope, ctx.now()).skip,
-        ),
+  // The index chain is only worth fetching for the modern categories actually
+  // due a walk — and if there are none, not at all. A second run the same
+  // afternoon should cost zero requests, not two, and a resumed run that has
+  // three of six codes left should not re-read the other three's section index.
+  // The difference matters because a run that finds nothing to do is exactly
+  // the run that happens most often.
+  const dueAWalk = surfaces.includes('modern')
+    ? categories.filter(
+        (category) => !ctx.state.resume(scopeKeyOf(category, 'modern'), ctx.scope, ctx.now()).skip,
       )
-    : new Map();
+    : [];
+  const modernUrls: Map<string, string> =
+    dueAWalk.length === 0 ? new Map() : await modernCategoryUrls(ctx, dueAWalk);
 
   try {
     for (const category of categories) {
