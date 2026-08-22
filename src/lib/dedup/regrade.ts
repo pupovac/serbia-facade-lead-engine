@@ -15,6 +15,7 @@
  */
 import type { Db } from '../db/client.js';
 import { classifyLead } from '../classify/index.js';
+import { leadClassificationInput } from '../classify/reclassify.js';
 import { scoreLead, toScoreInput } from '../score/index.js';
 import {
   applyGrading,
@@ -38,13 +39,17 @@ export function regradeLead(db: Db, leadId: number, at = new Date()): RegradeRes
   if (!lead) return undefined;
 
   const contacts = leadContactClaims(db, leadId);
-  const website = contacts.find((contact) => contact.kind === 'website');
 
-  const classification = classifyLead({
-    name: lead.name,
-    ...(lead.description == null ? {} : { description: lead.description }),
-    ...(website == null ? {} : { website: website.value }),
-  });
+  // Everything every source said, not just the survivor's own row: the source
+  // categories live in `raw_records` and a merged lead has more than one of
+  // them. Sharing this with `scripts/reclassify.ts` is deliberate — a merge and
+  // a re-classification run must not read the same lead differently.
+  const classification = classifyLead(
+    leadClassificationInput(db, leadId) ?? {
+      name: lead.name,
+      ...(lead.description == null ? {} : { description: lead.description }),
+    },
+  );
 
   const score = scoreLead(
     toScoreInput({

@@ -335,3 +335,145 @@ describe('classifyLead — mechanics', () => {
     expect(thick.confidence).toBeLessThanOrEqual(0.98);
   });
 });
+
+/**
+ * FUZZ-32 — the four recall changes, each pinned to the record that motivated
+ * it in the pilot corpus, plus the two interactions that had to be resolved
+ * before they were safe together.
+ */
+describe('classifyLead — FUZZ-32 recall changes', () => {
+  describe('a facade term in the business name opens the contractor gate', () => {
+    it('classifies `Ćorić Fasade`, whose only evidence is its own name', () => {
+      const result = classifyLead({ name: 'Ćorić Fasade' });
+      expect(result.label).toBe('FACADE_CONTRACTOR');
+      // The same word in free text stays ambiguous and nets nothing on its own.
+      expect(classifyLead({ description: 'Fasade.' }).label).toBe('UNKNOWN');
+    });
+
+    it('scores the name match as supporting, and says so in the evidence', () => {
+      const result = classifyLead({ name: 'House fasade' });
+      const fasada = result.evidence.find((e) => e.signalId === 'contractor.fasada');
+      expect(fasada?.field).toBe('name');
+      expect(fasada?.strength).toBe('supporting');
+      expect(result.contractor.supporting).toBeCloseTo(1.25, 3);
+      expect(result.contractor.ambiguous).toBe(0);
+    });
+
+    it('still needs a facade term — insulation in the name is not enough', () => {
+      for (const name of ['Termoizolacija d.o.o.', 'Vlamil Izolacija', 'Termo plus Zrenjanin']) {
+        const result = classifyLead({ name });
+        expect(result.label, name).toBe('UNKNOWN');
+        expect(result.contractor.gateOpen, name).toBe(false);
+      }
+    });
+
+    it('does not rescue a facade word that belongs to another trade', () => {
+      expect(classifyLead({ name: 'Fasadna stolarija Petrović' }).label).toBe('UNKNOWN');
+      expect(classifyLead({ name: 'Pranje fasada Beograd' }).label).toBe('UNKNOWN');
+    });
+  });
+
+  describe('moler is evidence, but never a label on its own', () => {
+    it.each(['Moler Master', 'Bane moler', 'ULTRA Moler', 'Molerski Radovi GM Color'])(
+      'records contractor evidence for %s and still returns UNKNOWN',
+      (name) => {
+        const result = classifyLead({ name });
+        expect(result.evidence.map((e) => e.signalId)).toContain('contractor.moler');
+        // A painter who never names a facade is a painter.
+        expect(result.label).toBe('UNKNOWN');
+      },
+    );
+
+    it('combines with a facade term into a facade crew', () => {
+      const result = classifyLead({
+        name: 'Dekor centar Babić',
+        description: 'Molersko farbarski radovi, fasade, mašinsko malterisanje.',
+      });
+      expect(result.label).toBe('FACADE_CONTRACTOR');
+      expect(result.evidence.map((e) => e.signalId)).toContain('contractor.moler');
+    });
+
+    it('reads `molersko-fasaderski radovi` in a name as one span', () => {
+      const result = classifyLead({ name: 'Molersko Fasaderska Radnja Extermo' });
+      expect(result.label).toBe('FACADE_CONTRACTOR');
+      expect(result.evidence.map((e) => e.signalId)).toContain('contractor.molersko-fasaderski');
+    });
+
+    it('reads the same words in a source category as a shelf, not a claim', () => {
+      // Poslovni Kontakt files painters, facade crews and plasterers together.
+      const result = classifyLead({
+        name: 'Moler Dragomir',
+        categories: ['Molerski, fasaderski i gipsarski radovi'],
+      });
+      expect(result.label).toBe('UNKNOWN');
+      expect(result.contractor.gateOpen).toBe(false);
+      const shelf = result.evidence.find((e) => e.signalId === 'contractor.molersko-fasaderski');
+      expect(shelf?.field).toBe('category');
+    });
+  });
+
+  describe('scaffolding is the neighbouring trade', () => {
+    it('suppresses `fasadne skele` the way `fasadna stolarija` is suppressed', () => {
+      const result = classifyLead({ description: 'Iznajmljujemo fasadne skele.' });
+      expect(result.label).toBe('UNKNOWN');
+      expect(result.evidence.map((e) => e.signalId)).toContain('adjacent.scaffolding-fasade');
+      expect(result.evidence.map((e) => e.signalId)).not.toContain('contractor.fasada');
+      expect(result.contractor.gateOpen).toBe(false);
+    });
+
+    it('keeps `Topers`, a scaffolding-hire firm, out of the contractor label', () => {
+      const result = classifyLead({
+        name: 'Topers',
+        categories: ['Završni radovi, restauracije', 'Gradjevinske skele', 'Platforme'],
+        description:
+          'TOPERS d.o.o je duži niz godina prepoznatljiv u oblasti građevinarstva po izvođenju završnih radova u građevinarstvu, a posebno po radovima na revitalizaciji/restauraciji i sanaciji fasada objekata koji su pod tretmanom Zavoda za zaštitu spomenika kulture.',
+      });
+      expect(result.label).toBe('UNKNOWN');
+      expect(result.contractor.coreCancelled).toBeGreaterThan(0);
+    });
+
+    it('does not punish a facade contractor who erects his own scaffolding', () => {
+      const result = classifyLead({
+        name: 'Fasaderski radovi Jović',
+        description: 'Izrada fasada, montaža skela, malterisanje.',
+      });
+      expect(result.label).toBe('FACADE_CONTRACTOR');
+    });
+  });
+
+  describe("Overture's English taxonomy corroborates", () => {
+    it.each([
+      'building_or_construction_service',
+      'contractor',
+      'building_contractor',
+      'painter',
+      'plasterer',
+    ])('records %s as supporting contractor evidence', (category) => {
+      const result = classifyLead({ name: 'Neko preduzeće', categories: [category] });
+      const hit = result.evidence.find((e) => e.signalId === 'contractor.source-category');
+      expect(hit?.strength).toBe('supporting');
+      // Never decisive on its own: the category names construction, not facades.
+      expect(result.label).toBe('UNKNOWN');
+    });
+
+    it('does not fire on the tail of another trade’s category', () => {
+      for (const category of ['paving_contractor', 'flooring_contractor']) {
+        const result = classifyLead({ name: 'Neko preduzeće', categories: [category] });
+        expect(
+          result.evidence.map((e) => e.signalId),
+          category,
+        ).not.toContain('contractor.source-category');
+      }
+    });
+
+    it('is decisive in combination with a Serbian facade term', () => {
+      const bare = classifyLead({ name: 'Ćorić Fasade' });
+      const withCategory = classifyLead({
+        name: 'Ćorić Fasade',
+        categories: ['building_or_construction_service'],
+      });
+      expect(withCategory.contractor.net).toBeGreaterThan(bare.contractor.net);
+      expect(withCategory.label).toBe('FACADE_CONTRACTOR');
+    });
+  });
+});

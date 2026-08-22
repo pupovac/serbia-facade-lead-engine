@@ -95,6 +95,13 @@ nothing may live only in a spreadsheet.**
 | `npm run format:check` | Prettier, check only                 |
 | `npm run scrape`       | The scraper CLI                      |
 
+One-off scripts live in `scripts/` and run with `npx tsx`:
+
+| Script                                       | What it does                                                                                                                                                                                    |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `scripts/reclassify.ts`                      | Re-classify a stored corpus with the current signal table. Dry run by default; `--apply` writes the new labels and re-scores the leads that moved, `--json <path>` dumps every lead's evidence. |
+| `scripts/report-classification-precision.ts` | Classifier accuracy on the 161-record labelled fixture set                                                                                                                                      |
+
 ## Repository layout
 
 ```

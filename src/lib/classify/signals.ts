@@ -31,6 +31,27 @@ function word(...words: readonly string[]): RegExp {
 }
 
 /**
+ * Two trades a directory files on one shelf, with the comma it puts between
+ * them — `stem` deliberately does not cross punctuation, and here the
+ * punctuation is the point.
+ */
+function shelf(...tokens: readonly string[]): RegExp {
+  const body = tokens.map((t) => `${t}[a-z]*`).join('[\\s,;\\-/]+(?:i\\s+)?');
+  return new RegExp(`(?<![a-z0-9])${body}`, 'g');
+}
+
+/**
+ * A source-taxonomy value, matched whole.
+ *
+ * Underscore counts as part of the token here and nowhere else, so `contractor`
+ * matches Overture's `contractor` and not the tail of `paving_contractor` — a
+ * road-paving firm is not evidence of facade work.
+ */
+function token(...values: readonly string[]): RegExp {
+  return new RegExp(`(?<![a-z0-9_])(?:${values.join('|')})(?![a-z0-9_])`, 'g');
+}
+
+/**
  * How much a field is trusted. A trade named in the company name is a
  * statement about the business; the same word in the twelfth line of a product
  * catalogue is a mention.
@@ -213,6 +234,24 @@ const CONTRACTOR: readonly Signal[] = [
     note: 'Sole traders advertise as majstor rather than firma. Common in classifieds.',
   },
   {
+    id: 'contractor.molersko-fasaderski',
+    axis: 'contractor',
+    strength: 'supporting',
+    weight: 0.5,
+    gate: 'facade',
+    shelfIn: ['category'],
+    patterns: [shelf('molersk', 'fasadersk'), shelf('fasadersk', 'molersk')],
+    note: 'The two trades together, longer than `fasader` and therefore claiming the span. In a company name this is a facade crew and opens the gate; as a *category* it is Poslovni Kontakt\u2019s three-trade shelf `Molerski, fasaderski i gipsarski radovi`, which files sole-trader painters, so there it corroborates and nothing more.',
+  },
+  {
+    id: 'contractor.moler',
+    axis: 'contractor',
+    strength: 'supporting',
+    weight: 0.4,
+    patterns: [stem('moler'), stem('krecenj'), stem('farbanje', 'zidova')],
+    note: 'molersko-fasaderski radovi is one trade in Serbia, and the two words are advertised together. Supporting rather than core, and deliberately gate-less: a painter who never says fasada stays UNKNOWN, a painter who does is a facade crew.',
+  },
+  {
     id: 'contractor.zavrsni-radovi',
     axis: 'contractor',
     strength: 'ambiguous',
@@ -220,16 +259,32 @@ const CONTRACTOR: readonly Signal[] = [
     patterns: [stem('zavrsni', 'radov'), stem('zavrsnih', 'radov'), stem('zavrsne', 'radov')],
   },
   {
+    id: 'contractor.source-category',
+    axis: 'contractor',
+    strength: 'supporting',
+    weight: 0.35,
+    patterns: [
+      token(
+        'building_or_construction_service',
+        'building_contractor',
+        'contractor',
+        'painter',
+        'painting',
+        'plasterer',
+        'plastering',
+      ),
+      stem('building', 'or', 'construction', 'service'),
+      stem('building', 'contractor'),
+    ],
+    note: 'Overture files businesses under an English taxonomy. Supporting and gate-less, because `contractor` names construction and not facades: it corroborates a Serbian facade term, it never produces a label on its own. The store side of the same taxonomy needs no mapping — those records already carry `gradjevinski materijal` or `stovariste` in their names.',
+  },
+  {
     id: 'contractor.visinski-radovi',
     axis: 'contractor',
     strength: 'supporting',
     weight: 0.2,
-    patterns: [
-      stem('visinsk', 'radov'),
-      stem('radovi', 'na', 'visini'),
-      stem('skele'),
-      stem('alpinist'),
-    ],
+    patterns: [stem('visinsk', 'radov'), stem('radovi', 'na', 'visini'), stem('alpinist')],
+    note: 'Scaffolding used to live here. It moved to `adjacent.scaffolding`: renting the platform a facade is worked from is the neighbouring trade, not this one.',
   },
 ];
 
@@ -566,14 +621,53 @@ const ADJACENT: readonly Signal[] = [
       stem('strukturaln', 'fasad'),
       stem('polustrukturaln', 'fasad'),
       stem('staklen', 'fasad'),
+      stem('staklen', 'i', 'bond', 'fasad'),
+      stem('bond', 'fasad'),
       stem('alu', 'fasad'),
       stem('aluminijumsk', 'fasad'),
       word('alubond'),
       stem('kompozitn', 'materijal'),
       stem('kompozitn', 'panel'),
       stem('ventilirana', 'fasad'),
+      stem('ventilisan', 'fasad'),
+      shelf('zastakljen', 'zidov'),
+      shelf('zastakljeni', 'zidovi', 'fasad'),
     ],
-    'Curtain-wall, composite-panel and window work. The word is `fasada`, the trade is not ours — so this one cancels facade core evidence instead of merely discounting it.',
+    'Curtain-wall, composite-panel and window work. The word is `fasada`, the trade is not ours — so this one cancels facade core evidence instead of merely discounting it. `ventilisana` / `zastakljeni zidovi, fasade` / `bond fasada` are the spellings the pilot corpus actually publishes for terms already listed here.',
+    true,
+  ),
+  adjacent(
+    'adjacent.scaffolding-fasade',
+    'other_trade',
+    0.7,
+    ['contractor'],
+    [
+      stem('fasadn', 'skel'),
+      stem('skele', 'za', 'fasad'),
+      stem('skela', 'za', 'fasad'),
+      stem('skelu', 'za', 'fasad'),
+    ],
+    'A `fasadna skela` is scaffolding, the same way a `fasadna stolarija` is a window. Longer than the bare `fasad…`, so it takes the span and the facade gate never opens on it.',
+    true,
+  ),
+  adjacent(
+    'adjacent.scaffolding',
+    'other_trade',
+    1.3,
+    ['contractor'],
+    [
+      stem('iznajmljivanj', 'skela'),
+      stem('izdavanj', 'skela'),
+      stem('najam', 'skela'),
+      stem('rentiranj', 'skela'),
+      stem('iznajmljivanje', 'gradjevinskih', 'skela'),
+      stem('gradjevinsk', 'skel'),
+      stem('brzomontazn', 'skel'),
+      stem('ramovsk', 'skel'),
+      stem('modularn', 'skel'),
+      stem('skelarsk'),
+    ],
+    'Scaffolding *hire*. Heavy and core-cancelling on purpose: this is the trade whose whole business sits against somebody else\u2019s facade, so its passing mention of facade work is not a claim to perform any. `montaza skela` is deliberately absent — facade crews erect their own scaffolding — and a facade term in the company\u2019s own name still outweighs this.',
     true,
   ),
   adjacent(

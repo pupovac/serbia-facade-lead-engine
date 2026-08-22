@@ -48,3 +48,8 @@ data/cache/
 
 # Pilot run artefacts — fetched pages and reports containing lead data.
 runlogs/
+
+# Attachments pulled from an issue, and the per-lead re-classification dumps
+# they feed. Both hold real businesses' names and phone numbers.
+attachments/
+research/fuzz32/

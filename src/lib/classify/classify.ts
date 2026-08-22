@@ -35,6 +35,7 @@ import type {
   ClassificationResult,
   LeadClassification,
   Signal,
+  SignalStrength,
   SuppressedMatch,
 } from './types.js';
 
@@ -158,6 +159,29 @@ function axisNet(axis: {
   };
 }
 
+/**
+ * How strongly a match counts, given where it was found.
+ *
+ * One exception to the table, and it is the rule that decides whether a facade
+ * contractor is found at all: an `ambiguous` contractor term **in the business's
+ * own name** counts as `supporting`. `fasada` is ambiguous in a product
+ * catalogue because a roofer, a window fitter and a cleaning company all print
+ * the word; it is not ambiguous in `Ćorić Fasade`, because a business names
+ * itself after the trade it performs. Without this, the only evidence a
+ * one-man fasader ever publishes — his own name — nets exactly zero, since
+ * `ambiguousCredit` is capped at `core + supporting`.
+ *
+ * The gate is untouched, so this promotes evidence, it never creates a label
+ * out of nothing: `Termoizolacija d.o.o.` still scores zero, because
+ * `termoizolacija` opens no facade gate however it is written.
+ */
+function effectiveStrength(signal: Signal, field: ClassificationField): SignalStrength {
+  if (field === 'name' && signal.axis === 'contractor' && signal.strength === 'ambiguous') {
+    return 'supporting';
+  }
+  return signal.strength;
+}
+
 function confidenceFor(net: number): number {
   return Math.min(0.98, 0.5 + 0.45 * Math.min(1, (net - DECISION_THRESHOLD) / DECISION_THRESHOLD));
 }
@@ -212,10 +236,14 @@ export function classifyLead(input: ClassificationInput): ClassificationResult {
 
     for (const { signal, first, occurrences } of bySignal.values()) {
       const weight = signal.weight * FIELD_WEIGHTS[field];
+      // The evidence trail carries the strength the arithmetic actually used,
+      // not the one declared in the table — otherwise a reviewer reading
+      // `ambiguous` cannot reconcile it with the axis totals below.
+      const scoredAs = effectiveStrength(signal, field);
       evidence.push({
         signalId: signal.id,
         axis: signal.axis,
-        strength: signal.strength,
+        strength: scoredAs,
         field,
         matched: first.text,
         weight: Math.round(weight * 1000) / 1000,
@@ -235,14 +263,19 @@ export function classifyLead(input: ClassificationInput): ClassificationResult {
 
       const bucket = signal.axis === 'contractor' ? contractor : store;
       if (signal.needsAssortment === true) pendingAssortmentDependent.push({ signal, weight });
-      else if (signal.strength === 'core') bucket.core += weight;
-      else if (signal.strength === 'supporting') bucket.supporting += weight;
+      else if (scoredAs === 'core') bucket.core += weight;
+      else if (scoredAs === 'supporting') bucket.supporting += weight;
       else bucket.ambiguous += weight;
 
-      if (signal.gate === 'facade' && signal.axis === 'contractor') contractor.gateOpen = true;
-      if (signal.gate === 'retail' && signal.axis === 'store') {
+      // A multi-trade shelf label corroborates but does not decide: opening a
+      // gate is deciding, because the gate is what permits a label at all.
+      const mayOpenGate = !(signal.shelfIn ?? []).includes(field);
+      if (signal.gate === 'facade' && signal.axis === 'contractor' && mayOpenGate) {
+        contractor.gateOpen = true;
+      }
+      if (signal.gate === 'retail' && signal.axis === 'store' && mayOpenGate) {
         store.gateOpen = true;
-        if (signal.strength === 'core') retailCoreFound = true;
+        if (scoredAs === 'core') retailCoreFound = true;
       }
       if (signal.assortment === true) assortmentSignals.add(signal.id);
     }

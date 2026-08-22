@@ -49,13 +49,25 @@ contractor label. Ambiguous evidence is also capped at `core + supporting`, so a
 word shared with another trade can corroborate real evidence but never
 substitute for it.
 
-Two smaller rules follow the same logic:
+Three smaller rules follow the same logic:
 
+- **An ambiguous contractor term in the business's own _name_ counts as
+  `supporting`.** `fasada` is ambiguous in a product catalogue, where a roofer, a
+  window fitter and a cleaning company all print it; it is not ambiguous in
+  `Ćorić Fasade`, because a business names itself after the trade it performs.
+  Without this the only evidence a one-man fasader ever publishes nets exactly
+  zero, since ambiguous credit is capped at `core + supporting`. The gate is
+  untouched, so it promotes evidence rather than inventing it: `Termoizolacija
+d.o.o.` still scores zero.
 - **A source category corroborates, it never decides.** `category` is weighted
   _below_ `description` because Poslovni Kontakt files every sole trader under
   `Molerski, fasaderski i gipsarski radovi`; at any weight that lets a category
   decide alone, ten painters become facade contractors. Measured, not assumed —
-  it happened on the first tuning pass.
+  it happened on the first tuning pass. A signal may also declare `shelfIn:
+['category']`, which lets it corroborate there but never **open** an axis
+  gate — `contractor.molersko-fasaderski` is that case: in a company's name
+  those two words are a facade crew, on a directory shelf they are three trades
+  filed together.
 - **A manufacturer is a supplier, not a buyer.** A record naming `fabrika` or
   `proizvodnja` with no counter (`stovarište`, `veleprodaja`, `farbara`) is
   `UNKNOWN`. An EPS factory is our competitor; a yard that also produces is
@@ -74,13 +86,13 @@ publish `fasada`, `termoizolacija` or `izolacija` while belonging to a trade we
 do not sell to.
 
 ```
-Overall accuracy 94.4% (152/161)
+Overall accuracy 95.7% (154/161)
 
                               predicted  correct  precision  recall  false-positive rate
-FACADE_CONTRACTOR                    11       10      90.9%   83.3%   0.7% (1/149)
-CONSTRUCTION_MATERIAL_STORE          38       34      89.5%   91.9%   3.2% (4/124)
-BOTH                                  1        1     100.0%   50.0%   0.0% (0/159)
-UNKNOWN                             111      107      96.4%   97.3%   7.8% (4/51)
+FACADE_CONTRACTOR                    12       11      91.7%   91.7%   0.7% (1/149)
+CONSTRUCTION_MATERIAL_STORE          37       34      91.9%   91.9%   2.4% (3/124)
+BOTH                                  2        2     100.0%  100.0%   0.0% (0/159)
+UNKNOWN                             110      107      97.3%   97.3%   5.9% (3/51)
 ```
 
 **No record whose true label is `UNKNOWN` is classified `FACADE_CONTRACTOR`.**
@@ -101,6 +113,26 @@ npx vitest run src/lib/classify                               # the same numbers
 
 `precision.test.ts` asserts floors a little below today's numbers, so tuning the
 signal table is free until it costs accuracy.
+
+## Re-classifying a stored corpus
+
+The signal table is only worth what it moves on real leads, so re-classification
+is a committed code path rather than a query somebody typed once:
+
+```
+npx tsx scripts/reclassify.ts            # dry run: labels before and after, and every transition
+npx tsx scripts/reclassify.ts --json f   # + each lead's new label, net scores and evidence
+npx tsx scripts/reclassify.ts --apply    # write the new labels and re-score the leads that moved
+```
+
+`leadClassificationInput` in `reclassify.ts` rebuilds the classifier input from
+**every source that has seen the lead**, not from the lead row: source categories
+are stored only inside `raw_records.payload`, and a lead five directories agree
+on has five category lists. `regradeLead` uses the same function, so a merge and
+a re-classification never read the same lead differently.
+
+`research/fuzz32-report.md` is what one such run looks like, measured on the
+3,601-lead pilot corpus.
 
 ## Where the fixture came from
 

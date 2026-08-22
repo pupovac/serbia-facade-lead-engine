@@ -77,6 +77,18 @@ export interface Signal {
    * hangs composite cladding is not.
    */
   readonly cancelsCore?: boolean;
+  /**
+   * Fields in which this term is a source's shelf label rather than the
+   * business's own claim, and so may corroborate but never **open** the axis
+   * gate.
+   *
+   * One entry today and it was measured: `Molerski, fasaderski i gipsarski
+   * radovi` is a single Poslovni Kontakt category covering three trades, and a
+   * gate opened on it turns every sole-trader painter filed under it into a
+   * facade contractor. The same words in a company's own name are that
+   * company's claim, and open the gate normally.
+   */
+  readonly shelfIn?: readonly ClassificationField[];
   /** Counts toward the building-materials assortment test. */
   readonly assortment?: boolean;
   /**
