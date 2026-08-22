@@ -163,6 +163,8 @@ export const PROVENANCE_FIELDS = [
   'registration_number',
   'tax_id',
   'coordinates',
+  'activity_code',
+  'activity_name',
 ] as const;
 export type ProvenanceField = (typeof PROVENANCE_FIELDS)[number];
 
@@ -475,6 +477,23 @@ export const leads = sqliteTable(
     description: text('description'),
     openingHours: text('opening_hours'),
     /**
+     * The APR (KD-2010) activity code the source printed for this business,
+     * four digits and no dot: `4331`.
+     *
+     * Nullable and additive: only a register-derived source publishes it, every
+     * other adapter leaves it null, and nothing is backfilled. It is stored as
+     * **what the page said**, not reconciled against APR's open data — FUZZ-45
+     * measured the two disagreeing on 52 of 329 records, and deciding which one
+     * is right is a later enrichment pass's job, not a write-time guess.
+     *
+     * This is the segmentation signal for the widened `kompanije-net` codes: an
+     * architect (`7111`) and a general builder (`4120`) both land `UNCLASSIFIED`
+     * on their name alone, and the code is the only thing that tells them apart.
+     */
+    activityCode: text('activity_code'),
+    /** The source's own name for that code: `Malterisanje`. What the export shows. */
+    activityName: text('activity_name'),
+    /**
      * 0–100. **Is this a lead for us?** — the label, its confidence and the
      * strength of the evidence behind it, and nothing else. How reachable the
      * business is contributes zero: a perfectly-documented parking garage
@@ -531,6 +550,9 @@ export const leads = sqliteTable(
     // is only ever compared against the other leads in the same place.
     index('leads_city_idx').on(t.cityId),
     index('leads_last_scraped_idx').on(t.lastScrapedAt),
+    // The review UI's activity-code filter, and the `group by` behind its
+    // facet. The code is what you filter and join on; the name is what reads.
+    index('leads_activity_code_idx').on(t.activityCode),
     oneOf('leads_classification_check', 'classification', LEAD_CLASSIFICATIONS),
     oneOf('leads_industry_check', 'classification_industry', ADJACENT_INDUSTRIES, true),
     oneOf('leads_status_check', 'status', LEAD_STATUSES),

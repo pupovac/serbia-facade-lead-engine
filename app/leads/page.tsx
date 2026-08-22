@@ -31,6 +31,7 @@ const COLUMNS: ReadonlyArray<{ key: LeadSortKey | null; label: string; num?: boo
   { key: 'city', label: 'Grad' },
   { key: null, label: 'Opština' },
   { key: null, label: 'Tip' },
+  { key: null, label: 'Delatnost (APR)' },
   { key: 'score', label: 'Skor', num: true },
   { key: null, label: 'Izvori', num: true },
   { key: null, label: 'Kanali' },
@@ -115,6 +116,23 @@ export default async function LeadListPage({
             ))}
           </select>
         </div>
+
+        {/* Only offered once a register-derived source has actually filed a
+            code. An empty select is a filter that promises something the data
+            cannot answer. */}
+        {facets.activityCodes.length === 0 ? null : (
+          <div className="field">
+            <label htmlFor="delatnost">Šifra delatnosti (APR)</label>
+            <select id="delatnost" name="delatnost" defaultValue={query.activityCode ?? ''}>
+              <option value="">sve ({facets.activityCodes.length})</option>
+              {facets.activityCodes.map((facet) => (
+                <option key={facet.value} value={facet.value}>
+                  {facet.label} ({facet.count})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div className="field">
           <label htmlFor="phone">Telefon</label>
@@ -242,6 +260,18 @@ export default async function LeadListPage({
                     <td className="muted small mono">{row.municipalityId ?? '—'}</td>
                     <td>
                       <ClassificationBadge value={row.classification} />
+                    </td>
+                    <td className="small">
+                      {row.activityCode == null ? (
+                        <span className="muted">—</span>
+                      ) : (
+                        <Link
+                          href={leadHref(query, { activityCode: row.activityCode })}
+                          title={`Šifra delatnosti ${row.activityCode}`}
+                        >
+                          {row.activityName ?? row.activityCode}
+                        </Link>
+                      )}
                     </td>
                     <td className="num">
                       <Score value={row.leadScore} />

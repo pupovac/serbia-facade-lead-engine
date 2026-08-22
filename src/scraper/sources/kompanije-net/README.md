@@ -5,11 +5,14 @@ The largest free contractor source in the registry and the only one that reaches
 **preduzetnici** at scale.
 
 - **Base URL** — `https://www.kompanije.net`
-- **Lead type** — `FACADE_CONTRACTOR`
+- **Lead types** — `FACADE_CONTRACTOR`, and `CONSTRUCTION_MATERIAL_STORE` from
+  `46.73` (FUZZ-46)
 - **Rendering** — static HTML, `cheerio`. No JavaScript anywhere in the crawl
   path; the only scripts on the page are AdSense, Google Analytics and a
   Facebook like button.
-- **Records** — ~9,830 under the five core contractor codes.
+- **Records** — 9,830 under the five core contractor codes, plus 13,095 under
+  the six codes FUZZ-46 widened the crawl to. 22,925 in all, ~9.5 hours at the
+  crawl's 1.5 s spacing.
 - **Registry entry** — `research/sources-contractors.json`, id `kompanije-net`,
   researched by FUZZ-41 and cleared on terms by FUZZ-44.
 
@@ -89,48 +92,97 @@ same as a national one.
 
 ### Activity codes
 
-The default crawl is the five core contractor codes. The adjacent four are
-opt-in with `--query`, by code (`43.91`), šifra (`4391`) or list id (`l75`).
+The default crawl is the five core contractor codes. Everything else is opt-in
+with `--query`, either **one code** — by code (`43.91`), šifra (`4391`) or list
+id (`l75`) — or **a whole tier** by name: `core`, `widened`, `adjacent`.
 
-`phone` and `facade-named` are FUZZ-45's measurements: 400 records sampled per
-core code, 80 per adjacent one. **facade-named** is the share whose _registered
-name_ names a facade trade (`fasad`, `termoizolac`, `stiropor`, `demit`,
-`izolacij`, `malteris`). It is a floor rather than a rate — a sole trader called
-`SZR MILAN` reveals nothing and counts against every code equally — but it is
-measured the same way for all nine, so the codes are comparable.
+| Code    | List | Sec.  | Category                                        | Records | Asserts                       | Tier     |
+| ------- | ---- | ----- | ----------------------------------------------- | ------- | ----------------------------- | -------- |
+| `43.31` | l70  | `d4`  | Malterisanje                                    | 900     | `FACADE_CONTRACTOR`           | core     |
+| `43.34` | l73  | `d4`  | Bojenje i zastakljivanje                        | 2,619   | `FACADE_CONTRACTOR`           | core     |
+| `43.29` | l69  | `d4`  | Ostali instalacioni radovi u građevinarstvu     | 652     | `FACADE_CONTRACTOR`           | core     |
+| `43.39` | l74  | `d4`  | Ostali završni radovi                           | 2,880   | `FACADE_CONTRACTOR`           | core     |
+| `43.99` | l76  | `d4`  | Ostali nepomenuti specifični građevinski radovi | 2,779   | `FACADE_CONTRACTOR`           | core     |
+| `23.64` | l197 | `d6`  | Proizvodnja maltera                             | 40      | —                             | widened  |
+| `46.73` | l548 | `d20` | Trgovina na veliko drvetom i građ materijalom   | 1,486   | `CONSTRUCTION_MATERIAL_STORE` | widened  |
+| `43.33` | l72  | `d4`  | Postavljanje podnih i zidnih obloga             | 2,121   | —                             | widened  |
+| `41.20` | l56  | `d4`  | Izgradnja stambenih i nestambenih zgrada        | 5,663   | —                             | widened  |
+| `71.11` | l573 | `d24` | Arhitektonska delatnost                         | 499     | —                             | widened  |
+| `71.12` | l574 | `d24` | Inženjerske delatnosti i tehničko savetovanje   | 3,286   | —                             | widened  |
+| `43.91` | l75  | `d4`  | Krovni radovi                                   | 329     | —                             | adjacent |
+| `43.32` | l71  | `d4`  | Ugradnja stolarije                              | 551     | —                             | adjacent |
 
-| Code    | List | Category                                        | Records | Phone | Facade-named | Tier     |
-| ------- | ---- | ----------------------------------------------- | ------- | ----- | ------------ | -------- |
-| `43.31` | l70  | Malterisanje                                    | 900     | 75%   | 13%          | core     |
-| `43.34` | l73  | Bojenje i zastakljivanje                        | 2,619   | 73%   | 10%          | core     |
-| `43.29` | l69  | Ostali instalacioni radovi u građevinarstvu     | 652     | 51%   | 5%           | core     |
-| `43.39` | l74  | Ostali završni radovi                           | 2,880   | 65%   | 2%           | core     |
-| `43.99` | l76  | Ostali nepomenuti specifični građevinski radovi | 2,779   | 56%   | 2%           | core     |
-| `43.91` | l75  | Krovni radovi                                   | 329     | 57%   | 8%           | adjacent |
-| `43.32` | l71  | Ugradnja stolarije                              | 551     | 79%   | 1%           | adjacent |
-| `43.33` | l72  | Postavljanje podnih i zidnih obloga             | 2,121   | 81%   | 0%           | adjacent |
-| `41.20` | l56  | Izgradnja stambenih i nestambenih zgrada        | 5,663   | 51%   | 0%           | adjacent |
-
-**The adjacent verdict, on that evidence: crawl `43.91`, skip the other three.**
-Krovni radovi scores above two of the five core codes and costs 329 records —
-about eight minutes. `41.20` is 5,663 records at 51% phone fill with not one
-facade-named business in 80, exactly as FUZZ-45 predicted, and `43.32` / `43.33`
-are barely better. `43.91` is still not promoted to `core`, because `core` also
-means claiming `assertedType: FACADE_CONTRACTOR` and 92% of it is roofing — it
-is a category worth reading and letting `src/lib/classify` judge:
+Record counts are exact — `a.cat-list` company links counted on each category
+index page, the core five on 2026-08-21 and the widened six on 2026-08-22.
 
 ```bash
-npm run scrape -- --source kompanije-net --query 43.91
+npm run scrape -- --source kompanije-net --budget 12000            # the core five
+npm run scrape -- --source kompanije-net --query widened --budget 14000
+npm run scrape -- --source kompanije-net --query core widened --budget 25000
+npm run scrape -- --source kompanije-net --query 71.12             # one code
 ```
 
 An unrecognised `--query` **raises** rather than falling back to the core five:
 a run asked for `43.21` and given `43.31` would report numbers for a category
 nobody asked about.
 
-The category slugs are **not** hard-coded. They carry diacritics and the site
-has changed them before, so `discover` reads them off the `GRAĐEVINARSTVO`
-index and keys on the stable `l<id>_` prefix. A code that has no link on that
-index raises `StructureChangedError` naming the code.
+#### Why `widened` is not name-filtered, and why FUZZ-45's yield metric is gone
+
+FUZZ-45 scored the adjacent codes by **facade-named share** — the share of
+sampled records whose registered name contains `fasad`, `termoizolac`,
+`stiropor`, `demit`, `izolacij` or `malteris` — and used it to decide what to
+skip. On that metric `41.20` and `43.33` scored 0% in 80 records each and were
+parked.
+
+**That metric is superseded for these six codes.** The member asked for every
+record in them regardless of name: a builder trading as `GRADNJA DOO` is exactly
+the lead a name filter drops, and a name is not what makes these records useful
+— the activity code is. The numbers are still in `categories.ts` as evidence for
+a human; nothing reads them.
+
+#### Why most of the widened codes assert nothing
+
+The FUZZ-38 epic rule is that an adapter under the epic sets `FACADE_CONTRACTOR`
+from source provenance rather than from a name. It holds where the code _is_ the
+evidence — `43.31 Malterisanje` is rendering a wall — and `46.73` is the same
+argument for the other buyer group: trading building materials wholesale is the
+definition of buyer group 2.
+
+It does not extend to the rest. `71.12 Inženjerske delatnosti` is not evidence
+of a fasader, and asserting it would file 3,286 engineering firms and 5,663
+general builders in the corpus as facade contractors. So `41.20` and `43.33` go
+through `src/lib/classify` on their name like any general directory record, and
+`23.64`, `71.11` and `71.12` are neither buyer group — they are a distinct
+segment, and `leads.activity_code` is what identifies them. **`UNCLASSIFIED` is
+not a failure for these records.**
+
+One extra guard, on the widened codes only: when the detail page prints a šifra
+that contradicts the index the record was found on, the assertion is **withdrawn**
+and the record goes to the classifier instead. The category asserts because the
+code is the evidence, and a page that names a different code has withdrawn it.
+The core five keep FUZZ-45's behaviour unchanged — their numbers were measured
+and accepted with the assertion made from the discovery category.
+
+#### The index chain
+
+No URL in the chain is assembled from a constant; each is read off the page
+above it, because every slug on this site carries diacritics and the site has
+changed them before.
+
+```
+GET /Srbija/                             once per run  → d<id> → section URL   (a.cat-link)
+GET /Srbija/d6_INDUSTRIJA.html           once per section → l<id> → category URL (a.cat-list)
+GET /Srbija/l197_Proizvodnja-maltera.html  once per category → every detail link
+```
+
+FUZZ-45 hard-coded the one section it needed. FUZZ-46's codes sit in four
+sections — `d4 GRAĐEVINARSTVO`, `d6 INDUSTRIJA`, `d20 TRGOVINA-NA-VELIKO`,
+`d24 USLUŽNE-DELATNOSTI` — and hard-coding four more slugs carrying `Đ`, `Ž` and
+a Serbian digraph would have put four more ways to 404 a five-hour crawl into a
+constants table. The chain costs two requests for a core run and five for the
+widened six, against 13,095 detail fetches, and only the sections a run still
+needs are fetched. A missing section link or a missing category link raises
+`StructureChangedError` naming what went missing.
 
 ### Two surfaces
 
@@ -203,6 +255,41 @@ The adapter splits on the comma — `src/lib/phone` rejects the joined string an
 reads either half perfectly, `.(0)` shim included — and changes nothing else.
 Normalization is `src/lib/phone`'s and is not reimplemented here.
 
+### The APR activity category
+
+Every detail page prints both halves of the state's own classification:
+
+```
+Šifra delatnosti:   4331
+Naziv delatnosti:   Malterisanje
+```
+
+FUZZ-46 carried them to the database as `leads.activity_code` /
+`leads.activity_name` — two columns, because the code is what you filter and
+join on and the name is what a human reads. Both are nullable and additive:
+every other source leaves them null, nothing is backfilled, and null means "this
+source does not publish an activity code", not "unknown".
+
+They are stored **exactly as the page printed them**, with per-field provenance
+like any other single-valued fact. Three things are deliberately not done:
+
+- **The page's code is not reconciled against the index it was found on.** They
+  disagree on a real share of records — `MET INŽENJERING 021`, found on the
+  `23.64 Proizvodnja maltera` index, prints `3832`. The lead carries the page's
+  code, `extra.categoryCode` carries the index's, and `extra` also flags the
+  disagreement. Both are evidence; neither is a correction of the other.
+- **It is not reconciled against APR open data either.** FUZZ-45 measured those
+  two disagreeing on 52 of 329 records matched on matični broj. A later
+  enrichment pass can decide; a write-time guess would destroy what it needs.
+- **A malformed value is not promoted.** Only a four-digit value reaches
+  `activity_code`; anything else stays in `raw_records`. A lead is worth having
+  for its phone number whatever the register did to its activity field.
+
+The review UI filters on the code (`/leads?delatnost=7111`) and shows the name
+as a column. That filter is the reason the field exists: `41.20` and `71.11`
+mostly classify as nothing from their names, and the code is the only thing that
+separates an architect from a general builder from a fasader.
+
 ### Place
 
 A sole trader's `Mesto` is very often a village (`Stubline`, `Milutinovac`) and
@@ -272,19 +359,25 @@ Resolving it is still `src/lib`'s job.
 
 ## Fixtures
 
-Real pages saved 2026-08-21, byte for byte:
+Real pages saved 2026-08-21 (FUZZ-45) and 2026-08-22 (FUZZ-46), byte for byte:
 
-| File                                 | What it is                                                                                             |
-| ------------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| `section-index-gradjevinarstvo.html` | The `GRAĐEVINARSTVO` index; 22 activity codes.                                                         |
-| `category-l70-malterisanje.html`     | The `43.31` category page — all 900 single-quoted detail links.                                        |
-| `category-legacy-433100.html`        | The legacy `43.31` index — 852 links, 65 with a slash in the slug.                                     |
-| `detail-agmax-company.html`          | A fully populated privredno društvo: `Forma`, `Status`, structured address, phone, MB, PIB, `Članovi`. |
-| `detail-acalend-sajt-prose.html`     | A preduzetnik with an empty `Sajt:` followed by the prose sentence.                                    |
-| `detail-matis-nis-blank-pib.html`    | A preduzetnik with a blank `PIB:` — the fall-through trap.                                             |
-| `detail-multi-phone.html`            | Two comma-separated numbers in one field.                                                              |
-| `detail-legacy-prizma.html`          | The legacy surface, proving the markup is the same.                                                    |
-| `detail-sajt-populated.html`         | The other half of trap 4 — a record that really does publish `www.abode.rs`.                           |
+| File                                                                                               | What it is                                                                                                                                                                                                    |
+| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `country-index-srbija.html`                                                                        | `/Srbija/` — the 26 sections, under `a.cat-link`.                                                                                                                                                             |
+| `section-index-gradjevinarstvo.html`                                                               | The `GRAĐEVINARSTVO` index; 22 activity codes.                                                                                                                                                                |
+| `section-index-industrija.html`                                                                    | `d6` — where `23.64 Proizvodnja maltera` lives.                                                                                                                                                               |
+| `section-index-trgovina-na-veliko.html`                                                            | `d20` — where `46.73` lives.                                                                                                                                                                                  |
+| `section-index-usluzne-delatnosti.html`                                                            | `d24` — where `71.11` and `71.12` live.                                                                                                                                                                       |
+| `category-l197-proizvodnja-maltera.html`                                                           | The `23.64` category page — all 40 detail links.                                                                                                                                                              |
+| `detail-l56-…`, `detail-l72-…`, `detail-l197-…`, `detail-l548-…`, `detail-l573-…`, `detail-l574-…` | One live page from each of the six widened codes, saved 2026-08-22 **before** the crawl was launched. They exist to answer one question: does a section outside `d4` print the same eight labels? All six do. |
+| `category-l70-malterisanje.html`                                                                   | The `43.31` category page — all 900 single-quoted detail links.                                                                                                                                               |
+| `category-legacy-433100.html`                                                                      | The legacy `43.31` index — 852 links, 65 with a slash in the slug.                                                                                                                                            |
+| `detail-agmax-company.html`                                                                        | A fully populated privredno društvo: `Forma`, `Status`, structured address, phone, MB, PIB, `Članovi`.                                                                                                        |
+| `detail-acalend-sajt-prose.html`                                                                   | A preduzetnik with an empty `Sajt:` followed by the prose sentence.                                                                                                                                           |
+| `detail-matis-nis-blank-pib.html`                                                                  | A preduzetnik with a blank `PIB:` — the fall-through trap.                                                                                                                                                    |
+| `detail-multi-phone.html`                                                                          | Two comma-separated numbers in one field.                                                                                                                                                                     |
+| `detail-legacy-prizma.html`                                                                        | The legacy surface, proving the markup is the same.                                                                                                                                                           |
+| `detail-sajt-populated.html`                                                                       | The other half of trap 4 — a record that really does publish `www.abode.rs`.                                                                                                                                  |
 
 Two are **derived**, and say so in their names: `category-redesigned.html` and
 `detail-redesigned.html` are the real pages with one thing broken, and they

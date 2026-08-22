@@ -150,6 +150,10 @@ export interface LeadInput {
   readonly longitude?: number | null | undefined;
   readonly description?: string | null | undefined;
   readonly openingHours?: string | null | undefined;
+  /** APR activity code as the source printed it — `4331`. Null for every other source. */
+  readonly activityCode?: string | null | undefined;
+  /** The source's own name for that code — `Malterisanje`. */
+  readonly activityName?: string | null | undefined;
   readonly leadScore?: number | undefined;
   readonly scoreBreakdown?: string | null | undefined;
   readonly relevanceScore?: number | undefined;
@@ -521,6 +525,8 @@ const FIELD_TO_COLUMN = {
   registration_number: 'registrationNumber',
   tax_id: 'taxId',
   coordinates: null,
+  activity_code: 'activityCode',
+  activity_name: 'activityName',
 } as const satisfies Record<ProvenanceField, keyof Lead | null>;
 
 interface FieldClaim {
@@ -546,6 +552,10 @@ function fieldClaimsFrom(input: LeadInput): FieldClaim[] {
   add('opening_hours', input.openingHours);
   add('registration_number', input.registrationNumber);
   add('tax_id', input.taxId);
+  // Source-stated, and a claim like any other: two sources that file the same
+  // business under different codes record a conflict rather than overwrite.
+  add('activity_code', input.activityCode);
+  add('activity_name', input.activityName);
   if (input.classification && isInScope(input.classification)) {
     add('classification', input.classification);
   }
@@ -686,6 +696,8 @@ function insertLead(tx: Executor, input: LeadInput, at: Date): number {
       longitude: input.longitude ?? null,
       description: input.description ?? null,
       openingHours: input.openingHours ?? null,
+      activityCode: input.activityCode ?? null,
+      activityName: input.activityName ?? null,
       leadScore: input.leadScore ?? 0,
       scoreBreakdown: input.scoreBreakdown ?? null,
       relevanceScore: input.relevanceScore ?? 0,
@@ -734,6 +746,8 @@ function updateLeadFillingBlanks(tx: Executor, existing: Lead, input: LeadInput,
   fill('longitude', input.longitude);
   fill('description', input.description);
   fill('openingHours', input.openingHours);
+  fill('activityCode', input.activityCode);
+  fill('activityName', input.activityName);
 
   // `UNCLASSIFIED` is the absence of a label and an incoming one fills it.
   // `OUT_OF_SCOPE` is not absence — it is a decision, and a thinner listing
@@ -1563,6 +1577,8 @@ const INHERITABLE_COLUMNS = [
   'longitude',
   'description',
   'openingHours',
+  'activityCode',
+  'activityName',
 ] as const satisfies readonly (keyof Lead)[];
 
 export function getMergeLogEntry(db: Executor, mergeLogId: number): MergeLogEntry | undefined {

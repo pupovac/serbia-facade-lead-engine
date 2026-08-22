@@ -77,6 +77,17 @@ claims; that is what makes "one clean row per business" cheap.
   a derived convenience column, `relevance × contactability / 100`, for the
   export's single sort key. None of the three is a purchase-likelihood guess,
   and nothing may smuggle a sales heuristic into them.
+- `activity_code` and `activity_name` hold the APR (KD-2010) classification the
+  source printed — `4331` / `Malterisanje` — as two columns, because the code is
+  what a filter and a join key needs and the name is what a human reads in the
+  export. Both are **nullable and additive**: only a register-derived source
+  publishes them, nothing is backfilled, and null means "this source does not
+  publish an activity code", not "unknown". They are stored as source-stated
+  and are never reconciled — not against the index the record was discovered
+  under, and not against APR's own open data, which FUZZ-45 measured disagreeing
+  on 52 of 329 matched records. Deciding which register is right is an
+  enrichment pass's job; a write-time guess would destroy the evidence it needs.
+  Added by FUZZ-46 (`drizzle/0005_apr_activity_category.sql`).
 - `merged_into_id` is set when this lead was merged away. The row stays, so
   every id ever handed out keeps resolving.
 
@@ -108,7 +119,7 @@ not an index.
 ### `lead_field_values` — per-field provenance, and the conflicts
 
 The claim log for the single-valued facts on `leads`: name, address, city,
-classification, registration number and the rest.
+classification, registration number, activity code and the rest.
 
 Exactly one claim per (lead, field) carries `is_current = true` and mirrors the
 `leads` column. Any other distinct value for that field **is** the recorded

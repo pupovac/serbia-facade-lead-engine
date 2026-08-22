@@ -27,8 +27,11 @@ import { expectFound, type CrawlContext, type DiscoveredItem } from '../../types
 import adapter from './index.js';
 
 const BASE = 'https://www.kompanije.net';
+const COUNTRY = `${BASE}/Srbija/`;
 const SECTION = `${BASE}/Srbija/d4_GRA%C4%90EVINARSTVO.html`;
+const INDUSTRIJA = `${BASE}/Srbija/d6_INDUSTRIJA.html`;
 const CATEGORY = `${BASE}/Srbija/l70_Malterisanje.html`;
+const MALTER = `${BASE}/Srbija/l197_Proizvodnja-maltera.html`;
 const LEGACY = `${BASE}/preduzetnici/preduzetnici.php?delatnost=433100`;
 const SCOPE = 'code:43.31|surface:modern';
 const HOUR = 60 * 60 * 1000;
@@ -45,12 +48,17 @@ function fixture(name: string): string {
  * without a fourth near-identical `.html` file in `__fixtures__`.
  */
 const PAGES: ReadonlyMap<string, string> = new Map([
+  [COUNTRY, 'country-index-srbija.html'],
   [SECTION, 'section-index-gradjevinarstvo.html'],
+  [INDUSTRIJA, 'section-index-industrija.html'],
   [CATEGORY, 'category-l70-malterisanje.html'],
+  [MALTER, 'category-l197-proizvodnja-maltera.html'],
   [LEGACY, 'category-legacy-433100.html'],
   [`${BASE}/Srbija/acalend/26011`, 'detail-acalend-sajt-prose.html'],
   [`${BASE}/Srbija/agmax/26017`, 'detail-agmax-company.html'],
   [`${BASE}/Srbija/matis-nis/26021`, 'detail-matis-nis-blank-pib.html'],
+  [`${BASE}/Srbija/demitkeramika/70238`, 'detail-l197-proizvodnja-maltera.html'],
+  [`${BASE}/Srbija/a-gradjevinski-materijal/205403`, 'detail-l548-gradjevinski-materijal.html'],
 ]);
 
 interface Harness {
@@ -133,11 +141,11 @@ function unit(id: string): Municipality {
 }
 
 describe('discover', () => {
-  it('reads the section index once, then one page for the whole category', async () => {
+  it('reads the index chain once, then one page for the whole category', async () => {
     const test = harness();
     const items = await collect(test.ctx);
 
-    expect(test.requested).toEqual([SECTION, CATEGORY]);
+    expect(test.requested).toEqual([COUNTRY, SECTION, CATEGORY]);
     expect(items).toHaveLength(900);
     expect(items[0]).toMatchObject({
       url: `${BASE}/Srbija/acalend/26011`,
@@ -161,7 +169,44 @@ describe('discover', () => {
     const test = harness({ pages: moved });
 
     expect(await collect(test.ctx)).toHaveLength(900);
-    expect(test.requested).toEqual([SECTION, renamed]);
+    expect(test.requested).toEqual([COUNTRY, SECTION, renamed]);
+  });
+
+  it('resolves the section URL off the country index the same way', async () => {
+    // FUZZ-46 spread the crawl over four sections whose slugs carry `Đ`, `Ž`
+    // and a Serbian digraph. Reading them removes four ways to 404 a crawl.
+    const renamed = `${BASE}/Srbija/d6_INDUSTRIJA-I-PROIZVODNJA.html`;
+    const moved = new Map(PAGES);
+    moved.set(
+      COUNTRY,
+      "<html><body><a class='cat-link' href='./d6_INDUSTRIJA-I-PROIZVODNJA.html'>Industrija</a></body></html>",
+    );
+    moved.set(renamed, 'section-index-industrija.html');
+    const test = harness({ pages: moved, queries: ['23.64'] });
+
+    expect(await collect(test.ctx)).toHaveLength(40);
+    expect(test.requested).toEqual([COUNTRY, renamed, MALTER]);
+  });
+
+  it('walks a code that lives in another section entirely', async () => {
+    const test = harness({ queries: ['23.64'] });
+    const items = await collect(test.ctx);
+
+    expect(test.requested).toEqual([COUNTRY, INDUSTRIJA, MALTER]);
+    expect(items).toHaveLength(40);
+    expect(items[0]).toMatchObject({
+      scopeKey: 'code:23.64|surface:modern',
+      hints: { surface: 'modern', categoryCode: '23.64' },
+    });
+  });
+
+  it('fetches only the sections the run still needs', async () => {
+    // A run resumed after `43.31` completed must not re-read `d4`, and a run
+    // that only wants `23.64` must never read `d4` at all.
+    const test = harness({ queries: ['23.64', '43.31'] });
+    test.state.saveScope(SCOPE, { cursor: null, status: 'done' });
+    await collect(test.ctx);
+    expect(test.requested).toEqual([COUNTRY, INDUSTRIJA, MALTER]);
   });
 
   it('marks the category done and clears the cursor when the walk finishes', async () => {
@@ -224,7 +269,7 @@ describe('discover', () => {
     const test = harness({ queries: ['43.31', 'legacy'] });
     const items = await collect(test.ctx);
 
-    expect(test.requested).toEqual([SECTION, CATEGORY, LEGACY]);
+    expect(test.requested).toEqual([COUNTRY, SECTION, CATEGORY, LEGACY]);
     expect(items).toHaveLength(900 + 852);
     expect(items.at(-1)).toMatchObject({
       scopeKey: 'code:43.31|surface:legacy',
@@ -232,8 +277,15 @@ describe('discover', () => {
     });
   });
 
+  it('raises when the country index holds no section link at all', async () => {
+    const bare = new Map([[COUNTRY, 'category-redesigned.html']]);
+    const test = harness({ pages: bare });
+    await expect(collect(test.ctx)).rejects.toThrow(StructureChangedError);
+  });
+
   it('raises when the section index holds no activity-code link at all', async () => {
-    const bare = new Map([[SECTION, 'category-redesigned.html']]);
+    const bare = new Map(PAGES);
+    bare.set(SECTION, 'category-redesigned.html');
     const test = harness({ pages: bare });
     await expect(collect(test.ctx)).rejects.toThrow(StructureChangedError);
   });
@@ -248,6 +300,16 @@ describe('discover', () => {
     );
     const test = harness({ pages: partial });
     await expect(collect(test.ctx)).rejects.toThrow(/l70 \(43\.31\)/);
+  });
+
+  it('raises naming the section when a whole section has lost its link', async () => {
+    const partial = new Map(PAGES);
+    partial.set(
+      COUNTRY,
+      "<html><body><a class='cat-link' href='./d4_GRA%C4%90EVINARSTVO.html'>Građevinarstvo</a></body></html>",
+    );
+    const test = harness({ pages: partial, queries: ['23.64'] });
+    await expect(collect(test.ctx)).rejects.toThrow(/section links d6/);
   });
 });
 
@@ -277,6 +339,38 @@ describe('extract', () => {
     // says so. A `--city obrenovac` run has to find it.
     const test = harness({ municipalities: [unit('beograd-obrenovac')] });
     expect(await adapter.extract(itemFor('26011', 'acalend'), test.ctx)).toHaveLength(1);
+  });
+
+  it('asserts the store side for a 46.73 record, end to end', async () => {
+    const test = harness();
+    const records = await adapter.extract(
+      {
+        url: `${BASE}/Srbija/a-gradjevinski-materijal/205403`,
+        scopeKey: 'code:46.73|surface:modern',
+        hints: { recordId: '205403', surface: 'modern', categoryCode: '46.73', indexName: '' },
+      },
+      test.ctx,
+    );
+    expect(records[0]).toMatchObject({
+      assertedType: 'CONSTRUCTION_MATERIAL_STORE',
+      activityCode: '4673',
+      activityName: 'Trgovina na veliko drvetom i građ materijalom',
+    });
+  });
+
+  it('asserts nothing for a 71.12 record, whatever its name says', async () => {
+    const test = harness();
+    const records = await adapter.extract(
+      {
+        url: `${BASE}/Srbija/demitkeramika/70238`,
+        scopeKey: 'code:71.12|surface:modern',
+        hints: { recordId: '70238', surface: 'modern', categoryCode: '71.12', indexName: '' },
+      },
+      test.ctx,
+    );
+    expect(records[0]?.assertedType).toBeUndefined();
+    // The activity code is what segments this record, not its name.
+    expect(records[0]?.activityCode).toBe('3832');
   });
 
   it('refuses an item with no activity code rather than asserting the wrong trade', async () => {

@@ -362,6 +362,71 @@ describe('upsertLead — fill blanks, never clobber', () => {
 
 /* -------------------------------------------------------------------------- */
 
+describe('the APR activity category', () => {
+  it('stores the code and its name, and records both as source claims', () => {
+    const result = upsertLead(
+      db,
+      lead('ACA LAZAREVIĆ PR ACALEND STUBLINE', {
+        activityCode: '4331',
+        activityName: 'Malterisanje',
+        phones: [{ e164: '+381643637451', raw: '+381.(0)64.3637451' }],
+      }),
+      PORTAL,
+    );
+
+    const stored = getLead(db, result.leadId);
+    expect(stored?.activityCode).toBe('4331');
+    expect(stored?.activityName).toBe('Malterisanje');
+
+    // Per-field provenance, like every other single-valued fact: the claim
+    // carries who said it and at which URL.
+    const claims = db
+      .select()
+      .from(leadFieldValues)
+      .where(eq(leadFieldValues.leadId, result.leadId))
+      .all()
+      .filter((row) => row.field === 'activity_code' || row.field === 'activity_name');
+    expect(claims.map((row) => row.value).sort()).toEqual(['4331', 'Malterisanje']);
+    expect(claims.every((row) => row.sourceId === 'portal-srbija')).toBe(true);
+    expect(claims.every((row) => row.isCurrent)).toBe(true);
+  });
+
+  it('leaves both columns null for a source that publishes no activity code', () => {
+    // The normal case, and it must stay the normal case: nothing is backfilled
+    // and no adapter is obliged to have an opinion.
+    const result = upsertLead(db, lead('Fasade Novak'), PORTAL);
+    const stored = getLead(db, result.leadId);
+    expect(stored?.activityCode).toBeNull();
+    expect(stored?.activityName).toBeNull();
+  });
+
+  it('records a disagreement between two registers instead of overwriting one', () => {
+    // FUZZ-45 measured the site's own filing and APR's open data disagreeing on
+    // 52 of 329 records. Neither wins here — the conflict is the finding.
+    const first = upsertLead(
+      db,
+      lead('MET INŽENJERING 021 DOO KULA', {
+        activityCode: '3832',
+        phones: [{ e164: '+381655665605', raw: '+381 65 5665605' }],
+      }),
+      PORTAL,
+    );
+    const second = upsertLead(
+      db,
+      lead('MET INŽENJERING 021 DOO KULA', {
+        activityCode: '2364',
+        phones: [{ e164: '+381655665605', raw: '+381 65 5665605' }],
+      }),
+      NAVIDIKU,
+    );
+
+    expect(getLead(db, first.leadId)?.activityCode).toBe('3832');
+    const conflict = fieldConflicts(db, second.leadId).find((c) => c.field === 'activity_code');
+    expect(conflict?.current).toBe('3832');
+    expect(conflict?.claims.map((c) => c.value).sort()).toEqual(['2364', '3832']);
+  });
+});
+
 describe('incremental re-runs', () => {
   it('updates instead of re-inserting when the same page is scraped again', () => {
     const day1 = new Date('2026-08-01T09:00:00Z');

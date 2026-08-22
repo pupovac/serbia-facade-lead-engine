@@ -12,6 +12,12 @@
  * hold". Both are sortable and filterable on their own — see `SORT_COLUMNS`
  * and `buildWhere` — because the single folded score put `UNKNOWN` rows in a
  * third of the owner's top 200.
+ *
+ * `activity_code` is filterable for the same reason one step further out. Most
+ * of what `kompanije-net`'s widened codes publish is a registered name and a
+ * phone, and a name like `GRADNJA DOO` classifies as nothing; the code the
+ * state filed the business under is the only thing that tells an architect from
+ * a general builder from a fasader, so it is a `where`, not a display column.
  */
 import {
   and,
@@ -153,6 +159,7 @@ function buildWhere(query: LeadListQuery): SQL | undefined {
     );
     predicates.push((query.hasPhone ? hasValidPhone : sql`not ${hasValidPhone}`) as SQL);
   }
+  if (query.activityCode) predicates.push(eq(leads.activityCode, query.activityCode) as SQL);
   if (query.sourceId) {
     predicates.push(
       exists(
@@ -237,6 +244,8 @@ export function listLeads(db: Executor, query: LeadListQuery = {}): LeadListPage
       contactabilityScore: leads.contactabilityScore,
       leadScore: leads.leadScore,
       status: leads.status,
+      activityCode: leads.activityCode,
+      activityName: leads.activityName,
       reviewedAt: leads.reviewedAt,
       lastSeenAt: leads.lastSeenAt,
     })
@@ -396,6 +405,28 @@ export function leadFacets(db: Executor): LeadFacets {
     )
     .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, 'sr'));
 
+  // `4331 — Malterisanje`, ordered by how many leads carry the code. Read from
+  // the data like every other facet: the vocabulary is whatever the crawls
+  // actually filed, not a list of KD-2010 codes baked into a component.
+  const activityCodes = db
+    .select({ value: leads.activityCode, name: leads.activityName, count: count() })
+    .from(leads)
+    .where(ACTIVE)
+    .groupBy(leads.activityCode, leads.activityName)
+    .orderBy(desc(count()))
+    .all()
+    .flatMap((row) =>
+      row.value == null
+        ? []
+        : [
+            toFacet(
+              row.value,
+              row.name == null ? row.value : `${row.value} — ${row.name}`,
+              row.count,
+            ),
+          ],
+    );
+
   const sourceRows = db
     .select({
       value: leadSources.sourceId,
@@ -411,7 +442,7 @@ export function leadFacets(db: Executor): LeadFacets {
     .all()
     .map((row) => toFacet(row.value, row.name, row.count));
 
-  return { classifications, statuses, municipalities, sources: sourceRows };
+  return { classifications, statuses, municipalities, sources: sourceRows, activityCodes };
 }
 
 /** Resolve a lead id to the row it lives on today, following a merge tombstone. */

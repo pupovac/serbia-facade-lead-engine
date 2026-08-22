@@ -82,6 +82,10 @@ export function parseLeadQuery(params: RawSearchParams): LeadListQuery {
     includeOutOfScope: one(params, 'ruledOut') === 'yes' ? true : undefined,
     hasPhone: phone === 'yes' ? true : phone === 'no' ? false : undefined,
     sourceId: one(params, 'izvor'),
+    // `delatnost` — the APR activity code, in Serbian like every other filter
+    // key. Validated against the facet, not against a baked-in code list: the
+    // vocabulary is whatever the crawls filed.
+    activityCode: one(params, 'delatnost'),
     sort,
     direction,
     page: integer(one(params, 'page')),
@@ -119,6 +123,7 @@ export function leadQueryToSearch(
   if (merged.hasPhone === true) params.set('phone', 'yes');
   if (merged.hasPhone === false) params.set('phone', 'no');
   set('izvor', merged.sourceId);
+  set('delatnost', merged.activityCode);
   if (merged.sort && merged.sort !== 'score') set('sort', merged.sort);
   if (merged.direction && merged.direction !== 'desc') set('dir', merged.direction);
   if (merged.page != null && merged.page > 1) set('page', merged.page);

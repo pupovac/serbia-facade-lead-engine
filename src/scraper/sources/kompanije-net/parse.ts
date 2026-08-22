@@ -81,24 +81,59 @@ export interface CategoryEntry {
 }
 
 /**
- * The `GRAĐEVINARSTVO` index → `listId → category page URL`.
+ * An index page of `<prefix><n>_<slug>.html` links → `id → absolute URL`.
  *
- * The slug carries diacritics and the site has changed them before
- * (`l76_Ostali-nepomenuti-specifični-…`), so the URL is read here rather than
- * built from a string in `categories.ts`. The stable half is the `l<id>_`
- * prefix, and that is what this matches on.
+ * Every slug on this site carries diacritics and the site has changed them
+ * before (`l76_Ostali-nepomenuti-specifični-…`), so no URL in the crawl chain
+ * is assembled from a string in `categories.ts` — each one is read off the page
+ * above it. The stable half is the `<prefix><n>_` id, and that is what this
+ * matches on.
  */
-export function parseSectionIndex($: CheerioAPI, pageUrl: string): Map<string, string> {
-  const byListId = new Map<string, string>();
-  for (const element of $('a.cat-list[href]').toArray()) {
+function parseIdIndex(
+  $: CheerioAPI,
+  pageUrl: string,
+  selector: string,
+  prefix: 'd' | 'l',
+): Map<string, string> {
+  const byId = new Map<string, string>();
+  const pattern = new RegExp(`(?:^|/)(${prefix}\\d+)_`);
+  for (const element of $(selector).toArray()) {
     const href = $(element).attr('href');
     if (href === undefined) continue;
-    const match = /(?:^|\/)(l\d+)_/.exec(href);
+    const match = pattern.exec(href);
     if (match === null) continue;
-    const listId = match[1] as string;
-    if (!byListId.has(listId)) byListId.set(listId, new URL(href, pageUrl).toString());
+    const id = match[1] as string;
+    if (!byId.has(id)) byId.set(id, new URL(href, pageUrl).toString());
   }
-  return byListId;
+  return byId;
+}
+
+/**
+ * The country index, `/Srbija/` → `sectionId → section page URL`.
+ *
+ * FUZZ-45 hard-coded one section URL, because every code it crawled was a
+ * construction trade and `d4 GRAĐEVINARSTVO` held all five. FUZZ-46's codes are
+ * spread over four sections — `d6 INDUSTRIJA`, `d20 TRGOVINA-NA-VELIKO`,
+ * `d24 USLUŽNE-DELATNOSTI` — and hard-coding four more diacritic-bearing slugs
+ * would put four more ways to 404 a five-hour crawl into a constants table.
+ * One extra request per run buys them all being read instead.
+ *
+ * The country index uses `a.cat-link`; a section index uses `a.cat-list`. They
+ * are different classes on purpose and neither is guessed at.
+ */
+export function parseCountryIndex($: CheerioAPI, pageUrl: string): Map<string, string> {
+  return parseIdIndex($, pageUrl, 'a.cat-link[href]', 'd');
+}
+
+/**
+ * A section index → `listId → category page URL`.
+ *
+ * Verified identical across all four sections FUZZ-46 reaches: the anchors
+ * carry `class='cat-list'` and single-quoted relative hrefs in `d6`, `d20` and
+ * `d24` exactly as they do in `d4`.
+ */
+export function parseSectionIndex($: CheerioAPI, pageUrl: string): Map<string, string> {
+  return parseIdIndex($, pageUrl, 'a.cat-list[href]', 'l');
 }
 
 /**
@@ -497,7 +532,48 @@ export function parseCompany($: CheerioAPI, url: string, expect: Expect): Compan
 export interface RecordRef {
   readonly recordId: string;
   readonly surface: Surface;
+  /** The category the record was **discovered** under. Crawl provenance. */
   readonly category: ActivityCategory;
+}
+
+/** A KD-2010 code as the detail page prints it: four digits, nothing else. */
+const SIFRA = /^\d{4}$/;
+
+/**
+ * Should this record carry the category's `assertedType`?
+ *
+ * `null` means no, and names why.
+ *
+ * The category asserts a trade because the *code* is the evidence. When the
+ * detail page prints a different code than the index filed the record under —
+ * and it does; the two are snapshots of different vintages — that evidence is
+ * gone: `MET INŽENJERING 021`, discovered under `23.64 Proizvodnja maltera`,
+ * prints `3832 Ponovna upotreba razvrstanih materijala`. Asserting
+ * `CONSTRUCTION_MATERIAL_STORE` on the strength of an index entry the page
+ * itself contradicts is the assertion doing the classifier's guessing for it,
+ * so the record goes through `src/lib/classify` instead. Nothing is dropped and
+ * nothing is reconciled — both codes are stored, and the count of these is in
+ * the run log.
+ *
+ * This guard is applied to the codes FUZZ-46 added. The core five keep FUZZ-45's
+ * behaviour unchanged: their numbers were measured and accepted with the
+ * assertion made from the discovery category, and this issue is not the place
+ * to move them.
+ */
+export function assertionFor(
+  page: CompanyPage,
+  category: ActivityCategory,
+): { type: NonNullable<ActivityCategory['assertedType']>; reason: string } | null {
+  if (category.assertedType === null) return null;
+  const contradicted =
+    category.tier !== 'core' && page.activityCode !== null && page.activityCode !== category.sifra;
+  if (contradicted) return null;
+  return {
+    type: category.assertedType,
+    reason:
+      `registered under KD ${category.code} ${category.name} ` +
+      `(šifra delatnosti ${page.activityCode ?? category.sifra})`,
+  };
 }
 
 /**
@@ -505,21 +581,35 @@ export interface RecordRef {
  *
  * Two decisions worth stating.
  *
- * **`assertedType` is claimed, and only for the core codes.** Being in
- * `43.31 Malterisanje` *is* the evidence — the classifier has nothing to read
- * on a page whose only prose is "Ova firma se bavi pretežno delatnošću
- * Malterisanje", and a sole trader called `ACA LAZAREVIĆ PR` scores `UNKNOWN`
- * forever otherwise. `assertedTypeReason` names the code and the site's own
- * category label, so the claim stays arguable from the `sourceUrl`. An adjacent
- * code asserts nothing: `41.20 Izgradnja zgrada` is general construction, and
- * claiming a facade contractor there would be the assertion doing the
- * classifier's guessing for it.
+ * **`assertedType` is the category's, and most categories assert nothing.**
+ * Being in `43.31 Malterisanje` *is* the evidence — the classifier has nothing
+ * to read on a page whose only prose is "Ova firma se bavi pretežno delatnošću
+ * Malterisanje", and a sole trader called `ACA LAZAREVIĆ PR` scores
+ * `UNCLASSIFIED` forever otherwise. `46.73 Trgovina na veliko … građevinskim
+ * materijalom` is the same argument for the other buyer group. `41.20 Izgradnja
+ * zgrada`, `71.11 Arhitektonska delatnost` and `71.12 Inženjerske delatnosti`
+ * assert nothing and go through `src/lib/classify` on their name, because a
+ * general builder is not a fasader and an engineering firm is neither. See
+ * `assertionFor` and `ActivityCategory.assertedType`.
+ *
+ * **The activity category is carried as two fields, source-stated.** The
+ * four-digit code and the site's own name for it, exactly as the detail page
+ * printed them, with the category the record was *discovered* under kept beside
+ * them in `extra`. The two disagree on a real share of records and neither is
+ * corrected against the other here — that is a later enrichment pass's call,
+ * and overwriting one with the other at parse time would destroy the evidence
+ * it needs.
  *
  * **No email is ever emitted.** The template has no email field at all. That is
  * fine and expected — a name, a city and a phone is a good lead.
  */
 export function toRawLead(page: CompanyPage, url: string, ref: RecordRef): RawLeadInput {
-  const asserted = ref.category.tier === 'core';
+  const asserted = assertionFor(page, ref.category);
+  // Only a value that is actually a code reaches the lead. A malformed one is
+  // kept in `extra` and never promoted, because a lead is worth having for its
+  // phone number whatever the register did to its activity field.
+  const activityCode =
+    page.activityCode !== null && SIFRA.test(page.activityCode) ? page.activityCode : null;
   return {
     sourceUrl: url,
     name: page.name,
@@ -541,22 +631,26 @@ export function toRawLead(page: CompanyPage, url: string, ref: RecordRef): RawLe
         [page.activityName, ref.category.name].filter((value): value is string => value !== null),
       ),
     ],
-    ...(asserted
-      ? {
-          assertedType: 'FACADE_CONTRACTOR' as const,
-          assertedTypeReason:
-            `registered under KD ${ref.category.code} ${ref.category.name} ` +
-            `(šifra delatnosti ${page.activityCode ?? ref.category.sifra})`,
-        }
-      : {}),
+    ...(activityCode === null ? {} : { activityCode }),
+    ...(page.activityName === null ? {} : { activityName: page.activityName }),
+    ...(asserted === null
+      ? {}
+      : { assertedType: asserted.type, assertedTypeReason: asserted.reason }),
     text: page.text,
     links: [...page.links],
     extra: {
       recordId: ref.recordId,
       surface: ref.surface,
+      // The category the record was discovered under, kept even when the page
+      // states a different one. It is the actual crawl provenance — which index
+      // page this URL came off — and it costs two strings.
       categoryCode: ref.category.code,
+      categoryName: ref.category.name,
       categoryListId: ref.category.listId,
       ...(page.activityCode === null ? {} : { sifraDelatnosti: page.activityCode }),
+      ...(page.activityCode === null || page.activityCode === ref.category.sifra
+        ? {}
+        : { activityCodeDiffersFromCategory: true }),
       ...(page.status === null ? {} : { status: page.status }),
       ...(page.municipality === null ? {} : { municipality: page.municipality }),
       ...(page.address === null ? {} : { addressRaw: page.address.raw }),

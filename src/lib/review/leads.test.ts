@@ -419,6 +419,79 @@ describe('facets', () => {
 
 /* -------------------------------------------------------------------------- */
 
+describe('the APR activity code', () => {
+  beforeEach(() => {
+    // A shape the widened `kompanije-net` codes actually produce: an architect,
+    // an engineering firm and a general builder, none of them classifiable from
+    // its name, all three separable only by the code.
+    add('AEK DOO', {
+      activityCode: '7111',
+      activityName: 'Arhitektonska delatnost',
+      classification: 'UNCLASSIFIED',
+    });
+    add('AB PROJEKT INŽENJERING', {
+      activityCode: '7112',
+      activityName: 'Inženjerske delatnosti i tehničko savetovanje',
+      classification: 'UNCLASSIFIED',
+    });
+    add('GRADNJA DOO', {
+      activityCode: '4120',
+      activityName: 'Izgradnja stambenih i nestambenih zgrada',
+      classification: 'UNCLASSIFIED',
+    });
+    add('A GRAĐEVINSKI MATERIJALI DOO', {
+      activityCode: '4673',
+      activityName: 'Trgovina na veliko drvetom i građ materijalom',
+      classification: 'CONSTRUCTION_MATERIAL_STORE',
+    });
+    add('Fasade Novak', { classification: 'FACADE_CONTRACTOR' });
+  });
+
+  it('filters the whole result set, not just the visible page', () => {
+    const page = listLeads(db, { activityCode: '7111' });
+    expect(page.total).toBe(1);
+    expect(page.rows[0]?.name).toBe('AEK DOO');
+  });
+
+  it('carries the code and its name onto the row', () => {
+    const row = listLeads(db, { activityCode: '4673' }).rows[0];
+    expect(row?.activityCode).toBe('4673');
+    expect(row?.activityName).toBe('Trgovina na veliko drvetom i građ materijalom');
+  });
+
+  it('leaves the field null for a source that does not publish one', () => {
+    const row = listLeads(db, { search: 'Fasade Novak' }).rows[0];
+    expect(row?.activityCode).toBeNull();
+    expect(row?.activityName).toBeNull();
+  });
+
+  it('offers a facet labelled the way the export reads, and skips the nulls', () => {
+    const facets = leadFacets(db);
+    expect(facets.activityCodes.map((f) => f.value).sort()).toEqual([
+      '4120',
+      '4673',
+      '7111',
+      '7112',
+    ]);
+    expect(facets.activityCodes.find((f) => f.value === '7111')?.label).toBe(
+      '7111 — Arhitektonska delatnost',
+    );
+    // The lead with no code is not a filter option called "null".
+    expect(facets.activityCodes.reduce((sum, f) => sum + f.count, 0)).toBe(4);
+  });
+
+  it('has an empty facet when nothing in the database carries a code', () => {
+    const empty = openTestDatabase();
+    try {
+      expect(leadFacets(empty).activityCodes).toEqual([]);
+    } finally {
+      closeDatabase(empty);
+    }
+  });
+});
+
+/* -------------------------------------------------------------------------- */
+
 describe('source URLs', () => {
   it('does not offer the Overture S3 prefix as a link', () => {
     expect(

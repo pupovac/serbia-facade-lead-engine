@@ -28,9 +28,12 @@ import { expectFound } from '../../types.js';
 import { CATEGORIES, selectCategories, selectSurfaces, scopeKeyOf } from './categories.js';
 import {
   LABELS,
+  REQUIRED_LABELS,
+  assertionFor,
   looksLikeWebsite,
   parseAddress,
   parseCompany,
+  parseCountryIndex,
   parseLegacyCategory,
   parseModernCategory,
   parsePlaceSentence,
@@ -42,9 +45,18 @@ import {
 } from './parse.js';
 
 const BASE = 'https://www.kompanije.net';
+const COUNTRY = `${BASE}/Srbija/`;
 const SECTION = `${BASE}/Srbija/d4_GRAĐEVINARSTVO.html`;
 const CATEGORY = `${BASE}/Srbija/l70_Malterisanje.html`;
 const LEGACY_INDEX = `${BASE}/preduzetnici/preduzetnici.php?delatnost=433100`;
+
+/** The section index fixture that carries each `sectionId` in the table. */
+const SECTION_FIXTURES: Readonly<Record<string, string>> = {
+  d4: 'section-index-gradjevinarstvo.html',
+  d6: 'section-index-industrija.html',
+  d20: 'section-index-trgovina-na-veliko.html',
+  d24: 'section-index-usluzne-delatnosti.html',
+};
 
 function fixture(name: string): cheerio.CheerioAPI {
   return cheerio.load(
@@ -55,24 +67,67 @@ function fixture(name: string): cheerio.CheerioAPI {
 const assert: Expect = (value, selector, url, expected) =>
   expectFound('kompanije-net', value, selector, url, expected);
 
-const MALTERISANJE = CATEGORIES.find((category) => category.code === '43.31')!;
-const IZGRADNJA_ZGRADA = CATEGORIES.find((category) => category.code === '41.20')!;
+const categoryFor = (code: string) => CATEGORIES.find((entry) => entry.code === code)!;
+const MALTERISANJE = categoryFor('43.31');
+const IZGRADNJA_ZGRADA = categoryFor('41.20');
+const TRGOVINA_MATERIJALOM = categoryFor('46.73');
+
+describe('parseCountryIndex', () => {
+  it('resolves every section this adapter reaches, diacritics and all', () => {
+    const bySection = parseCountryIndex(fixture('country-index-srbija.html'), COUNTRY);
+
+    expect(bySection.size).toBe(26);
+    // The four slugs FUZZ-45 would have had to hard-code, two of them carrying
+    // a character that has to survive URL encoding.
+    expect(bySection.get('d4')).toBe(`${BASE}/Srbija/d4_GRA%C4%90EVINARSTVO.html`);
+    expect(bySection.get('d6')).toBe(`${BASE}/Srbija/d6_INDUSTRIJA.html`);
+    expect(bySection.get('d20')).toBe(`${BASE}/Srbija/d20_TRGOVINA-NA-VELIKO.html`);
+    expect(bySection.get('d24')).toBe(`${BASE}/Srbija/d24_USLU%C5%BDNE-DELATNOSTI.html`);
+
+    // Every section in the table is reachable. This is the assertion that fails
+    // first if the site renumbers or renames its sections.
+    for (const entry of CATEGORIES) {
+      expect(bySection.has(entry.sectionId), `${entry.sectionId} (${entry.code})`).toBe(true);
+    }
+  });
+
+  it('does not mistake a category link for a section link', () => {
+    // `a.cat-link` on the country index, `a.cat-list` on a section index. The
+    // two classes differ by one letter and neither is guessed at.
+    expect(parseCountryIndex(fixture('section-index-gradjevinarstvo.html'), SECTION).size).toBe(0);
+  });
+});
 
 describe('parseSectionIndex', () => {
   it('resolves every activity code this adapter crawls to an absolute URL', () => {
-    const byListId = parseSectionIndex(fixture('section-index-gradjevinarstvo.html'), SECTION);
+    const byListId = new Map<string, string>();
+    for (const [sectionId, file] of Object.entries(SECTION_FIXTURES)) {
+      const url = `${BASE}/Srbija/${sectionId}_x.html`;
+      for (const [listId, href] of parseSectionIndex(fixture(file), url)) {
+        byListId.set(listId, href);
+      }
+    }
 
-    expect(byListId.size).toBe(22);
     expect(byListId.get('l70')).toBe(`${BASE}/Srbija/l70_Malterisanje.html`);
     expect(byListId.get('l69')).toBe(
       `${BASE}/Srbija/l69_Ostali-instalacioni-radovi-u-gra%C4%91evinarstvu.html`,
     );
+    expect(byListId.get('l197')).toBe(`${BASE}/Srbija/l197_Proizvodnja-maltera.html`);
 
-    // Every code in the table is reachable, core and adjacent alike. This is
-    // the assertion that fails first if the site renumbers its categories.
-    for (const category of CATEGORIES) {
-      expect(byListId.has(category.listId), `${category.listId} (${category.code})`).toBe(true);
+    // Every code in the table is reachable, in the section the table says it is
+    // in. This is the assertion that fails first if the site renumbers its
+    // categories or moves one between sections.
+    for (const entry of CATEGORIES) {
+      const inSection = parseSectionIndex(
+        fixture(SECTION_FIXTURES[entry.sectionId] as string),
+        `${BASE}/Srbija/${entry.sectionId}_x.html`,
+      );
+      expect(inSection.has(entry.listId), `${entry.listId} (${entry.code})`).toBe(true);
     }
+  });
+
+  it('reads the GRAĐEVINARSTVO section exactly as FUZZ-45 did', () => {
+    expect(parseSectionIndex(fixture('section-index-gradjevinarstvo.html'), SECTION).size).toBe(22);
   });
 });
 
@@ -251,6 +306,125 @@ describe('parseCompany — the preduzetnik layout', () => {
   });
 });
 
+/**
+ * The label-set check FUZZ-46 owed the widened six.
+ *
+ * `parseCompany` asserts that every record prints the same eight labels, and
+ * FUZZ-45 validated that on `43.29/43.31/43.34/43.39/43.99` — five codes inside
+ * one section of the site. `23.64` is in `d6 INDUSTRIJA`, `46.73` in
+ * `d20 TRGOVINA-NA-VELIKO`, `71.11` and `71.12` in `d24 USLUŽNE-DELATNOSTI`,
+ * and a different section printing a different template would have turned a
+ * 13,095-request crawl into 13,095 `StructureChangedError`s. One live detail
+ * page from each was fetched before the crawl was launched; these are those
+ * pages, and this is the assertion they were fetched to answer.
+ */
+describe('parseCompany — one page from each of the six widened codes', () => {
+  const SAMPLES = [
+    {
+      code: '41.20',
+      file: 'detail-l56-izgradnja-zgrada.html',
+      url: `${BASE}/Srbija/3-m-trivic-mirko/14276`,
+      name: '3-M. TRIVIĆ MIRKO DOO BATAJNICA',
+      sifra: '4120',
+      activityName: 'Izgradnja stambenih i nestambenih zgrada',
+      phones: [] as string[],
+      registrationNumber: '07720912',
+    },
+    {
+      code: '43.33',
+      file: 'detail-l72-podne-i-zidne-obloge.html',
+      url: `${BASE}/Srbija/keramika-lo/28745`,
+      name: 'ALEKSA ILIĆ PREDUZETNIK, SAMOSTALNA ZANATSKO KERAMIČARSKA RADNJA KERAMIKA LO, LEŠNICA',
+      sifra: '4333',
+      activityName: 'Postavljanje podnih i zidnih obloga',
+      phones: ['+381.(0)15.840874'],
+      registrationNumber: '62704047',
+    },
+    {
+      code: '23.64',
+      file: 'detail-l197-proizvodnja-maltera.html',
+      url: `${BASE}/Srbija/demitkeramika/70238`,
+      name: 'MET INŽENJERING 021 DOO KULA',
+      // The page contradicts the index it was found on. Kept as-is; see below.
+      sifra: '3832',
+      activityName: 'Ponovna upotreba razvrstanih materijala',
+      phones: ['+381 65 5665605'],
+      registrationNumber: '20809817',
+    },
+    {
+      code: '46.73',
+      file: 'detail-l548-gradjevinski-materijal.html',
+      url: `${BASE}/Srbija/a-gradjevinski-materijal/205403`,
+      name: 'A GRAĐEVINSKI MATERIJALI DOO SREMSKA MITROVICA',
+      sifra: '4673',
+      activityName: 'Trgovina na veliko drvetom i građ materijalom',
+      phones: [],
+      registrationNumber: '20705205',
+    },
+    {
+      code: '71.11',
+      file: 'detail-l573-arhitektonska-delatnost.html',
+      url: `${BASE}/Srbija/aek/242130`,
+      name: 'AEK DRUŠTVO SA OGRANIČENOM ODGOVORNOŠĆU, BEOGRAD (STARI GRAD)',
+      sifra: '7111',
+      activityName: 'Arhitektonska delatnost',
+      phones: ['+381.62.249000'],
+      registrationNumber: '20563753',
+    },
+    {
+      code: '71.12',
+      file: 'detail-l574-inzenjerske-delatnosti.html',
+      url: `${BASE}/Srbija/ab-projekt-inzenjering/242539`,
+      name: 'AB PROJEKT INŽENJERING ĐORĐO KURIDŽA PREDUZETNIK APATIN',
+      sifra: '7112',
+      activityName: 'Inženjerske delatnosti i tehničko savetovanje',
+      phones: [],
+      registrationNumber: '50020193',
+    },
+  ] as const;
+
+  it.each(SAMPLES)('$code prints the whole label set', (sample) => {
+    const company = parseCompany(fixture(sample.file), sample.url, assert);
+
+    // The assertion the crawl rests on: not one of these four new sections
+    // needed the label set weakened.
+    for (const label of REQUIRED_LABELS) expect(company.labels).toContain(label);
+    expect(company.name).toBe(sample.name);
+    expect(company.activityCode).toBe(sample.sifra);
+    expect(company.activityName).toBe(sample.activityName);
+    expect(company.phones).toEqual(sample.phones);
+    expect(company.registrationNumber).toBe(sample.registrationNumber);
+    // No record on this site publishes an email, and none is invented here.
+    expect(company.website).toBeNull();
+  });
+
+  it('reads a struck-off engineering firm without treating Status as a filter', () => {
+    // `71.12` is company-heavy, so `Status:` is printed far more often here
+    // than on the sole-trader-dominated core five. It is still never a filter:
+    // the dead-record question is answered against APR open data downstream.
+    const company = parseCompany(
+      fixture('detail-l574-inzenjerske-delatnosti.html'),
+      `${BASE}/Srbija/ab-projekt-inzenjering/242539`,
+      assert,
+    );
+    expect(company.status).toBe('Brisan iz registra');
+    expect(company.legalForm).toBe('Preduzetnik');
+  });
+
+  it('reads the place off the structured address when the page prints no sentence', () => {
+    // The `23.64` sample has a `Članovi` block where other records carry
+    // "Nalazi se u opštini …", so the municipality has to come from the
+    // address field. Both paths have to work or a whole section loses its city.
+    const company = parseCompany(
+      fixture('detail-l197-proizvodnja-maltera.html'),
+      `${BASE}/Srbija/demitkeramika/70238`,
+      assert,
+    );
+    expect(company.municipality).toBe('Kula');
+    expect(company.place).toBe('Kula');
+  });
+});
+
 describe('parseCompany — the legacy surface', () => {
   it('parses a `/preduzetnici/` page with the same code as a modern one', () => {
     const url = `${BASE}/preduzetnici/p127306_ZANATSKA-ZIDARSKO-FASADERSKA.htm`;
@@ -356,10 +530,37 @@ describe('selectCategories / selectSurfaces', () => {
     expect(selectSurfaces([])).toEqual(['modern']);
   });
 
-  it('takes an adjacent code by code, šifra or list id', () => {
-    expect(selectCategories(['43.33']).map((category) => category.listId)).toEqual(['l72']);
-    expect(selectCategories(['4333']).map((category) => category.listId)).toEqual(['l72']);
-    expect(selectCategories(['l72']).map((category) => category.listId)).toEqual(['l72']);
+  it('takes any code by code, šifra or list id', () => {
+    expect(selectCategories(['43.33']).map((entry) => entry.listId)).toEqual(['l72']);
+    expect(selectCategories(['4333']).map((entry) => entry.listId)).toEqual(['l72']);
+    expect(selectCategories(['l72']).map((entry) => entry.listId)).toEqual(['l72']);
+    expect(selectCategories(['71.12']).map((entry) => entry.listId)).toEqual(['l574']);
+  });
+
+  it('takes FUZZ-46’s six as a set, by tier', () => {
+    // Reachable individually *and* as a set, without a code change and without
+    // repeating six codes on a command line that already carries a budget.
+    expect(selectCategories(['widened']).map((entry) => entry.code)).toEqual([
+      '23.64',
+      '46.73',
+      '43.33',
+      '41.20',
+      '71.11',
+      '71.12',
+    ]);
+    expect(selectCategories(['widened']).reduce((n, e) => n + e.measuredRecords, 0)).toBe(13_095);
+  });
+
+  it('mixes a tier and a single code without duplicating either', () => {
+    const selected = selectCategories(['core', '46.73']);
+    expect(selected.map((entry) => entry.code)).toEqual([
+      '43.31',
+      '43.39',
+      '43.99',
+      '43.34',
+      '43.29',
+      '46.73',
+    ]);
   });
 
   it('refuses a code it does not know instead of silently crawling the core five', () => {
@@ -368,13 +569,27 @@ describe('selectCategories / selectSurfaces', () => {
 
   it('adds the legacy surface only when asked, and is not itself a category', () => {
     expect(selectSurfaces(['legacy'])).toEqual(['modern', 'legacy']);
-    expect(selectCategories(['legacy']).map((category) => category.tier)).toEqual([
+    expect(selectCategories(['legacy']).map((entry) => entry.tier)).toEqual([
       'core',
       'core',
       'core',
       'core',
       'core',
     ]);
+  });
+
+  it('asserts a trade only where the code is the evidence', () => {
+    // The FUZZ-38 epic rule holds for a rendering trade and for a builders'
+    // merchant. It does not extend to a general builder, an architect or an
+    // engineering consultancy, and this is where that is written down.
+    const asserted = Object.fromEntries(
+      CATEGORIES.map((entry) => [entry.code, entry.assertedType]),
+    );
+    expect(asserted['43.31']).toBe('FACADE_CONTRACTOR');
+    expect(asserted['46.73']).toBe('CONSTRUCTION_MATERIAL_STORE');
+    for (const code of ['41.20', '43.33', '23.64', '71.11', '71.12']) {
+      expect(asserted[code], code).toBeNull();
+    }
   });
 
   it('keys a scope by category and surface', () => {
@@ -416,7 +631,7 @@ describe('toRawLead', () => {
     );
   });
 
-  it('asserts nothing for an adjacent code — 41.20 is general building construction', () => {
+  it('asserts nothing for 41.20 — general building construction is not a facade trade', () => {
     const record = toRawLead(
       parseCompany(fixture('detail-acalend-sajt-prose.html'), url, assert),
       url,
@@ -430,11 +645,68 @@ describe('toRawLead', () => {
     expect(record.assertedTypeReason).toBeUndefined();
   });
 
+  it('asserts the store side for 46.73, which is buyer group 2 by definition', () => {
+    const storeUrl = `${BASE}/Srbija/a-gradjevinski-materijal/205403`;
+    const record = toRawLead(
+      parseCompany(fixture('detail-l548-gradjevinski-materijal.html'), storeUrl, assert),
+      storeUrl,
+      { recordId: '205403', surface: 'modern', category: TRGOVINA_MATERIJALOM },
+    );
+    expect(record.assertedType).toBe('CONSTRUCTION_MATERIAL_STORE');
+    expect(record.assertedTypeReason).toBe(
+      'registered under KD 46.73 Trgovina na veliko drvetom i građ materijalom ' +
+        '(šifra delatnosti 4673)',
+    );
+  });
+
+  it('carries the activity code and its name, both as the page printed them', () => {
+    expect(lead()).toMatchObject({ activityCode: '4331', activityName: 'Malterisanje' });
+  });
+
+  it('keeps the page’s code even when the index filed the record elsewhere', () => {
+    // `MET INŽENJERING 021` is on the `23.64 Proizvodnja maltera` index and its
+    // own page says `3832`. Neither is corrected against the other: the lead
+    // carries what the page said, `extra` carries where it was found, and a
+    // later enrichment pass decides. Overwriting one here would destroy the
+    // evidence that pass needs.
+    const mismatchUrl = `${BASE}/Srbija/demitkeramika/70238`;
+    const record = toRawLead(
+      parseCompany(fixture('detail-l197-proizvodnja-maltera.html'), mismatchUrl, assert),
+      mismatchUrl,
+      { recordId: '70238', surface: 'modern', category: categoryFor('23.64') },
+    );
+    expect(record.activityCode).toBe('3832');
+    expect(record.activityName).toBe('Ponovna upotreba razvrstanih materijala');
+    expect(record.extra).toMatchObject({
+      categoryCode: '23.64',
+      categoryName: 'Proizvodnja maltera',
+      sifraDelatnosti: '3832',
+      activityCodeDiffersFromCategory: true,
+    });
+  });
+
+  it('withdraws a widened code’s assertion when the page contradicts the index', () => {
+    // The same record, pretended to have been found on the `46.73` index. The
+    // category would assert `CONSTRUCTION_MATERIAL_STORE`; the page says the
+    // business recycles sorted materials. `assertionFor` declines, and the
+    // record goes to `src/lib/classify` like any other.
+    const page = parseCompany(
+      fixture('detail-l197-proizvodnja-maltera.html'),
+      `${BASE}/Srbija/demitkeramika/70238`,
+      assert,
+    );
+    expect(assertionFor(page, TRGOVINA_MATERIJALOM)).toBeNull();
+    // The core five keep FUZZ-45's behaviour: their numbers were measured and
+    // accepted with the assertion made from the discovery category.
+    expect(assertionFor(page, MALTERISANJE)?.type).toBe('FACADE_CONTRACTOR');
+  });
+
   it('records which surface and which category the record came from', () => {
     expect(lead().extra).toMatchObject({
       recordId: '26011',
       surface: 'modern',
       categoryCode: '43.31',
+      categoryName: 'Malterisanje',
       categoryListId: 'l70',
       sifraDelatnosti: '4331',
       municipality: 'Obrenovac',

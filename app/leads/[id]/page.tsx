@@ -475,6 +475,19 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
               <dd className="mono">{lead.taxId ?? '—'}</dd>
               <dt>Pravna forma</dt>
               <dd>{lead.legalForm ?? '—'}</dd>
+              <dt>Šifra delatnosti (APR)</dt>
+              <dd>
+                {lead.activityCode == null ? (
+                  // Null is the normal state: only a register-derived source
+                  // publishes an activity code, and nothing is backfilled.
+                  <span className="muted">izvor je ne objavljuje</span>
+                ) : (
+                  <Link href={`/leads?delatnost=${lead.activityCode}`}>
+                    <span className="mono">{lead.activityCode}</span>
+                    {lead.activityName == null ? null : ` — ${lead.activityName}`}
+                  </Link>
+                )}
+              </dd>
               <dt>Koordinate</dt>
               <dd className="mono small">
                 {lead.latitude != null && lead.longitude != null
